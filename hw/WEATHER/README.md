@@ -19,7 +19,12 @@ last_modified_on: 2022-10-17
     'main': 'Clear', 'description': '맑음', 'icon': '01d'}], 'base': 'stations', 'main': {'temp': 13.73, 'feels_like': 11.84, 'temp_min': 13.4, 'temp_max': 13.76, 'pressure': 1019, 'humidity': 26}, 'visibility': 10000, 'wind': {'speed': 3.6, 'deg': 310, 'gust': 8.75}, 'clouds'': 1019, 'humidity': 26}, 'vis, 'sys': {'type': 1, 'id': 8096, 'country': 'KR', 'sunrise': 1665956461, 'sunset': 1665996809}, 'timezoneibility': 10000, 'wind': {'spe': 'Suwon-si', 'cod': 200}ed': 3.6, 'deg': 310, 'gust': 
     8.75}, 'clouds': {'all': 0}, ' \S07P31A408\hw\WEATHER>dt': 1665991657, 'sys': {'type': 1, 'id': 8096, 'country': 'KR', 'sunrise': 1665956461, 'sunset': 1665996809}, 'timezone': 32400, 'id': 1835553, 'name': 'Suwon-si', 'cod': 200}   
     ```
-
+    - `temp_min`, `temp_max` 값은 **현재** 도시의 평균적인 최대 최소 값
+        - 하루 동안의 최대 최소가 아님!
+    - 도시 이름 없을 때
+        ```json
+        {'cod': '404', 'message': 'city not found'}
+        ```
 ### 기상청 육상 중기예보
 - [사이트](https://www.data.go.kr/data/15059468/openapi.do)
 - api url: http://www.kma.go.kr/weather/forecast/mid-term-rss3.jsp?stnId=108

@@ -37,3 +37,31 @@
         * device identity 업로드
         * 온보딩 json 파일 다운
     * Device App 제작 단계
+
+
+
+### 실습
+**기초 세팅**
+필요한 파일 다운로드 후 권한 설정
+- wget http://toddaustin07.github.io/mastersetup
+- chmod +x mastersetup
+
+파일을 실행해봤는데 경고가 나왔다. -> CHECKING YOUR SYSTEM
+
+이후 config Guide 문서를 참고하여 진행 https://github.com/toddaustin07/rpi-st-device/blob/main/ConfigGuide.pdf
+
+해당 라즈베리파이가 적합한지 확인  
+$ iw phy0 info  
+supported interface modes 했을때 AP가 목록에 있으면 가능!
+
+git 레포를 clone한다.
+
+필요한 패키지를 설치하기전에 apt-get을 업그레이드, 업데이트 해야한다.
+
+필요한 패키지들 설치 후 git 클론한 디렉토리에서 installSDKdeps 파일을 실행한다.  
+이때 문제가 발생한다면 문제가 발생한 dependencies를 설치해준다.  
+
+**SDK 관련 세팅**
+st-device-sdk-c 관련 git을 clone한다.  
+~/rpi-st-device에서 sdkbuildsetup파일 실행해서 sdk 세팅  
+~/st-device-sdk-c에서 make로 빌드 수행  

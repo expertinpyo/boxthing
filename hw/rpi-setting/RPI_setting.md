@@ -93,6 +93,16 @@ sudo reboot
 - VNC 다운로드 : [https://www.realvnc.com/en/connect/download/viewer/](https://www.realvnc.com/en/connect/download/viewer/)
 - Windows 버전 다운로드 후 RPI IP 입력합니다.
 
+### 에러 & 해결
+
+- 에러 : Cannot currently show the desktop
+- 해결 : 해상도를 설정해주자
+
+```java
+sudo raspi-config
+2. Display Options > Resolution
+```
+
 ## 고정 IP일 시 연결 방법(테스트 해봐야 함)
 
 - 보통 공용 WIFI 사용 시 개인 별로 IP가 할당되어 사용하는 경우 있는데, 이때 RPI 연결 방법이 달라진다.
@@ -124,7 +134,11 @@ static domain_name_servers= DNS 주소
 
 ### 테스트
 
-- 집에서 고정 IP 설정 후 테스트
-- 참고
-  - [https://blog.naver.com/PostView.naver?blogId=kangbin80&logNo=222406917211&parentCategoryNo=&categoryNo=6&viewDate=&isShowPopularPosts=true&from=search](https://blog.naver.com/PostView.naver?blogId=kangbin80&logNo=222406917211&parentCategoryNo=&categoryNo=6&viewDate=&isShowPopularPosts=true&from=search)
-  - [https://hyunmin1906.tistory.com/m/280](https://hyunmin1906.tistory.com/m/280)
+- 오프라인 때는 고정 IP이므로, 집에서의 개발환경과 다르다.
+- 연결 순서
+  1. 우선 모바일 핫스팟을 이용하여 ssh로 연결 후, /etc/dhcpcd.conf를 수정해준다.
+  2. sd카드 제거 후, wpa_supplicant.conf를 수정해준다.
+  3. sd카드 장착 후 부팅 후 ssh 연결해보자.
+  4. 아마 IP는 고정 IP의 앞 3자리는 동일할것이다.
+     1. ex) 고정 IP : 111.222.333.145 , RPI IP : 111.222.333.???
+     2. 따라서, ip scanner을 통해 해당 범위를 찾아보자.

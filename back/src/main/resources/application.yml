@@ -27,3 +27,9 @@ spring:
               - profile
               - https://www.googleapis.com/auth/calendar.calendarlist.readonly
               - https://www.googleapis.com/auth/calendar.readonly
+          github:
+            client-id: "${OAUTH2_GITHUB_CLIENT_ID}"
+            client-secret: "${OAUTH2_GITHUB_CLIENT_SECRET}"
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - notifications

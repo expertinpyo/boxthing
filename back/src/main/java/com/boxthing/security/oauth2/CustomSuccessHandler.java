@@ -33,20 +33,26 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     String registrationId = oauthToken.getAuthorizedClientRegistrationId();
     String accessToken = client.getAccessToken().getTokenValue();
-    OAuth2RefreshToken hasRefreshToken = client.getRefreshToken();
-    if (hasRefreshToken == null) {
-      // no refresh token
-      // TODO: login failure page
-      return;
-    }
-    String refreshToken = hasRefreshToken.getTokenValue();
     String state = request.getParameter("state");
 
-    log.info(
-        "regId: {}, accessToken: {}, refreshToken: {}, state: {}\n",
-        registrationId,
-        accessToken,
-        refreshToken,
-        state);
+    log.info("regId: {}, accessToken: {}, state: {}\n", registrationId, accessToken, state);
+
+    // google 인증 성공
+    if (registrationId.equals("google")) {
+      OAuth2RefreshToken maybeRefreshToken = client.getRefreshToken();
+      if (maybeRefreshToken == null) {
+        // no refresh token
+        // TODO: login failure page
+        return;
+      }
+      String refreshToken = maybeRefreshToken.getTokenValue();
+
+      log.info("google OK, refreshToken: {}\n", refreshToken);
+    }
+
+    // github 인증 성공
+    if (registrationId.equals("github")) {
+      log.info("github OK\n");
+    }
   }
 }

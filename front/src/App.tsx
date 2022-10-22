@@ -1,24 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+/** @jsxImportSource @emotion/react */
+
+import { useEffect } from "react";
+import "./App.css";
+import Content from "./component/Content/Content";
+import Header from "./component/Header/Header";
+import Nav from "./component/Nav/Nav";
+import { css } from "@emotion/react";
 
 function App() {
+  const handleResize = () => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+  };
+
+  useEffect(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div
+        css={css`
+          width: 12.5%;
+          height: 100%;
+        `}
+      >
+        <Nav></Nav>
+      </div>
+      <div
+        css={css`
+          width: 87.5%;
+          height: 100%;
+        `}
+      >
+        <Header></Header>
+        <Content></Content>
+      </div>
     </div>
   );
 }

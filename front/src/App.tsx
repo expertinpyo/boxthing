@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import "./App.css";
-import Content from "./component/Content/Content";
 import Header from "./component/Header/Header";
 import Nav from "./component/Nav/Nav";
 import { css } from "@emotion/react";
+import PlanContent from "./component/Content/PlanContent";
 
 function App() {
   const handleResize = () => {
@@ -37,7 +37,7 @@ function App() {
         `}
       >
         <Header></Header>
-        <Content></Content>
+        <PlanContent></PlanContent>
       </div>
     </div>
   );

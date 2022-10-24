@@ -1,8 +1,11 @@
 /** @jsxImportSource @emotion/react */
 
-import { css } from "@emotion/react";
+import { css } from "@emotion/react"
+import { useRecoilValue } from "recoil"
+import { timeState } from "../../App"
 
 function Timer() {
+  const currentTime = useRecoilValue(timeState)
   return (
     <div
       css={css`
@@ -11,8 +14,10 @@ function Timer() {
         align-items: center;
         justify-content: space-between;
       `}
-    ></div>
-  );
+    >
+      {currentTime}
+    </div>
+  )
 }
 
-export default Timer;
+export default Timer

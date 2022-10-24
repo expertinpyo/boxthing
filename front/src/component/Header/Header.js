@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
-import { css } from "@emotion/react";
+import { css } from "@emotion/react"
+import Timer from "./Timer"
 
 function Header() {
   return (
@@ -22,9 +23,11 @@ function Header() {
           padding: 16px;
           align-items: center;
         `}
-      ></div>
+      >
+        <Timer></Timer>
+      </div>
     </div>
-  );
+  )
 }
 
-export default Header;
+export default Header

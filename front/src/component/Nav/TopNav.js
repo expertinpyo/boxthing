@@ -1,10 +1,10 @@
 /** @jsxImportSource @emotion/react */
 
-import { css } from "@emotion/react";
-import weather from "../../asset/nav_icon/weather.png";
-import github from "../../asset/nav_icon/github.png";
-import working from "../../asset/nav_icon/working.png";
-import water from "../../asset/nav_icon/water.png";
+import { css } from "@emotion/react"
+import weather from "../../asset/nav_icon/weather.png"
+import github from "../../asset/nav_icon/github.png"
+import working from "../../asset/nav_icon/working.png"
+import water from "../../asset/nav_icon/water.png"
 
 function TopNav() {
   const array = [
@@ -12,7 +12,7 @@ function TopNav() {
     { img: github, alt: "github" },
     { img: working, alt: "working" },
     { img: water, alt: "water" },
-  ];
+  ]
   return (
     <div
       css={css`
@@ -27,6 +27,7 @@ function TopNav() {
       {array.map((item, index) => {
         return (
           <div
+            key={index}
             css={css`
               width: 50%;
               aspect-ratio: 1/1;
@@ -76,10 +77,10 @@ function TopNav() {
               `}
             ></div>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
-export default TopNav;
+export default TopNav

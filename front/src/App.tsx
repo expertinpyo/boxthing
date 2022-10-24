@@ -10,35 +10,113 @@ import { atom, useSetRecoilState } from "recoil"
 
 const timeState = atom({
   key: "timeState",
-  default: new Date().toLocaleString(),
+  default: new Date(),
 })
 
-const planState = atom({
-  key: "planState",
+const planListState = atom({
+  key: "planListState",
   default: [
     {
-      isActive: true,
-      item: {
-        title: "즐거운 점심 시간",
-        subtitle: "순두부 짬뽕 or 날치알 비빔밥",
-        time: "11:30 - 12:30 AM",
+      kind: "calendar#event",
+      etag: '"3333189635762000"',
+      id: "5curjtaj80idbjt1i46vtgimfq",
+      status: "confirmed",
+      htmlLink:
+        "https://www.google.com/calendar/event?eid=NWN1cmp0YWo4MGlkYmp0MWk0NnZ0Z2ltZnEgZGlkbmxpZUBt",
+      created: "2022-10-24T07:00:17.000Z",
+      updated: "2022-10-24T07:00:17.881Z",
+      summary: "뭐냐뭐냐",
+      description: "뭐냐뭐냐설명",
+      creator: {
+        email: "didnlie@gmail.com",
+        self: true,
       },
+      organizer: {
+        email: "didnlie@gmail.com",
+        self: true,
+      },
+      start: {
+        dateTime: "2022-10-24T16:15:00+09:00",
+        timeZone: "Asia/Seoul",
+      },
+      end: {
+        dateTime: "2022-10-24T16:45:00+09:00",
+        timeZone: "Asia/Seoul",
+      },
+      iCalUID: "5curjtaj80idbjt1i46vtgimfq@google.com",
+      sequence: 0,
+      reminders: {
+        useDefault: true,
+      },
+      eventType: "default",
     },
     {
-      isActive: false,
-      item: {
-        title: "기능 회의",
-        subtitle: "기능 상세 회의",
-        time: "12:30 - 2:30 PM",
+      kind: "calendar#event",
+      etag: '"3333189684532000"',
+      id: "3q67nteuc6h3jn6o7jljokfdr9",
+      status: "confirmed",
+      htmlLink:
+        "https://www.google.com/calendar/event?eid=M3E2N250ZXVjNmgzam42bzdqbGpva2ZkcjkgZGlkbmxpZUBt",
+      created: "2022-10-24T07:00:42.000Z",
+      updated: "2022-10-24T07:00:42.266Z",
+      summary: "냐뭐냐뭐",
+      description: "냐뭐냐뭐설명",
+      creator: {
+        email: "didnlie@gmail.com",
+        self: true,
       },
+      organizer: {
+        email: "didnlie@gmail.com",
+        self: true,
+      },
+      start: {
+        dateTime: "2022-10-24T17:00:00+09:00",
+        timeZone: "Asia/Seoul",
+      },
+      end: {
+        dateTime: "2022-10-24T18:00:00+09:00",
+        timeZone: "Asia/Seoul",
+      },
+      iCalUID: "3q67nteuc6h3jn6o7jljokfdr9@google.com",
+      sequence: 0,
+      reminders: {
+        useDefault: true,
+      },
+      eventType: "default",
     },
     {
-      isActive: false,
-      item: {
-        title: "사전학습 및 자료조사",
-        subtitle: "HW 센서 및 API 조사",
-        time: "2:30 - 5:30 PM",
+      kind: "calendar#event",
+      etag: '"3333189719942000"',
+      id: "5kdtfcmv5qhuj6qas12need0ct",
+      status: "confirmed",
+      htmlLink:
+        "https://www.google.com/calendar/event?eid=NWtkdGZjbXY1cWh1ajZxYXMxMm5lZWQwY3QgZGlkbmxpZUBt",
+      created: "2022-10-24T07:00:59.000Z",
+      updated: "2022-10-24T07:00:59.971Z",
+      summary: "킹뭐킹뭐",
+      description: "킹뭐킹뭐",
+      creator: {
+        email: "didnlie@gmail.com",
+        self: true,
       },
+      organizer: {
+        email: "didnlie@gmail.com",
+        self: true,
+      },
+      start: {
+        dateTime: "2022-10-24T16:30:00+09:00",
+        timeZone: "Asia/Seoul",
+      },
+      end: {
+        dateTime: "2022-10-24T17:30:00+09:00",
+        timeZone: "Asia/Seoul",
+      },
+      iCalUID: "5kdtfcmv5qhuj6qas12need0ct@google.com",
+      sequence: 0,
+      reminders: {
+        useDefault: true,
+      },
+      eventType: "default",
     },
   ],
 })
@@ -55,7 +133,7 @@ function App() {
     handleResize()
     window.addEventListener("resize", handleResize)
     let timer = setInterval(() => {
-      setCurrentTime(new Date().toLocaleString())
+      setCurrentTime(new Date())
     }, 1000)
 
     return () => {
@@ -87,4 +165,4 @@ function App() {
   )
 }
 
-export { App, timeState, planState }
+export { App, timeState, planListState }

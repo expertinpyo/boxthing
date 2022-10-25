@@ -1,5 +1,6 @@
 package com.boxthing.security.oauth2;
 
+import com.boxthing.api.v1.repository.UserRepository;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +14,16 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
   private final OAuth2AuthorizationRequestResolver defaultAuthorizationRequestResolver;
 
+  private UserRepository userRepository = null;
+
   public CustomAuthorizationRequestResolver(
       ClientRegistrationRepository clientRegistrationRepository,
-      String authorizationRequestBaseUri) {
+      String authorizationRequestBaseUri,
+      UserRepository userRepository) {
     this.defaultAuthorizationRequestResolver =
         new DefaultOAuth2AuthorizationRequestResolver(
             clientRegistrationRepository, authorizationRequestBaseUri);
+    this.userRepository = userRepository;
   }
 
   @Override
@@ -35,6 +40,10 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     if (state == null) {
       return null;
     }
+    log.info("about user : ", authorizationRequest.toString());
+    log.info(
+        "custom user authorization : ",
+        customAuthorizationRequest(authorizationRequest, state).toString());
 
     return customAuthorizationRequest(authorizationRequest, state);
   }
@@ -55,6 +64,9 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
       return null;
     }
 
+    log.info("about user : ", authorizationRequest);
+    log.info(
+        "custom user authorization : ", customAuthorizationRequest(authorizationRequest, state));
     return customAuthorizationRequest(authorizationRequest, state);
   }
 

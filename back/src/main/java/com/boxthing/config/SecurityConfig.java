@@ -1,5 +1,6 @@
 package com.boxthing.config;
 
+import com.boxthing.api.v1.repository.UserRepository;
 import com.boxthing.security.oauth2.CustomAuthorizationRequestResolver;
 import com.boxthing.security.oauth2.CustomSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ public class SecurityConfig {
   private final ClientRegistrationRepository clientRegistrationRepository;
   private final CustomSuccessHandler successHandler;
 
+  private final UserRepository userRepository;
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.httpBasic()
@@ -38,7 +41,7 @@ public class SecurityConfig {
         .baseUri("/oauth2/authorization")
         .authorizationRequestResolver(
             new CustomAuthorizationRequestResolver(
-                clientRegistrationRepository, "/oauth2/authorization"))
+                clientRegistrationRepository, "/oauth2/authorization", userRepository))
         .and()
         .redirectionEndpoint()
         .baseUri("/oauth2/callback/{registrationId}")

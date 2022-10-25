@@ -1,5 +1,8 @@
 package com.boxthing.security.oauth2;
 
+import com.boxthing.api.v1.domain.mapper.UserMapper;
+import com.boxthing.api.v1.dto.UserDto.*;
+import com.boxthing.api.v1.repository.UserRepository;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +23,9 @@ import org.springframework.stereotype.Component;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
   private final OAuth2AuthorizedClientService clientService;
+
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
   @Override
   public void onAuthenticationSuccess(
@@ -46,7 +52,15 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
+      UserGoogleRequestDto userGoogleRequestDto =
+          UserGoogleRequestDto.builder()
+              .googleRefreshJws(refreshToken)
+              .username(oauthToken.getName())
+              .build();
 
+      userRepository.save(userMapper.toEntity(userGoogleRequestDto));
+      log.info("client: {}", oauthToken.getPrincipal());
+      log.info("client: {}", oauthToken.getName());
       log.info("google OK, refreshToken: {}\n", refreshToken);
     }
 

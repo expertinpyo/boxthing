@@ -2,11 +2,42 @@
 
 import { css } from "@emotion/react"
 import PlanListItem from "../Plan/PlanListItem"
-import { planState } from "../../App"
-import { useRecoilValue } from "recoil"
+import { planListState, timeState } from "../../App"
+import { selector, useRecoilValue } from "recoil"
+
+const upcomingPlanListState = selector({
+  key: "upcomingPlanList",
+  get: ({ get }) => {
+    const list = get(planListState)
+    const currentTime = get(timeState)
+
+    return list.filter((item) => {
+      const temp = new Date(item.start.dateTime) - currentTime
+      return temp < 1000 * 60 * 20 && temp > 0 ? true : false
+    })
+  },
+})
+
+const inProgressPlanListState = selector({
+  key: "inProgressPlanListState",
+  get: ({ get }) => {
+    const list = get(planListState)
+    const currentTime = get(timeState)
+
+    return list.filter((item) => {
+      return currentTime - new Date(item.start.dateTime) >= 0 &&
+        currentTime - new Date(item.end.dateTime) < 0
+        ? true
+        : false
+    })
+  },
+})
 
 function PlanContent() {
-  const planList = useRecoilValue(planState)
+  const planList = useRecoilValue(planListState)
+  const upcomingPlanList = useRecoilValue(upcomingPlanListState)
+  const inProgressPlanList = useRecoilValue(inProgressPlanListState)
+
   return (
     <div
       css={css`
@@ -28,14 +59,8 @@ function PlanContent() {
           flex-direction: column;
         `}
       >
-        {planList.map((item, index) => {
-          return (
-            <PlanListItem
-              key={index}
-              isActive={item.isActive}
-              item={item.item}
-            ></PlanListItem>
-          )
+        {planList.map((item) => {
+          return <PlanListItem key={item.id} item={item}></PlanListItem>
         })}
       </div>
     </div>

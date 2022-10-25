@@ -8,6 +8,9 @@
 
 :root {
   --main-gradient-color: linear-gradient(270deg, #fc466b 0%, #3f5efb 100%);
+  --background-color: #f0f0f3;
+  --logo-background-color: rgb(232, 181, 5);
+  --logo-box-color: rgb(255, 222, 89);
 }
 
 * {

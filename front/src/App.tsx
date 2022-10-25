@@ -11,6 +11,8 @@ import GitBox from "./component/Box/GitBox"
 import PlanBox from "./component/Box/PlanBox"
 import WorkBox from "./component/Box/WorkBox"
 import HealthBox from "./component/Box/HealthBox"
+import StretchingModal from "./component/Modal/StretchingModal"
+import { useState } from "react"
 
 const timeState = atom({
   key: "timeState",
@@ -254,6 +256,8 @@ const notiListState = atom({
 const boxes = [<PlanBox />, <GitBox />, <WorkBox />, <HealthBox />]
 
 function App() {
+  const [open, setOpen] = useState(false)
+
   const setCurrentTime = useSetRecoilState(timeState)
 
   const handleResize = () => {
@@ -294,7 +298,13 @@ function App() {
         <PlanContent></PlanContent>
       </div> */}
       {/* <PlanBox></PlanBox> */}
-      <GitBox></GitBox>
+      {/* <GitBox></GitBox> */}
+      <StretchingModal open={open}></StretchingModal>
+      <button
+        onClick={() => {
+          setOpen(!open)
+        }}
+      ></button>
     </div>
   )
 }

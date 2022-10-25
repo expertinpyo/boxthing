@@ -3,5 +3,4 @@
   /* min-height 와 height는 결이 다른 property 인 듯 */
   height: calc(var(--vh) * 100);
   display: flex;
-  background: #fffcdd;
 }

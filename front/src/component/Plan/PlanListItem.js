@@ -13,12 +13,18 @@ const activeFontStyle = {
 
 const basicItemStyle = {
   width: "100%",
-  height: "20%",
+  height: "19%",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   borderRadius: "16px",
   padding: "16px",
+  marginTop: "1%",
+  background: "#f0f0f3",
+  boxShadow: `-10px -10px 30px #fff,
+    10px 10px 30px #aeaec040,
+    inset -10px -10px 10px #aeaec025,
+    inset 10px 10px 10px #fff;`,
 }
 const activeItemStyle = {
   background: "var(--main-gradient-color)",

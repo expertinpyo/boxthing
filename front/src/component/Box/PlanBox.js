@@ -1,9 +1,7 @@
 /** @jsxImportSource @emotion/react */
-
 import { css } from "@emotion/react"
-import PlanListItem from "../Plan/PlanListItem"
+import { useRecoilValue, selector } from "recoil"
 import { planListState, timeState } from "../../App"
-import { selector, useRecoilValue } from "recoil"
 
 const upcomingPlanListState = selector({
   key: "upcomingPlanList",
@@ -33,37 +31,15 @@ const inProgressPlanListState = selector({
   },
 })
 
-function PlanContent() {
+function PlanBox() {
   const planList = useRecoilValue(planListState)
   const upcomingPlanList = useRecoilValue(upcomingPlanListState)
   const inProgressPlanList = useRecoilValue(inProgressPlanListState)
 
-  return (
-    <div
-      css={css`
-        width: 100%;
-        height: 80%;
-        // padding-left: 6.25%;
-        // padding-right: 6.25%;
-      `}
-    >
-      <div
-        css={css`
-          width: 100%;
-          height: 100%;
-          border-radius: 16px 16px 0px 0px;
-          padding: 16px;
-          display: flex;
-          justify-content: flex-start;
-          flex-direction: column;
-        `}
-      >
-        {planList.map((item) => {
-          return <PlanListItem key={item.id} item={item}></PlanListItem>
-        })}
-      </div>
-    </div>
-  )
+  console.log("planList", planList)
+  console.log("upcoming", upcomingPlanList)
+  console.log("inProgress", inProgressPlanList)
+  return <div></div>
 }
 
-export default PlanContent
+export default PlanBox

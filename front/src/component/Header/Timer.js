@@ -1,8 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
-import { css } from "@emotion/react"
 import { useRecoilValue } from "recoil"
-import { timeState } from "../../App"
+import { timerState } from "../../store/timer"
 
 const dayNames = [
   "일요일",
@@ -15,19 +14,22 @@ const dayNames = [
 ]
 
 function Timer() {
-  const today = useRecoilValue(timeState)
+  const today = useRecoilValue(timerState)
   return (
     <div
-      css={css`
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-      `}
+      css={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
-      <div>{`${today.getHours()} : ${today.getMinutes()} ${
-        today.getHours() >= 12 ? "PM" : "AM"
-      }`}</div>
+      <div css={{ fontSize: "1.5rem" }}>{`${today.getHours()} : ${today
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")} ${today.getHours() >= 12 ? "PM" : "AM"}`}</div>
       <div>{`${today.getFullYear()} ${today.getMonth()} ${today.getDate()} ${
         dayNames[today.getDay()]
       }`}</div>

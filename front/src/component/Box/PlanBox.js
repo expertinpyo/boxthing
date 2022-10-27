@@ -1,45 +1,56 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react"
-import { useRecoilValue, selector } from "recoil"
-import { planListState, timeState } from "../../App"
-
-const upcomingPlanListState = selector({
-  key: "upcomingPlanList",
-  get: ({ get }) => {
-    const list = get(planListState)
-    const currentTime = get(timeState)
-
-    return list.filter((item) => {
-      const temp = new Date(item.start.dateTime) - currentTime
-      return temp < 1000 * 60 * 20 && temp > 0 ? true : false
-    })
-  },
-})
-
-const inProgressPlanListState = selector({
-  key: "inProgressPlanListState",
-  get: ({ get }) => {
-    const list = get(planListState)
-    const currentTime = get(timeState)
-
-    return list.filter((item) => {
-      return currentTime - new Date(item.start.dateTime) >= 0 &&
-        currentTime - new Date(item.end.dateTime) < 0
-        ? true
-        : false
-    })
-  },
-})
+import { defaultBoxStyle } from "../../style/shared"
+import { useRecoilValue } from "recoil"
+import {
+  planState,
+  upcomingPlanState,
+  inProgressPlanState,
+} from "../../store/plan"
+import PlanUpcoming from "../Plan/PlanUpcoming"
+import PlanInProgress from "../Plan/PlanInProgress"
+import PlanListItem from "../Plan/PlanListItem"
 
 function PlanBox() {
-  const planList = useRecoilValue(planListState)
-  const upcomingPlanList = useRecoilValue(upcomingPlanListState)
-  const inProgressPlanList = useRecoilValue(inProgressPlanListState)
+  const plan = useRecoilValue(planState)
+  const upcomingPlan = useRecoilValue(upcomingPlanState)
+  const inProgressPlan = useRecoilValue(inProgressPlanState)
 
-  console.log("planList", planList)
-  console.log("upcoming", upcomingPlanList)
-  console.log("inProgress", inProgressPlanList)
-  return <div></div>
+  // console.log("planList", plan)
+  // console.log("upcoming", upcomingPlan)
+  // console.log("inProgress", inProgressPlan)
+  return (
+    <div
+      css={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
+      <div
+        css={{
+          width: "29%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <div css={{ ...defaultBoxStyle, width: "100%", height: "48%" }}>
+          <PlanUpcoming item={upcomingPlan} />
+        </div>
+        <div css={{ ...defaultBoxStyle, width: "100%", height: "48%" }}>
+          <PlanInProgress item={inProgressPlan} />
+        </div>
+      </div>
+      <div css={{ width: "69%", height: "100%" }}>
+        {plan.map((item) => {
+          return <PlanListItem key={item.id} item={item} />
+        })}
+      </div>
+    </div>
+  )
 }
 
 export default PlanBox

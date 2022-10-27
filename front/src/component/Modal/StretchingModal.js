@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
+// import { jsx } from "@emotion/react"
 
-import { css } from "@emotion/react"
-import { forwardRef } from "react"
 import Forward from "../../asset/stretching_images/Forward.gif"
 import Triceps from "../../asset/stretching_images/Triceps.gif"
 import OverheadReach from "../../asset/stretching_images/OverheadReach.gif"
@@ -13,6 +12,8 @@ import ShoulderShrug from "../../asset/stretching_images/ShoulderShrug.gif"
 import Neck from "../../asset/stretching_images/Neck.gif"
 import UpperTrap from "../../asset/stretching_images/UpperTrap.gif"
 import Hamstring from "../../asset/stretching_images/Hamstring.gif"
+
+import { defaultBoxStyle } from "../../style/shared"
 
 const stretchingList = [
   {
@@ -124,46 +125,30 @@ const stretchingList = [
 function StretchingModal({ open }) {
   return (
     <div
-      css={css`
-        width: 80%;
-        height: 80%;
-        display: flex;
-        align-items: center;
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.375);
-        border-radius: 16px;
-        box-shadow: 0 0.75rem 2rem 0 rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.125);
-        transition: opacity 500ms;
-        opacity: ${open ? 1 : 0};
-      `}
+      css={{
+        ...defaultBoxStyle,
+        display: "flex",
+        alignItems: "center",
+        transition: "opacity 500ms",
+        opacity: `${open ? 1 : 0}`,
+      }}
     >
-      <div
-        css={css`
-          inline-height: 0;
-          width: 100%;
-          height: 100%;
-        `}
-      >
+      <div css={{ inlineHeight: "0", width: "100%", height: "100%" }}>
         <img
-          css={css`
-            height: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 16px;
-          `}
+          css={{ height: "100%", aspectRatio: "1/1", borderRadius: "16px" }}
           src={stretchingList[1].image}
           alt="forward"
         ></img>
       </div>
       <div
-        css={css`
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          align-items: center;
-        `}
+        css={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
       >
         <div>{stretchingList[1].name}</div>
         <div>

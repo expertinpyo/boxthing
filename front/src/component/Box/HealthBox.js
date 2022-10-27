@@ -1,16 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react"
+import { defaultBoxStyle } from "../../style/shared"
 
 function HealthBox() {
-  return (
-    <div
-      css={css`
-        width: 100%;
-        height: 100%;
-        background: yellow;
-      `}
-    ></div>
-  )
+  return <div css={{ ...defaultBoxStyle }}></div>
 }
 
 export default HealthBox

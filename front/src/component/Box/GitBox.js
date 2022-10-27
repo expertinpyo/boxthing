@@ -1,25 +1,13 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react"
-import { useRecoilValue, selector } from "recoil"
-import { notiListState } from "../../App"
-
-const unreadNotiListState = selector({
-  key: "unreadNotiListState",
-  get: ({ get }) => {
-    const list = get(notiListState)
-
-    return list.filter((item) => {
-      return item.unread
-    })
-  },
-})
+import { useRecoilValue } from "recoil"
+import { notiState, unreadNotiState } from "../../store/noti"
 
 function GitBox() {
-  const notiList = useRecoilValue(notiListState)
-  const unreadNotiList = useRecoilValue(unreadNotiListState)
+  const noti = useRecoilValue(notiState)
+  const unreadNoti = useRecoilValue(unreadNotiState)
 
-  console.log("notiList", notiList)
-  console.log("unread", unreadNotiList)
+  console.log("noti", noti)
+  console.log("unreadNoti", unreadNoti)
   return <div></div>
 }
 

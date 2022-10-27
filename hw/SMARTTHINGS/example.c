@@ -64,7 +64,7 @@ void cap_switch_init_cb(IOT_CAP_HANDLE *handle, void *usr_data)
 
     /* Send initial switch attribute */
     ST_CAP_SEND_ATTR_STRING(handle, "switch", "on", NULL, NULL, sequence_no);
-
+    system("vcgencmd display_power 1");
     if (sequence_no < 0)
         printf("fail to send switch value\n");
     else
@@ -77,7 +77,7 @@ void cap_switch_cmd_off_cb(IOT_CAP_HANDLE *handle,
     int32_t sequence_no = 1;
 
     printf("OFF command received");
-
+    system("vcgencmd display_power 0");
     /* Update switch attribute */
     ST_CAP_SEND_ATTR_STRING(handle, "switch", "off", NULL, NULL, sequence_no);
 
@@ -93,7 +93,7 @@ void cap_switch_cmd_on_cb(IOT_CAP_HANDLE *handle,
     int32_t sequence_no = 1;
 
     printf("ON command received");
-
+    system("vcgencmd display_power 1");
     /* Update switch attribute */
     ST_CAP_SEND_ATTR_STRING(handle, "switch", "on", NULL, NULL, sequence_no);
 

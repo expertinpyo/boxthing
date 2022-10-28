@@ -1,30 +1,30 @@
 /** @jsxImportSource @emotion/react */
 
 import { useRecoilValue } from "recoil"
-import { selectedContentState } from "../store/nav"
-import { defaultBoxStyle } from "../style/shared"
+import { navState } from "../store/nav"
+import { AnimatePresence } from "framer-motion"
+import PlanBox from "../component/Box/PlanBox"
+import GitBox from "../component/Box/GitBox"
+import WorkBox from "../component/Box/WorkBox"
+import HealthBox from "../component/Box/HealthBox"
 
 const Main = () => {
-  const selectedContent = useRecoilValue(selectedContentState)
+  const selectedContent = useRecoilValue(navState)
   return (
     <div
       css={{
         width: "100%",
         height: "100%",
         paddingTop: 16,
+        overflow: "hidden",
       }}
     >
-      <div
-        css={{
-          ...defaultBoxStyle,
-          width: "100%",
-          height: "100%",
-          padding: 16,
-          borderRadius: "16px 16px 0px 0px",
-        }}
-      >
-        {selectedContent}
-      </div>
+      <AnimatePresence>
+        {selectedContent === 0 ? <PlanBox key="plan" /> : null}
+        {selectedContent === 1 ? <GitBox key="git" /> : null}
+        {selectedContent === 2 ? <WorkBox key="work" /> : null}
+        {selectedContent === 3 ? <HealthBox key="health" /> : null}
+      </AnimatePresence>
     </div>
   )
 }

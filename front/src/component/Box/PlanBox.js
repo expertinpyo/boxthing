@@ -10,7 +10,9 @@ import PlanUpcoming from "../Plan/PlanUpcoming"
 import PlanInProgress from "../Plan/PlanInProgress"
 import PlanListItem from "../Plan/PlanListItem"
 
-function PlanBox() {
+import { motion } from "framer-motion"
+
+function PlanBox({ key }) {
   const plan = useRecoilValue(planState)
   const upcomingPlan = useRecoilValue(upcomingPlanState)
   const inProgressPlan = useRecoilValue(inProgressPlanState)
@@ -19,37 +21,56 @@ function PlanBox() {
   // console.log("upcoming", upcomingPlan)
   // console.log("inProgress", inProgressPlan)
   return (
-    <div
+    <motion.div
+      key={key}
       css={{
+        ...defaultBoxStyle,
         width: "100%",
         height: "100%",
-        display: "flex",
-        justifyContent: "space-between",
+        padding: 16,
+        borderRadius: "16px 16px 0px 0px",
       }}
+      initial={{ transform: "translateY(100%)" }}
+      animate={{ transform: "translateY(0%)" }}
+      exit={{ transform: "translateY(100%)" }}
+      transition={{ duration: 1 }}
     >
       <div
         css={{
-          width: "29%",
+          width: "100%",
           height: "100%",
           display: "flex",
           justifyContent: "space-between",
-          flexDirection: "column",
-          alignItems: "center",
         }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 3 }}
       >
-        <div css={{ ...defaultBoxStyle, width: "100%", height: "48%" }}>
-          <PlanUpcoming item={upcomingPlan} />
+        <div
+          css={{
+            width: "29%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <div css={{ ...defaultBoxStyle, width: "100%", height: "48%" }}>
+            <PlanUpcoming item={upcomingPlan} />
+          </div>
+          <div css={{ ...defaultBoxStyle, width: "100%", height: "48%" }}>
+            <PlanInProgress item={inProgressPlan} />
+          </div>
         </div>
-        <div css={{ ...defaultBoxStyle, width: "100%", height: "48%" }}>
-          <PlanInProgress item={inProgressPlan} />
+        <div css={{ width: "69%", height: "100%" }}>
+          {plan.map((item) => {
+            return <PlanListItem key={item.id} item={item} />
+          })}
         </div>
       </div>
-      <div css={{ width: "69%", height: "100%" }}>
-        {plan.map((item) => {
-          return <PlanListItem key={item.id} item={item} />
-        })}
-      </div>
-    </div>
+    </motion.div>
   )
 }
 

@@ -12,6 +12,7 @@ const PlanListItem = ({ item }) => {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
+        padding: 8,
       }}
     >
       <div
@@ -20,14 +21,33 @@ const PlanListItem = ({ item }) => {
           flexDirection: "column",
           justifyContent: "space-between",
           alignItems: "flex-start",
+          width: "60%",
         }}
       >
-        <div css={{}}>{item.summary}</div>
-        <div css={{ color: "var(--font-sub-color)", fontSize: "0.75rem" }}>
+        <div
+          css={{
+            width: "100%",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {item.summary}
+        </div>
+        <div
+          css={{
+            color: "var(--font-sub-color)",
+            fontSize: "0.75rem",
+            width: "100%",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
           {item.description}
         </div>
       </div>
-      <div>
+      <div css={{ width: "30%", display: "flex", justifyContent: "flex-end" }}>
         {`${start.getHours().toString().padStart(2, "0")}:${start
           .getMinutes()
           .toString()

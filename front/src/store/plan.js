@@ -13,8 +13,8 @@ const planState = atom({
         "https://www.google.com/calendar/event?eid=NWN1cmp0YWo4MGlkYmp0MWk0NnZ0Z2ltZnEgZGlkbmxpZUBt",
       created: "2022-10-24T07:00:17.000Z",
       updated: "2022-10-24T07:00:17.881Z",
-      summary: "뭐냐뭐냐",
-      description: "뭐냐뭐냐설명",
+      summary: "뭐냐뭐냐ffffffffffffffffffffffffffffffffffffffffffffffffff",
+      description: "뭐냐뭐냐설명ddddddddddddddddddddddddddddddddddddddd",
       creator: {
         email: "didnlie@gmail.com",
         self: true,
@@ -92,11 +92,11 @@ const planState = atom({
         self: true,
       },
       start: {
-        dateTime: "2022-10-24T16:30:00+09:00",
+        dateTime: "2022-10-28T10:14:00+09:00",
         timeZone: "Asia/Seoul",
       },
       end: {
-        dateTime: "2022-10-24T17:30:00+09:00",
+        dateTime: "2022-10-28T10:15:00+09:00",
         timeZone: "Asia/Seoul",
       },
       iCalUID: "5kdtfcmv5qhuj6qas12need0ct@google.com",

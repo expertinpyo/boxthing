@@ -122,14 +122,17 @@ const stretchingList = [
   },
 ]
 
-function StretchingModal({ open }) {
+function StretchingModal({ open = true }) {
   return (
     <div
       css={{
+        width: "100%",
+        height: "100%",
         ...defaultBoxStyle,
         display: "flex",
         alignItems: "center",
         transition: "opacity 500ms",
+        padding: 16,
         opacity: `${open ? 1 : 0}`,
       }}
     >

@@ -1,7 +1,7 @@
 package com.boxthing.api.v1.domain.mapper;
 
-import com.boxthing.api.v1.domain.User;
-import com.boxthing.api.v1.dto.UserDto.UserGoogleRequestDto;
+import com.boxthing.api.v1.domain.Device;
+import com.boxthing.api.v1.dto.DeviceDto.DeviceRequestDto;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -10,14 +10,14 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface DeviceMapper {
 
-  UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+  DeviceMapper INSTANCE = Mappers.getMapper(DeviceMapper.class);
 
-  User toEntity(final UserGoogleRequestDto dto);
+  Device toEntity(final DeviceRequestDto dto);
 
   @BeanMapping(
       nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
       nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-  void updateUserFromDto(UserGoogleRequestDto dto, @MappingTarget User user);
+  void updateDeviceFromDto(DeviceRequestDto dto, @MappingTarget Device device);
 }

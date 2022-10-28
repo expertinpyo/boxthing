@@ -1,7 +1,10 @@
 package com.boxthing.security.oauth2;
 
+import com.boxthing.api.v1.domain.User;
+import com.boxthing.api.v1.domain.mapper.DeviceMapper;
 import com.boxthing.api.v1.domain.mapper.UserMapper;
 import com.boxthing.api.v1.dto.UserDto.*;
+import com.boxthing.api.v1.repository.DeviceRepository;
 import com.boxthing.api.v1.repository.UserRepository;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -26,6 +29,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+
+  private final DeviceRepository deviceRepository;
+  private final DeviceMapper deviceMapper;
 
   @Override
   public void onAuthenticationSuccess(
@@ -52,16 +58,33 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
-      UserGoogleRequestDto userGoogleRequestDto =
-          UserGoogleRequestDto.builder()
-              .googleRefreshJws(refreshToken)
-              .username(oauthToken.getName())
-              .build();
+      String email = oauthToken.getPrincipal().getAttribute("email");
 
-      userRepository.save(userMapper.toEntity(userGoogleRequestDto));
-      log.info("client: {}", oauthToken.getPrincipal());
-      log.info("client: {}", oauthToken.getName());
-      log.info("google OK, refreshToken: {}\n", refreshToken);
+      User user = userRepository.findByEmail(email);
+      if (!deviceRepository.findByState(state)) {
+        // state값이 db에 없을 때
+        return;
+      }
+
+      if (user != null) {
+        UserGoogleRequestDto dto =
+            UserGoogleRequestDto.builder().googleRefreshJws(refreshToken).build();
+        userMapper.updateUserFromDto(dto, user);
+        log.info("user updated : {} {}", user, state);
+        userRepository.save(user);
+      } else {
+        UserGoogleRequestDto dto =
+            UserGoogleRequestDto.builder()
+                .email(email)
+                .googleRefreshJws(refreshToken)
+                .username(oauthToken.getName())
+                .build();
+        user = userRepository.save(userMapper.toEntity(dto));
+        log.info("user new created : {} {}", user, state);
+      }
+      // 이렇게 DB에 user 정보 저장 후 access token return 하는 방식으로 하면 될 듯
+      // access token 반환 + state값 확인, right?
+
     }
 
     // github 인증 성공

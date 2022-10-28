@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,6 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 빈 생성자, protected하게 접근
 @Getter
+@Setter
 @ToString
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "user")
@@ -29,9 +31,8 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 설정 db에 위임
   private Long id;
 
-  private String username;
+  private String email;
   private String googleRefreshJws;
-
   private String githubJws;
 
   @CreatedDate
@@ -41,8 +42,8 @@ public class User {
   @LastModifiedDate private LocalDateTime updatedAt;
 
   @Builder
-  public User(String username, String googleRefreshJws, String githubJws) {
-    this.username = username;
+  public User(String email, String googleRefreshJws, String githubJws) {
+    this.email = email;
     this.googleRefreshJws = googleRefreshJws;
     this.githubJws = githubJws;
   }

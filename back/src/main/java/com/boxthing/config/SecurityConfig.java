@@ -1,6 +1,6 @@
 package com.boxthing.config;
 
-import com.boxthing.api.v1.repository.UserRepository;
+import com.boxthing.api.v1.repository.DeviceRepository;
 import com.boxthing.security.oauth2.CustomAuthorizationRequestResolver;
 import com.boxthing.security.oauth2.CustomSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfig {
+
+  // 이전에  WebSecurityConfigurerAdapter을 상속받아 configure 메서드를 오버라이딩 하는 방식이었으나
+  // Spring Security 5.7.0 부터는 SecurityFilterChain을 빈으로 등록하여 사용하는 것을 권장함
   private final ClientRegistrationRepository clientRegistrationRepository;
   private final CustomSuccessHandler successHandler;
 
-  private final UserRepository userRepository;
+  private final DeviceRepository deviceRepository;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -39,9 +42,11 @@ public class SecurityConfig {
     http.oauth2Login()
         .authorizationEndpoint()
         .baseUri("/oauth2/authorization")
+        // oauth2Login() / authorizationEndpoint() / authorizationRequestResolver()를 사용
+        // => 사용자 정의 OAuth2AuthorizationRequestResolver를 삽입함
         .authorizationRequestResolver(
             new CustomAuthorizationRequestResolver(
-                clientRegistrationRepository, "/oauth2/authorization", userRepository))
+                clientRegistrationRepository, "/oauth2/authorization"))
         .and()
         .redirectionEndpoint()
         .baseUri("/oauth2/callback/{registrationId}")

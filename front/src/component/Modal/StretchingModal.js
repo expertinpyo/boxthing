@@ -13,98 +13,101 @@ import Neck from "../../asset/stretching_images/Neck.gif"
 import UpperTrap from "../../asset/stretching_images/UpperTrap.gif"
 import Hamstring from "../../asset/stretching_images/Hamstring.gif"
 
+import stretch from "../../asset/stretching_images/check.gif"
+
 import { defaultBoxStyle } from "../../style/shared"
+import { useEffect, useState } from "react"
 
 const stretchingList = [
   {
     name: "삼두근 스트레칭",
     explanation: [
-      "1. 팔을 들어올려 구부려 손이 반대쪽을 향하도록 합니다.",
-      "2. 다른 손으로 팔꿈치를 머리 쪽으로 당깁니다.",
-      "3. 10~30초 동안 유지합니다.",
-      "4. 반대쪽도 반복합니다.",
+      "팔을 들어올려 구부려 손이 반대쪽을 향하도록 합니다.",
+      "다른 손으로 팔꿈치를 머리 쪽으로 당깁니다.",
+      "10~30초 동안 유지합니다.",
+      "반대쪽도 반복합니다.",
     ],
     image: Triceps,
   },
   {
     name: "광배근 스트레칭",
     explanation: [
-      "1. 각 팔을 머리 위로 뻗습니다.",
-      "2. 반대쪽에 도달하십시오.",
-      "3. 10~30초 동안 유지합니다.",
-      "4. 반대쪽도 반복합니다.",
+      "각 팔을 머리 위로 뻗습니다.",
+      "반대쪽에 도달하십시오.",
+      "10~30초 동안 유지합니다.",
+      "반대쪽도 반복합니다.",
     ],
     image: OverheadReach,
   },
   {
     name: "상체와 팔 스트레칭",
     explanation: [
-      "1. 손바닥이 바깥쪽을 향하게 하여 머리 위로 손을 맞잡습니다.",
-      "2. 팔을 위로 밀어 올리십시오.",
-      "3. 10~30초 동안 자세를 유지합니다.",
+      "손바닥이 바깥쪽을 향하게 하여 머리 위로 손을 맞잡습니다.",
+      "팔을 위로 밀어 올리십시오.",
+      "10~30초 동안 자세를 유지합니다.",
     ],
     image: UpperBody,
   },
   {
     name: "어깨와 가슴 스트레칭",
     explanation: [
-      "1. 등 뒤에서 손을 잡습니다.",
-      "2. 가슴을 바깥쪽으로 밀고 턱을 들어 올립니다.",
-      "3. 10~30초 동안 자세를 유지합니다.",
+      "등 뒤에서 손을 잡습니다.",
+      "가슴을 바깥쪽으로 밀고 턱을 들어 올립니다.",
+      "10~30초 동안 자세를 유지합니다.",
     ],
     image: ShoulderPec,
   },
   {
     name: "앞으로 스트레칭",
     explanation: [
-      "1.손을 앞으로 깍지 끼고 팔과 일직선이 되도록 머리를 낮춥니다.",
-      "2. 앞으로 누르고 10~30초 동안 유지합니다.",
+      "손을 앞으로 깍지 끼고 팔과 일직선이 되도록 머리를 낮춥니다.",
+      "앞으로 누르고 10~30초 동안 유지합니다.",
     ],
     image: Forward,
   },
   {
     name: "몸통 회전 스트레칭",
     explanation: [
-      "1. 앞을 향한 상태에서 발을 땅에 단단히 고정하십시오.",
-      "2. 의자 등받이에 놓인 팔 방향으로 상체를 비틀십시오.",
-      "3. 10~30초 동안 자세를 유지합니다.",
-      "4. 다른 쪽에서도 반복합니다.",
+      "앞을 향한 상태에서 발을 땅에 단단히 고정하십시오.",
+      "의자 등받이에 놓인 팔 방향으로 상체를 비틀십시오.",
+      "10~30초 동안 자세를 유지합니다.",
+      "다른 쪽에서도 반복합니다.",
     ],
     image: Torso,
   },
   {
     name: "고관절 스트레칭",
     explanation: [
-      "1. 앉은 상태에서 한쪽 다리를 바깥쪽으로 뻗습니다.",
-      "2. 발가락을 향해 손을 뻗습니다.",
-      "3. 10~30초 동안 유지합니다.",
-      "4. 반대쪽도 반복합니다.",
+      "앉은 상태에서 한쪽 다리를 바깥쪽으로 뻗습니다.",
+      "발가락을 향해 손을 뻗습니다.",
+      "10~30초 동안 유지합니다.",
+      "반대쪽도 반복합니다.",
     ],
     image: HipAndKneeFlexion,
   },
   {
     name: "어깨 으쓱 스트레칭",
     explanation: [
-      "1. 양쪽 어깨를 동시에 귀 쪽으로 들어 올립니다.",
-      "2. 떨어뜨리고 각 방향으로 10회 반복합니다.",
+      "양쪽 어깨를 동시에 귀 쪽으로 들어 올립니다.",
+      "떨어뜨리고 각 방향으로 10회 반복합니다.",
     ],
     image: ShoulderShrug,
   },
   {
     name: "목 스트레칭",
     explanation: [
-      "1. 긴장을 풀고 머리를 앞으로 기울입니다.",
-      "2. 한쪽 방향으로 천천히 롤링하고 10초 동안 유지합니다.",
-      "3. 다른 쪽에서도 반복합니다.",
-      "4. 다시 긴장을 풀고 턱을 다시 시작 위치로 들어 올립니다.",
-      "5. 각 방향에 대해 3회 수행합니다.",
+      "긴장을 풀고 머리를 앞으로 기울입니다.",
+      "한쪽 방향으로 천천히 롤링하고 10초 동안 유지합니다.",
+      "다른 쪽에서도 반복합니다.",
+      "다시 긴장을 풀고 턱을 다시 시작 위치로 들어 올립니다.",
+      "각 방향에 대해 3회 수행합니다.",
     ],
     image: Neck,
   },
   {
     name: "목과 어깨 스트레칭",
     explanation: [
-      "가벼운 스트레칭이 느껴질 때까지 머리를 양쪽 어깨 쪽으로 부드럽게 당깁니다.",
+      "가벼운 스트레칭이 느껴질 때까지 머리를 어깨 쪽으로 부드럽게 당깁니다.",
       "10~15초 동안 자세를 유지합니다.",
       "양쪽에서 한 번씩 교대로 합니다.",
     ],
@@ -113,16 +116,21 @@ const stretchingList = [
   {
     name: "햄스트링 스트레칭",
     explanation: [
-      "1. 앉은 상태에서 한쪽 다리를 바깥쪽으로 뻗습니다.",
-      "2. 발가락을 향해 손을 뻗습니다.",
-      "3. 10~30초 동안 유지합니다.",
-      "4. 반대쪽도 반복합니다.",
+      "앉은 상태에서 한쪽 다리를 바깥쪽으로 뻗습니다.",
+      "발가락을 향해 손을 뻗습니다.",
+      "10~30초 동안 유지합니다.",
+      "반대쪽도 반복합니다.",
     ],
     image: Hamstring,
   },
 ]
 
 function StretchingModal({ open = true }) {
+  const [choice, setChoice] = useState(0)
+
+  useEffect(() => {
+    setChoice(Math.floor(Math.random() * 10))
+  }, [])
   return (
     <div
       css={{
@@ -139,7 +147,7 @@ function StretchingModal({ open = true }) {
       <div css={{ inlineHeight: "0", width: "100%", height: "100%" }}>
         <img
           css={{ height: "100%", aspectRatio: "1/1", borderRadius: "16px" }}
-          src={stretchingList[1].image}
+          src={stretchingList[choice].image}
           alt="forward"
         ></img>
       </div>
@@ -153,10 +161,48 @@ function StretchingModal({ open = true }) {
           alignItems: "center",
         }}
       >
-        <div>{stretchingList[1].name}</div>
-        <div>
-          {stretchingList[1].explanation.map((item) => {
-            return <div>{item}</div>
+        <div
+          css={{
+            width: "100%",
+            height: "20%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 32,
+            fontWeight: "bold",
+          }}
+        >
+          {stretchingList[choice].name}
+        </div>
+        <div
+          css={{
+            width: "100%",
+            height: "80%",
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            paddingLeft: 32,
+            flexDirection: "column",
+          }}
+        >
+          {stretchingList[choice].explanation.map((item) => {
+            return (
+              <div
+                css={{
+                  display: "flex",
+                  position: "relative",
+                  height: "20%",
+                  width: "100%",
+                }}
+              >
+                <div css={{ width: "8%", inlineHeight: 0, marginRight: "2%" }}>
+                  <img src={stretch} alt="stretch" css={{ width: "100%" }} />
+                </div>
+                <div css={{ width: "90%", fontSize: 18, marginBottom: 20 }}>
+                  {item}
+                </div>
+              </div>
+            )
           })}
         </div>
       </div>

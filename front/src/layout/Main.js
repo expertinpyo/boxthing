@@ -1,15 +1,17 @@
 /** @jsxImportSource @emotion/react */
 
-import { useRecoilValue } from "recoil"
-import { navState } from "../store/nav"
-import { AnimatePresence } from "framer-motion"
-import PlanBox from "../component/Box/PlanBox"
-import GitBox from "../component/Box/GitBox"
-import WorkBox from "../component/Box/WorkBox"
-import HealthBox from "../component/Box/HealthBox"
+import { useRecoilValue } from "recoil";
+import { navState } from "../store/nav";
+import { AnimatePresence } from "framer-motion";
+import PlanBox from "../component/Box/PlanBox";
+import GitBox from "../component/Box/GitBox";
+import WorkBox from "../component/Box/WorkBox";
+import HealthBox from "../component/Box/HealthBox";
+import { Route, Routes, useLocation } from "react-router-dom";
 
 const Main = () => {
-  const selectedContent = useRecoilValue(navState)
+  const location = useLocation();
+  const selectedContent = useRecoilValue(navState);
   return (
     <div
       css={{
@@ -19,14 +21,16 @@ const Main = () => {
         overflow: "hidden",
       }}
     >
-      <AnimatePresence>
-        {selectedContent === 0 ? <PlanBox key="plan" /> : null}
-        {selectedContent === 1 ? <GitBox key="git" /> : null}
-        {selectedContent === 2 ? <WorkBox key="work" /> : null}
-        {selectedContent === 3 ? <HealthBox key="health" /> : null}
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" exact element={<PlanBox />} />
+          <Route path="/git" element={<GitBox />} />
+          <Route path="/work" element={<WorkBox />} />
+          <Route path="/health" element={<HealthBox />} />
+        </Routes>
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default Main
+export default Main;

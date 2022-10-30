@@ -1,21 +1,21 @@
 /** @jsxImportSource @emotion/react */
-import { defaultBoxStyle } from "../../style/shared"
-import { useRecoilValue } from "recoil"
+import { defaultBoxStyle } from "../../style/shared";
+import { useRecoilValue } from "recoil";
 import {
   planState,
   upcomingPlanState,
   inProgressPlanState,
-} from "../../store/plan"
-import PlanUpcoming from "../Plan/PlanUpcoming"
-import PlanInProgress from "../Plan/PlanInProgress"
-import PlanListItem from "../Plan/PlanListItem"
+} from "../../store/plan";
+import PlanUpcoming from "../Plan/PlanUpcoming";
+import PlanInProgress from "../Plan/PlanInProgress";
+import PlanListItem from "../Plan/PlanListItem";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 function PlanBox({ key }) {
-  const plan = useRecoilValue(planState)
-  const upcomingPlan = useRecoilValue(upcomingPlanState)
-  const inProgressPlan = useRecoilValue(inProgressPlanState)
+  const plan = useRecoilValue(planState);
+  const upcomingPlan = useRecoilValue(upcomingPlanState);
+  const inProgressPlan = useRecoilValue(inProgressPlanState);
 
   // console.log("planList", plan)
   // console.log("upcoming", upcomingPlan)
@@ -30,10 +30,10 @@ function PlanBox({ key }) {
         padding: 16,
         borderRadius: "16px 16px 0px 0px",
       }}
-      initial={{ transform: "translateY(100%)" }}
-      animate={{ transform: "translateY(0%)" }}
-      exit={{ transform: "translateY(100%)" }}
-      transition={{ duration: 1 }}
+      initial={{ transform: "translateY(100%)", opacity: 0 }}
+      animate={{ transform: "translateY(0%)", opacity: 1 }}
+      exit={{ transform: "translateY(100%)", opacity: 0 }}
+      transition={{ duration: 0.5, ease: "circOut" }}
     >
       <div
         css={{
@@ -66,12 +66,12 @@ function PlanBox({ key }) {
         </div>
         <div css={{ width: "69%", height: "100%" }}>
           {plan.map((item) => {
-            return <PlanListItem key={item.id} item={item} />
+            return <PlanListItem key={item.id} item={item} />;
           })}
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
 
-export default PlanBox
+export default PlanBox;

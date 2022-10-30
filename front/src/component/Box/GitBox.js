@@ -1,17 +1,17 @@
 /** @jsxImportSource @emotion/react */
-import { useRecoilValue } from "recoil"
-import { notiState, unreadNotiState } from "../../store/noti"
-import { defaultBoxStyle } from "../../style/shared"
-import NotiListItem from "../Git/NotiListItem"
+import { useRecoilValue } from "recoil";
+import { notiState, unreadNotiState } from "../../store/noti";
+import { defaultBoxStyle } from "../../style/shared";
+import NotiListItem from "../Git/NotiListItem";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 function GitBox() {
-  const noti = useRecoilValue(notiState)
-  const unreadNoti = useRecoilValue(unreadNotiState)
+  const noti = useRecoilValue(notiState);
+  const unreadNoti = useRecoilValue(unreadNotiState);
 
-  console.log("noti", noti)
-  console.log("unreadNoti", unreadNoti)
+  console.log("noti", noti);
+  console.log("unreadNoti", unreadNoti);
   return (
     <motion.div
       css={{
@@ -24,15 +24,15 @@ function GitBox() {
       initial={{ transform: "translateY(100%)" }}
       animate={{ transform: "translateY(0%)" }}
       exit={{ transform: "translateY(100%)" }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 0.5, ease: "circOut" }}
     >
       <div css={{ width: "100%", height: "100%" }}>
         {noti.map((item) => {
-          return <NotiListItem key={item.id} item={item} />
+          return <NotiListItem key={item.id} item={item} />;
         })}
       </div>
     </motion.div>
-  )
+  );
 }
 
-export default GitBox
+export default GitBox;

@@ -1,7 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import { defaultBoxStyle } from "../../style/shared"
+import { defaultBoxStyle } from "../../style/shared";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
+import { Water } from "../Health/Water";
+import WaterInfo from "../Health/WaterInfo";
+
 function HealthBox({ key }) {
   return (
     <motion.div
@@ -16,11 +19,26 @@ function HealthBox({ key }) {
       initial={{ transform: "translateY(100%)" }}
       animate={{ transform: "translateY(0%)" }}
       exit={{ transform: "translateY(100%)" }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 0.5, ease: "circOut" }}
     >
-      <div css={{ ...defaultBoxStyle }}></div>
+      <div
+        css={{
+          ...defaultBoxStyle,
+          width: "50%",
+          height: "100%",
+          padding: 16,
+          borderRadius: 16,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Water />
+        <WaterInfo />
+      </div>
     </motion.div>
-  )
+  );
 }
 
-export default HealthBox
+export default HealthBox;

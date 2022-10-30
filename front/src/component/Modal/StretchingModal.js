@@ -1,22 +1,24 @@
 /** @jsxImportSource @emotion/react */
 // import { jsx } from "@emotion/react"
 
-import Forward from "../../asset/stretching_images/Forward.gif"
-import Triceps from "../../asset/stretching_images/Triceps.gif"
-import OverheadReach from "../../asset/stretching_images/OverheadReach.gif"
-import UpperBody from "../../asset/stretching_images/UpperBody.gif"
-import ShoulderPec from "../../asset/stretching_images/ShoulderPec.gif"
-import Torso from "../../asset/stretching_images/Torso.gif"
-import HipAndKneeFlexion from "../../asset/stretching_images/HipAndKneeFlexion.gif"
-import ShoulderShrug from "../../asset/stretching_images/ShoulderShrug.gif"
-import Neck from "../../asset/stretching_images/Neck.gif"
-import UpperTrap from "../../asset/stretching_images/UpperTrap.gif"
-import Hamstring from "../../asset/stretching_images/Hamstring.gif"
+import Forward from "../../asset/stretching_images/Forward.gif";
+import Triceps from "../../asset/stretching_images/Triceps.gif";
+import OverheadReach from "../../asset/stretching_images/OverheadReach.gif";
+import UpperBody from "../../asset/stretching_images/UpperBody.gif";
+import ShoulderPec from "../../asset/stretching_images/ShoulderPec.gif";
+import Torso from "../../asset/stretching_images/Torso.gif";
+import HipAndKneeFlexion from "../../asset/stretching_images/HipAndKneeFlexion.gif";
+import ShoulderShrug from "../../asset/stretching_images/ShoulderShrug.gif";
+import Neck from "../../asset/stretching_images/Neck.gif";
+import UpperTrap from "../../asset/stretching_images/UpperTrap.gif";
+import Hamstring from "../../asset/stretching_images/Hamstring.gif";
 
-import stretch from "../../asset/stretching_images/check.gif"
+import stretch from "../../asset/stretching_images/check.gif";
 
-import { defaultBoxStyle } from "../../style/shared"
-import { useEffect, useState } from "react"
+import { defaultBoxStyle } from "../../style/shared";
+import { useEffect, useState } from "react";
+
+import { motion } from "framer-motion";
 
 const stretchingList = [
   {
@@ -123,16 +125,16 @@ const stretchingList = [
     ],
     image: Hamstring,
   },
-]
+];
 
 function StretchingModal({ open = true }) {
-  const [choice, setChoice] = useState(0)
+  const [choice, setChoice] = useState(0);
 
   useEffect(() => {
-    setChoice(Math.floor(Math.random() * 10))
-  }, [])
+    setChoice(Math.floor(Math.random() * 10));
+  }, []);
   return (
-    <div
+    <motion.div
       css={{
         width: "100%",
         height: "100%",
@@ -143,6 +145,10 @@ function StretchingModal({ open = true }) {
         padding: 16,
         opacity: `${open ? 1 : 0}`,
       }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
     >
       <div css={{ inlineHeight: "0", width: "100%", height: "100%" }}>
         <img
@@ -202,12 +208,12 @@ function StretchingModal({ open = true }) {
                   {item}
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
-    </div>
-  )
+    </motion.div>
+  );
 }
 
-export default StretchingModal
+export default StretchingModal;

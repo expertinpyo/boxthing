@@ -64,3 +64,9 @@ const upcomingPlanListState = selector({
 1. `selector()` 내에 `get()` 의 경우 저장되어 있는 객체를 얕은 복사해서 주는가? 주소가 같은가?
 2. Array filter 함수의 경우 새로운 객체를 반환해줬던가?
 3. re-render 관련해서 공부 좀 더 해야겠다!
+
+# 2022-10-27
+
+**문제 상황**
+
+최상단 element의 height를 다양한 환경에서도 동일한 높이를 갖게 하고 싶어서 `height: calc(var(--vh) * 100);`를 사용해 useEffect 내에서 동적으로 설정되게 만들었는데, 아주 미세한 스크롤바가 나타난다. 정확히 100vh랑 동일한 value를 갖지 못하는 것 같다.

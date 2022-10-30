@@ -1,60 +1,63 @@
 /** @jsxImportSource @emotion/react */
 
-import { css } from "@emotion/react"
-
-const basicFontStyle = {
-  fontSize: "1.5rem",
-  fontWeight: "bold",
-}
-
-const activeFontStyle = {
-  color: "white",
-}
-
-const basicItemStyle = {
-  width: "100%",
-  height: "20%",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  borderRadius: "16px",
-  padding: "16px",
-}
-const activeItemStyle = {
-  background: "var(--main-gradient-color)",
-}
-
-function PlanListItem({ isActive = false, item }) {
+const PlanListItem = ({ item }) => {
   const start = new Date(item.start.dateTime)
   const end = new Date(item.end.dateTime)
-  const startHour = start.getHours().toString()
-  const endHour = end.getHours().toString()
+
   return (
-    <div css={{ ...basicItemStyle, ...(isActive && activeItemStyle) }}>
+    <div
+      css={{
+        width: "100%",
+        height: "15%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 8,
+      }}
+    >
       <div
-        css={css`
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          align-items: flex-start;
-        `}
+        css={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          width: "60%",
+        }}
       >
-        <span css={{ ...basicFontStyle, ...(isActive && activeFontStyle) }}>
+        <div
+          css={{
+            width: "100%",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
           {item.summary}
-        </span>
-        <span css={{ ...(isActive && activeFontStyle) }}>
+        </div>
+        <div
+          css={{
+            color: "var(--font-sub-color)",
+            fontSize: "0.75rem",
+            width: "100%",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
           {item.description}
-        </span>
+        </div>
       </div>
-      <span css={{ ...basicFontStyle, ...(isActive && activeFontStyle) }}>
-        {`${startHour.padStart(2, "0")}:${start
+      <div css={{ width: "30%", display: "flex", justifyContent: "flex-end" }}>
+        {`${start.getHours().toString().padStart(2, "0")}:${start
           .getMinutes()
           .toString()
-          .padStart(2, "0")} - ${endHour.padStart(2, "0")}:${end
-          .getMinutes()
+          .padStart(2, "0")} - ${end
+          .getHours()
           .toString()
-          .padStart(2, "0")} ${end.getHours() >= 12 ? "PM" : "AM"} `}
-      </span>
+          .padStart(2, "0")}:${end.getMinutes().toString().padStart(2, "0")} ${
+          end.getHours() >= 12 ? "PM" : "AM"
+        } `}
+      </div>
     </div>
   )
 }

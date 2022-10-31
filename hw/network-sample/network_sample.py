@@ -106,6 +106,7 @@ async def main():
         ws_test_coro(),
         mqtt_test_coro(),
         main_coro(),
+        sub_coro()
     )
 
 

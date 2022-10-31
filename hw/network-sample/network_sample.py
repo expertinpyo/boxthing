@@ -80,10 +80,23 @@ async def mqtt_test_coro():
 
 
 async def main_coro():
+    i = 0
     while True:
+        print("main_num: ", end='')
+        print(i)
+        i+=1
+        await asyncio.sleep(5)
         pass
 
-
+async def sub_coro():
+    i = 0
+    while True:
+        print("sub_num: ", end='')
+        print(i)
+        i+=1
+        await asyncio.sleep(8)
+        pass
+    
 async def main():
     ws_server = await websockets.serve(ws_handler, "localhost", 8765)
 

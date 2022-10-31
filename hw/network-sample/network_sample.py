@@ -80,10 +80,7 @@ async def mqtt_test_coro():
 
 
 async def main_coro():
-    i = 0
     while True:
-        print(i)
-        i+=1
         pass
 
 

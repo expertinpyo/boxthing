@@ -20,4 +20,6 @@ public interface DeviceMapper {
       nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
       nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
   void updateDeviceFromDto(DeviceRequestDto dto, @MappingTarget Device device);
+
+  void updateStateNull(DeviceRequestDto dto, @MappingTarget Device device);
 }

@@ -33,16 +33,12 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     if (authorizationRequest == null) {
       return null;
     }
-
     String state = request.getParameter("state");
     // 기기 식별을 위해 해쉬화된 값, 해쉬화는 QRCreator에서 진행
     // state check 로직 정의해야 함
-
-    log.info("about user : ", authorizationRequest.toString());
-    log.info(
-        "custom user authorization : ",
-        customAuthorizationRequest(authorizationRequest, state).toString());
-
+    if (state == null) {
+      return null;
+    }
     return customAuthorizationRequest(authorizationRequest, state);
   }
 
@@ -51,7 +47,6 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
       HttpServletRequest request, String clientRegistrationId) {
     OAuth2AuthorizationRequest authorizationRequest =
         this.defaultAuthorizationRequestResolver.resolve(request, clientRegistrationId);
-
     if (authorizationRequest == null) {
       return null;
     }
@@ -61,10 +56,6 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     if (state == null) {
       return null;
     }
-
-    log.info("about user : ", authorizationRequest);
-    log.info(
-        "custom user authorization : ", customAuthorizationRequest(authorizationRequest, state));
     return customAuthorizationRequest(authorizationRequest, state);
   }
 

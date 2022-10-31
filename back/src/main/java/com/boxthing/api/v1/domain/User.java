@@ -7,6 +7,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -41,10 +42,14 @@ public class User {
 
   @LastModifiedDate private LocalDateTime updatedAt;
 
+  @OneToOne(mappedBy = "user")
+  private Device device;
+
   @Builder
-  public User(String email, String googleRefreshJws, String githubJws) {
+  public User(String email, String googleRefreshJws, String githubJws, Device device) {
     this.email = email;
     this.googleRefreshJws = googleRefreshJws;
     this.githubJws = githubJws;
+    this.device = device;
   }
 }

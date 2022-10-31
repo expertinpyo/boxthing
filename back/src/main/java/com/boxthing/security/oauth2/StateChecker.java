@@ -7,8 +7,4 @@ import lombok.RequiredArgsConstructor;
 public class StateChecker {
 
   private final DeviceRepository deviceRepository;
-
-  public boolean IsStateValid(String state) {
-    return deviceRepository.findByState(state);
-  }
 }

@@ -7,5 +7,5 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
 
   Device findBySerialNumber(String serialNumber);
 
-  boolean findByState(String state);
+  Device findByState(String state);
 }

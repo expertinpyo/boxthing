@@ -1,8 +1,10 @@
 package com.boxthing.security.oauth2;
 
+import com.boxthing.api.v1.domain.Device;
 import com.boxthing.api.v1.domain.User;
 import com.boxthing.api.v1.domain.mapper.DeviceMapper;
 import com.boxthing.api.v1.domain.mapper.UserMapper;
+import com.boxthing.api.v1.dto.DeviceDto.DeviceRequestDto;
 import com.boxthing.api.v1.dto.UserDto.*;
 import com.boxthing.api.v1.repository.DeviceRepository;
 import com.boxthing.api.v1.repository.UserRepository;
@@ -47,7 +49,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String accessToken = client.getAccessToken().getTokenValue();
     String state = request.getParameter("state");
 
+    Device device = deviceRepository.findByState(state);
+    if (device == null) {
+      return;
+    }
+    log.info("device : {}", device);
     log.info("regId: {}, accessToken: {}, state: {}\n", registrationId, accessToken, state);
+    log.info("refreshToken : {}", client.getRefreshToken());
 
     // google 인증 성공
     if (registrationId.equals("google")) {
@@ -61,10 +69,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       String email = oauthToken.getPrincipal().getAttribute("email");
 
       User user = userRepository.findByEmail(email);
-      if (!deviceRepository.findByState(state)) {
-        // state값이 db에 없을 때
-        return;
-      }
 
       if (user != null) {
         UserGoogleRequestDto dto =
@@ -84,12 +88,25 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       }
       // 이렇게 DB에 user 정보 저장 후 access token return 하는 방식으로 하면 될 듯
       // access token 반환 + state값 확인, right?
-
+      DeviceRequestDto dto =
+          DeviceRequestDto.builder()
+              .state(null)
+              .serialNumber(device.getSerialNumber())
+              .id(device.getId())
+              .user(user)
+              .build();
+      deviceMapper.updateStateNull(dto, device);
+      deviceRepository.save(device);
     }
 
     // github 인증 성공
     if (registrationId.equals("github")) {
-      log.info("github OK\n");
+      log.info("github");
+      User user = device.getUser();
+      UserGoogleRequestDto dto = UserGoogleRequestDto.builder().githubJws(accessToken).build();
+      userMapper.updateUserFromDto(dto, user);
+      userRepository.save(user);
+      log.info("possible");
     }
   }
 }

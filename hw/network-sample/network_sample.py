@@ -89,11 +89,11 @@ async def main_coro():
         pass
 
 async def sub_coro():
-    i = 0
+    j = 0
     while True:
         print("sub_num: ", end='')
-        print(i)
-        i+=1
+        print(j)
+        j+=1
         await asyncio.sleep(8)
         pass
     
@@ -106,11 +106,11 @@ async def main():
         ws_test_coro(),
         mqtt_test_coro(),
         main_coro(),
-        sub_coro()
+        sub_coro(),
     )
 
 
 if __name__ == "__main__":
     # 다음줄은 윈도우에서 실행할 경우 필요
-    #asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())

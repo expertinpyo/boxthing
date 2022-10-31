@@ -79,8 +79,8 @@ const planState = atom({
       status: "confirmed",
       htmlLink:
         "https://www.google.com/calendar/event?eid=NWtkdGZjbXY1cWh1ajZxYXMxMm5lZWQwY3QgZGlkbmxpZUBt",
-      created: "2022-10-24T07:00:59.000Z",
-      updated: "2022-10-24T07:00:59.971Z",
+      created: "2022-10-31T11:15:59.000Z",
+      updated: "2022-10-31T11:30:59.971Z",
       summary: "킹뭐킹뭐",
       description: "킹뭐킹뭐",
       creator: {
@@ -92,11 +92,11 @@ const planState = atom({
         self: true,
       },
       start: {
-        dateTime: "2022-10-28T10:14:00+09:00",
+        dateTime: "2022-10-31T11:15:00+09:00",
         timeZone: "Asia/Seoul",
       },
       end: {
-        dateTime: "2022-10-28T10:15:00+09:00",
+        dateTime: "2022-10-31T11:30:00+09:00",
         timeZone: "Asia/Seoul",
       },
       iCalUID: "5kdtfcmv5qhuj6qas12need0ct@google.com",

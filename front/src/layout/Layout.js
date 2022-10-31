@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import StretchingModal from "../component/Modal/StretchingModal";
-import WaterModal from "../component/Modal/WaterModal";
-import Header from "./Header";
-import Main from "./Main";
+import StretchingModal from "../component/Modal/StretchingModal"
+import WaterModal from "../component/Modal/WaterModal"
+import Header from "./Header"
+import Main from "./Main"
 
 const Layout = () => {
   return (
@@ -27,7 +27,7 @@ const Layout = () => {
         <Main />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Layout;
+export default Layout

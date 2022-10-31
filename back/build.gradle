@@ -33,16 +33,13 @@ dependencies {
     // mqtt
     implementation 'org.springframework.boot:spring-boot-starter-integration'
     implementation 'org.springframework.integration:spring-integration-mqtt'
-
+    implementation 'com.google.code.gson:gson:2.10'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     // QR creator
     implementation group: 'com.google.zxing', name: 'core', version: '3.5.0'
     implementation group: 'com.google.zxing', name: 'javase', version:'3.5.0'
 
-
-
-    
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-	compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

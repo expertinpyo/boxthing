@@ -22,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 빈 생성자, protected하게 접근
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "device")
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "user")
 @Entity
@@ -46,10 +46,9 @@ public class User {
   private Device device;
 
   @Builder
-  public User(String email, String googleRefreshJws, String githubJws, Device device) {
+  public User(String email, String googleRefreshJws, String githubJws) {
     this.email = email;
     this.googleRefreshJws = googleRefreshJws;
     this.githubJws = githubJws;
-    this.device = device;
   }
 }

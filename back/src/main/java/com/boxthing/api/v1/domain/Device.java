@@ -16,7 +16,7 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "user")
 @NoArgsConstructor
 public class Device {
 

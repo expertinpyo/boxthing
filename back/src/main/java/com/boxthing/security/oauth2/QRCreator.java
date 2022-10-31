@@ -8,10 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,15 +23,7 @@ public class QRCreator {
   private final DeviceMapper deviceMapper;
 
   // 이 클래스로부터 로직 진행됨
-  @GetMapping("")
-  public Object createQr(
-      @RequestParam("serialNumber") String serialNumber, @RequestParam("site") String site)
-      throws NoSuchAlgorithmException {
-    String url = String.valueOf(hashedUri(serialNumber, site));
-    return ResponseEntity.ok().body(url);
-  }
-
-  public UriComponents hashedUri(String serialNumber, String site) throws NoSuchAlgorithmException {
+  public String hashedUri(String serialNumber, String site) throws NoSuchAlgorithmException {
     StringBuffer state = new StringBuffer();
     String hashType = "SHA-256";
     MessageDigest md;
@@ -48,8 +37,11 @@ public class QRCreator {
 
     log.info("hashed : {}", state);
     Device device = deviceRepository.findBySerialNumber(serialNumber);
+    if (device == null) {
+      return null;
+    }
+
     DeviceRequestDto dto = DeviceRequestDto.builder().state(String.valueOf(state)).build();
-    log.info("serial number : {}", device);
     deviceMapper.updateDeviceFromDto(dto, device);
     deviceRepository.save(device);
     String path = "/oauth2/authorization/" + site;
@@ -61,6 +53,6 @@ public class QRCreator {
             .path(path)
             .queryParam("state", state.toString())
             .build();
-    return uri;
+    return uri.toString();
   }
 }

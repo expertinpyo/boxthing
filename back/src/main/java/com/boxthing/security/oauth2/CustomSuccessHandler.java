@@ -8,6 +8,9 @@ import com.boxthing.api.v1.dto.DeviceDto.DeviceRequestDto;
 import com.boxthing.api.v1.dto.UserDto.*;
 import com.boxthing.api.v1.repository.DeviceRepository;
 import com.boxthing.api.v1.repository.UserRepository;
+import com.boxthing.config.MqttConfig.MqttOutboundGateway;
+import com.boxthing.dto.MqttDto.MqttResponseDto;
+import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +38,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private final DeviceRepository deviceRepository;
   private final DeviceMapper deviceMapper;
 
+  private final MqttOutboundGateway gateway;
+  private static final String BASE_TOPIC = "boxthing";
+  private final Gson gson = new Gson();
+
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -53,16 +60,20 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     if (device == null) {
       return;
     }
-    log.info("device : {}", device);
     log.info("regId: {}, accessToken: {}, state: {}\n", registrationId, accessToken, state);
-    log.info("refreshToken : {}", client.getRefreshToken());
-
+    log.info("device : {}", device);
     // google 인증 성공
     if (registrationId.equals("google")) {
       OAuth2RefreshToken maybeRefreshToken = client.getRefreshToken();
       if (maybeRefreshToken == null) {
         // no refresh token
-        // TODO: login failure page
+        MqttResponseDto responseDto =
+            MqttResponseDto.builder()
+                .type("google token")
+                .data("Login failed, no refresh token")
+                .build();
+        gateway.publish(
+            String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -71,20 +82,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       User user = userRepository.findByEmail(email);
 
       if (user != null) {
+
         UserGoogleRequestDto dto =
             UserGoogleRequestDto.builder().googleRefreshJws(refreshToken).build();
         userMapper.updateUserFromDto(dto, user);
-        log.info("user updated : {} {}", user, state);
+        log.info("user updated : {} {}", user.toString(), state);
         userRepository.save(user);
+
       } else {
         UserGoogleRequestDto dto =
-            UserGoogleRequestDto.builder()
-                .email(email)
-                .googleRefreshJws(refreshToken)
-                .username(oauthToken.getName())
-                .build();
+            UserGoogleRequestDto.builder().email(email).googleRefreshJws(refreshToken).build();
         user = userRepository.save(userMapper.toEntity(dto));
-        log.info("user new created : {} {}", user, state);
+        log.info("New user created : {} {}", user.toString(), state);
       }
       // 이렇게 DB에 user 정보 저장 후 access token return 하는 방식으로 하면 될 듯
       // access token 반환 + state값 확인, right?
@@ -95,8 +104,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
               .id(device.getId())
               .user(user)
               .build();
-      deviceMapper.updateStateNull(dto, device);
+      deviceMapper.updateWithNull(dto, device);
       deviceRepository.save(device);
+
+      MqttResponseDto responseDto =
+          MqttResponseDto.builder().type("google token").data(user.getGoogleRefreshJws()).build();
+      gateway.publish(
+          String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
     }
 
     // github 인증 성공
@@ -107,6 +121,20 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       userMapper.updateUserFromDto(dto, user);
       userRepository.save(user);
       log.info("possible");
+      MqttResponseDto responseDto =
+          MqttResponseDto.builder().type("github token").data(user.getGithubJws()).build();
+      gateway.publish(
+          String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
+
+      DeviceRequestDto deviceDto =
+          DeviceRequestDto.builder()
+              .state(null)
+              .serialNumber(device.getSerialNumber())
+              .id(device.getId())
+              .user(user)
+              .build();
+      deviceMapper.updateWithNull(deviceDto, device);
+      deviceRepository.save(device);
     }
   }
 }

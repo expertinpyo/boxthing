@@ -5,12 +5,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -25,9 +29,14 @@ public class WaterLog extends BaseLogEntity {
 
   private Float amount;
 
+  @ManyToOne(targetEntity = User.class)
+  @JoinColumn(name = "user_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private User user;
+
   @Builder
   public WaterLog(Float amount, User user) {
-    super(user);
+    this.user = user;
     this.amount = amount;
   }
 }

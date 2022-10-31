@@ -2,6 +2,7 @@ package com.boxthing.api.v1.domain.mapper;
 
 import com.boxthing.api.v1.domain.User;
 import com.boxthing.api.v1.dto.UserDto.UserGoogleRequestDto;
+import com.boxthing.api.v1.dto.UserDto.UserNullDto;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -20,4 +21,6 @@ public interface UserMapper {
       nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
       nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
   void updateUserFromDto(UserGoogleRequestDto dto, @MappingTarget User user);
+
+  void updateWithNull(UserNullDto dto, @MappingTarget User user);
 }

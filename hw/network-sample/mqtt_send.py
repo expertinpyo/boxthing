@@ -16,7 +16,7 @@ async def mqtt_consumer(client):
 async def mqtt_producer(client):
     while True:
         message = await mqtt_message_queue.get()
-        await client.publish("water",json.dumps(message))
+        await client.publish("water/howmuch",json.dumps(message))
         
         
         

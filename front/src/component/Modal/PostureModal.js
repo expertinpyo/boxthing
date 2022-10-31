@@ -1,11 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import { defaultBoxStyle } from "../../style/shared"
-import { WaterAnimation } from "../Health/Water"
-
 import { motion } from "framer-motion"
+import Angry from "../../asset/angry.gif"
 
-const WaterModal = ({ start, end }) => {
+const PostureModal = () => {
   return (
     <motion.div
       css={{
@@ -13,9 +11,9 @@ const WaterModal = ({ start, end }) => {
         width: "100%",
         height: "100%",
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
         // transform: "translate(-50%, -50%)",
         background: "rgba(255, 255, 255, 0.375)",
         zIndex: 1,
@@ -25,10 +23,10 @@ const WaterModal = ({ start, end }) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <WaterAnimation start={start} end={end} />
-      <div css={{ fontWeight: "bold" }}>250ml 섭취하셨습니다!</div>
+      <img src={Angry} alt="" css={{ width: 200 }} />
+      <div css={{ fontWeight: "bold" }}>자세를 똑바로 하세요!</div>
     </motion.div>
   )
 }
 
-export default WaterModal
+export default PostureModal

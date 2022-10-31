@@ -18,6 +18,7 @@ const NavBadge = () => {
             right: -5,
             color: "white",
             fontSize: 12,
+            fontWeight: "bold",
             lineHeight: 0,
             display: "flex",
             justifyContent: "center",

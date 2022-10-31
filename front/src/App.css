@@ -3,8 +3,6 @@
   /* min-height 와 height는 결이 다른 property 인 듯 */
   height: 100vh;
   /* height: 100vh; */
-  padding-left: 16px;
-  padding-right: 16px;
   display: flex;
   flex-direction: column;
   background-color: #8ec5fc;

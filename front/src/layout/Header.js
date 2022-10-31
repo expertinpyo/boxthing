@@ -1,17 +1,14 @@
 /** @jsxImportSource @emotion/react */
 
 import Timer from "../component/Header/Timer"
-import { defaultBoxStyle } from "../style/shared"
 import calendar from "../asset/nav_icon/google-calendar.png"
 import github from "../asset/nav_icon/github.png"
 import working from "../asset/nav_icon/working-woman.png"
 import examine from "../asset/nav_icon/examination.png"
-import { useSetRecoilState } from "recoil"
 
-import { Link } from "react-router-dom"
-
-import { navState } from "../store/nav"
 import NavListItem from "../component/Header/NavListItem"
+
+import { motion } from "framer-motion"
 
 const array = [
   { type: "calendar", img: calendar, path: "/" },
@@ -21,7 +18,6 @@ const array = [
 ]
 
 const Header = () => {
-  const setNavState = useSetRecoilState(navState)
   return (
     <div
       css={{
@@ -31,6 +27,10 @@ const Header = () => {
         justifyContent: "space-between",
         alignItems: "center",
       }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
     >
       <div css={{ width: "20%", height: "100%" }}>
         <Timer />

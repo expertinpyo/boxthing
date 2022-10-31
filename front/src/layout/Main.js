@@ -1,17 +1,15 @@
 /** @jsxImportSource @emotion/react */
 
-import { useRecoilValue } from "recoil";
-import { navState } from "../store/nav";
-import { AnimatePresence } from "framer-motion";
-import PlanBox from "../component/Box/PlanBox";
-import GitBox from "../component/Box/GitBox";
-import WorkBox from "../component/Box/WorkBox";
-import HealthBox from "../component/Box/HealthBox";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { useRecoilValue } from "recoil"
+import { AnimatePresence } from "framer-motion"
+import PlanBox from "../component/Box/PlanBox"
+import GitBox from "../component/Box/GitBox"
+import WorkBox from "../component/Box/WorkBox"
+import HealthBox from "../component/Box/HealthBox"
+import { Route, Routes, useLocation } from "react-router-dom"
 
 const Main = () => {
-  const location = useLocation();
-  const selectedContent = useRecoilValue(navState);
+  const location = useLocation()
   return (
     <div
       css={{
@@ -30,7 +28,7 @@ const Main = () => {
         </Routes>
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}
 
-export default Main;
+export default Main

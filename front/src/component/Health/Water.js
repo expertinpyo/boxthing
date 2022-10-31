@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect } from "react";
-import { useRecoilValue } from "recoil";
-import { reachState } from "../../store/health";
-import "./Water.css";
+import { useEffect } from "react"
+import { useRecoilValue } from "recoil"
+import { reachState } from "../../store/health"
+import "./Water.css"
 
 const WaterSVG = () => {
   return (
@@ -22,11 +22,11 @@ const WaterSVG = () => {
         <path d="M140,20c-21.5-0.4-38.8-2.5-51.1-4.5c-13.4-2.2-26.5-5.2-27.3-5.4C46,6.5,42,4.7,31.5,2.7C24.3,1.4,13.6-0.1,0,0c0,0,0,0,0,0l0,20H140z"></path>
       </symbol>
     </svg>
-  );
-};
+  )
+}
 
 const Water = () => {
-  const reach = useRecoilValue(reachState);
+  const reach = useRecoilValue(reachState)
 
   return (
     <div css={{ width: "100%", height: "100%", position: "relative" }}>
@@ -52,29 +52,29 @@ const Water = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const WaterAnimation = ({ start, end }) => {
-  const reach = useRecoilValue(reachState);
+  const reach = useRecoilValue(reachState)
 
   useEffect(() => {
-    let cnt = document.getElementById("_count");
-    let water = document.getElementById("_water");
-    let percent = cnt.innerText;
-    let interval;
+    let cnt = document.getElementById("_count")
+    let water = document.getElementById("_water")
+    let percent = cnt.innerText
+    let interval
     interval = setInterval(function () {
-      percent++;
-      cnt.innerHTML = percent;
-      water.style.transform = "translate(0" + "," + (100 - percent) + "%)";
+      percent++
+      cnt.innerHTML = percent
+      water.style.transform = "translate(0" + "," + (100 - percent) + "%)"
       if (percent === end) {
-        clearInterval(interval);
+        clearInterval(interval)
       }
-    }, 60);
-  }, [end]);
+    }, 60)
+  }, [end])
 
   return (
-    <div css={{ width: "100%", height: "100%", position: "relative" }}>
+    <div css={{ width: 250, height: 250, position: "relative" }}>
       <WaterSVG />
       <div class="box">
         <div class="percent">
@@ -97,7 +97,7 @@ const WaterAnimation = ({ start, end }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export { Water, WaterAnimation };
+export { Water, WaterAnimation }

@@ -80,10 +80,23 @@ async def mqtt_test_coro():
 
 
 async def main_coro():
+    i = 0
     while True:
+        print("main_num: ", end='')
+        print(i)
+        i+=1
+        await asyncio.sleep(5)
         pass
 
-
+async def sub_coro():
+    j = 0
+    while True:
+        print("sub_num: ", end='')
+        print(j)
+        j+=1
+        await asyncio.sleep(8)
+        pass
+    
 async def main():
     ws_server = await websockets.serve(ws_handler, "localhost", 8765)
 
@@ -93,10 +106,13 @@ async def main():
         ws_test_coro(),
         mqtt_test_coro(),
         main_coro(),
+        sub_coro(),
     )
 
 
 if __name__ == "__main__":
     # 다음줄은 윈도우에서 실행할 경우 필요
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    asyncio.run(main())
+    #asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    #asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

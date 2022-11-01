@@ -145,11 +145,14 @@ function StretchingModal() {
         justifyContent: "center",
         transition: "opacity 500ms",
         padding: 16,
+        backgroundColor: "#8ec5fc",
+        backgroundImage:
+          "linear-gradient(62deg,#8ec5fc 0%,#e0c3fc 50%,#95f2ff 100%)",
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 1 }}
     >
       <div
         css={{

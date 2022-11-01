@@ -30,7 +30,10 @@ function Timer() {
         .getMinutes()
         .toString()
         .padStart(2, "0")} ${today.getHours() >= 12 ? "PM" : "AM"}`}</div>
-      <div>{`${today.getFullYear()} ${today.getMonth()} ${today.getDate()} ${
+      <div>{`${today.getFullYear()} ${today
+        .getMonth()
+        .toString()
+        .padStart(2, "0")} ${today.getDate().toString().padStart(2, "0")} ${
         dayNames[today.getDay()]
       }`}</div>
     </div>

@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
+import "./NotiListItem.css"
 import { defaultBoxStyle } from "../../style/shared"
 
 const noti_type_object = {
@@ -69,6 +70,7 @@ const NotiListItem = ({ item }) => {
   return (
     <div
       css={{
+        background: item.unread ? "white" : "rgba(255,255,255,0.375)",
         position: "relative",
         width: "100%",
         height: "15%",
@@ -76,11 +78,14 @@ const NotiListItem = ({ item }) => {
         justifyContent: "space-between",
         alignItems: "center",
         padding: 8,
+        marginBottom: 8,
+        borderRadius: 8,
         // ...defaultBoxStyle,
         // borderRadius: 8,
         // marginTop: 10,
         // marginBottom: 24,
       }}
+      className={item.unread ? "gradient-border" : null}
     >
       <div
         css={{

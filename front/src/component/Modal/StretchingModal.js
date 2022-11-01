@@ -1,24 +1,24 @@
 /** @jsxImportSource @emotion/react */
 // import { jsx } from "@emotion/react"
 
-import Forward from "../../asset/stretching_images/Forward.gif";
-import Triceps from "../../asset/stretching_images/Triceps.gif";
-import OverheadReach from "../../asset/stretching_images/OverheadReach.gif";
-import UpperBody from "../../asset/stretching_images/UpperBody.gif";
-import ShoulderPec from "../../asset/stretching_images/ShoulderPec.gif";
-import Torso from "../../asset/stretching_images/Torso.gif";
-import HipAndKneeFlexion from "../../asset/stretching_images/HipAndKneeFlexion.gif";
-import ShoulderShrug from "../../asset/stretching_images/ShoulderShrug.gif";
-import Neck from "../../asset/stretching_images/Neck.gif";
-import UpperTrap from "../../asset/stretching_images/UpperTrap.gif";
-import Hamstring from "../../asset/stretching_images/Hamstring.gif";
+import Forward from "../../asset/stretching_images/Forward.gif"
+import Triceps from "../../asset/stretching_images/Triceps.gif"
+import OverheadReach from "../../asset/stretching_images/OverheadReach.gif"
+import UpperBody from "../../asset/stretching_images/UpperBody.gif"
+import ShoulderPec from "../../asset/stretching_images/ShoulderPec.gif"
+import Torso from "../../asset/stretching_images/Torso.gif"
+import HipAndKneeFlexion from "../../asset/stretching_images/HipAndKneeFlexion.gif"
+import ShoulderShrug from "../../asset/stretching_images/ShoulderShrug.gif"
+import Neck from "../../asset/stretching_images/Neck.gif"
+import UpperTrap from "../../asset/stretching_images/UpperTrap.gif"
+import Hamstring from "../../asset/stretching_images/Hamstring.gif"
 
-import stretch from "../../asset/stretching_images/check.gif";
+import stretch from "../../asset/stretching_images/check.gif"
 
-import { defaultBoxStyle } from "../../style/shared";
-import { useEffect, useState } from "react";
+import { defaultBoxStyle } from "../../style/shared"
+import { useEffect, useState } from "react"
 
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"
 
 const stretchingList = [
   {
@@ -125,95 +125,119 @@ const stretchingList = [
     ],
     image: Hamstring,
   },
-];
+]
 
-function StretchingModal({ open = true }) {
-  const [choice, setChoice] = useState(0);
+function StretchingModal() {
+  const [choice, setChoice] = useState(0)
 
   useEffect(() => {
-    setChoice(Math.floor(Math.random() * 10));
-  }, []);
+    setChoice(Math.floor(Math.random() * 10))
+  }, [])
   return (
     <motion.div
       css={{
+        zIndex: 1,
+        position: "fixed",
         width: "100%",
         height: "100%",
-        ...defaultBoxStyle,
         display: "flex",
         alignItems: "center",
+        justifyContent: "center",
         transition: "opacity 500ms",
         padding: 16,
-        opacity: `${open ? 1 : 0}`,
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div css={{ inlineHeight: "0", width: "100%", height: "100%" }}>
-        <img
-          css={{ height: "100%", aspectRatio: "1/1", borderRadius: "16px" }}
-          src={stretchingList[choice].image}
-          alt="forward"
-        ></img>
-      </div>
       <div
         css={{
           width: "100%",
           height: "100%",
+          ...defaultBoxStyle,
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           alignItems: "center",
         }}
       >
         <div
           css={{
+            inlineHeight: "0",
             width: "100%",
-            height: "20%",
+            height: "100%",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            fontSize: 32,
-            fontWeight: "bold",
+            padding: 16,
           }}
         >
-          {stretchingList[choice].name}
+          <img
+            css={{ width: "100%", aspectRatio: "1/1", borderRadius: "16px" }}
+            src={stretchingList[choice].image}
+            alt="forward"
+          ></img>
         </div>
         <div
           css={{
             width: "100%",
-            height: "80%",
+            height: "100%",
             display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            paddingLeft: 32,
             flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "center",
           }}
         >
-          {stretchingList[choice].explanation.map((item) => {
-            return (
-              <div
-                css={{
-                  display: "flex",
-                  position: "relative",
-                  height: "20%",
-                  width: "100%",
-                }}
-              >
-                <div css={{ width: "8%", inlineHeight: 0, marginRight: "2%" }}>
-                  <img src={stretch} alt="stretch" css={{ width: "100%" }} />
+          <div
+            css={{
+              width: "100%",
+              height: "20%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: 32,
+              fontWeight: "bold",
+            }}
+          >
+            {stretchingList[choice].name}
+          </div>
+          <div
+            css={{
+              width: "100%",
+              height: "80%",
+              display: "flex",
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+              paddingLeft: 32,
+              flexDirection: "column",
+            }}
+          >
+            {stretchingList[choice].explanation.map((item) => {
+              return (
+                <div
+                  css={{
+                    display: "flex",
+                    position: "relative",
+                    height: "20%",
+                    width: "100%",
+                  }}
+                >
+                  <div
+                    css={{ width: "8%", inlineHeight: 0, marginRight: "2%" }}
+                  >
+                    <img src={stretch} alt="stretch" css={{ width: "100%" }} />
+                  </div>
+                  <div css={{ width: "90%", fontSize: 18, marginBottom: 20 }}>
+                    {item}
+                  </div>
                 </div>
-                <div css={{ width: "90%", fontSize: 18, marginBottom: 20 }}>
-                  {item}
-                </div>
-              </div>
-            );
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
     </motion.div>
-  );
+  )
 }
 
-export default StretchingModal;
+export default StretchingModal

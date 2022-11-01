@@ -6,7 +6,9 @@ import os
 
 mqtt_message_queue = asyncio.Queue()
 
-serial_number = os.system("cat /proc/cpuinfo | grep Serial | awk '{print$3}'")
+stream = os.popen("cat /proc/cpuinfo | grep Serial | awk '{print$3}'")
+serial_number = stream.read().replace("\n","")
+stream.close()
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
@@ -18,6 +20,7 @@ async def mqtt_consumer(client):
 async def mqtt_producer(client):
     while True:
         message = await mqtt_message_queue.get()
+        print(message)
         await client.publish("boxthing",json.dumps(message))
         
 

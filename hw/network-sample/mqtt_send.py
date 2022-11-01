@@ -6,7 +6,7 @@ import os
 
 mqtt_message_queue = asyncio.Queue()
 
-serial_number = os.system("cat /proc/cpu_info | grep Serial | awk '{print$3}'")
+serial_number = os.system("cat /proc/cpuinfo | grep Serial | awk '{print$3}'")
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:

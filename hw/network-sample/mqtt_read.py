@@ -10,7 +10,9 @@ async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
         await client.subscribe("water/howmuch")
         async for message in messages:
-            data = json.loads(message)
+            print("print: ", end='')
+            print(message)
+            data = json.loads(message.payload)
             print(f"Message from mqtt: {data}")
 
 async def mqtt_producer(client):
@@ -28,7 +30,7 @@ async def mqtt_main():
     ) as client:
         await asyncio.gather(
             mqtt_consumer(client),
-            mqtt_producer(client)
+            #mqtt_producer(client)
         )
         
 async def mqtt_test_coro():

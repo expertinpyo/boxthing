@@ -17,6 +17,7 @@ async def mqtt_producer(client):
     while True:
         message = await mqtt_message_queue.get()
         await client.publish("water/howmuch",json.dumps(message))
+        print("done!");
         
         
         
@@ -27,7 +28,7 @@ async def mqtt_main():
         tls_params=aiomqtt.TLSParameters(),
     ) as client:
         await asyncio.gather(
-            mqtt_consumer(client),
+            #mqtt_consumer(client),
             mqtt_producer(client)
         )
         

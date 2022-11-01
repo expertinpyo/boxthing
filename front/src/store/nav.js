@@ -44,4 +44,9 @@ const postureModalState = atom({
   default: false,
 })
 
-export { waterModalState, stretchModalState, postureModalState }
+const loginState = atom({
+  key: "loginState",
+  default: false,
+})
+
+export { waterModalState, stretchModalState, postureModalState, loginState }

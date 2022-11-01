@@ -8,17 +8,20 @@ mqtt_message_queue = asyncio.Queue()
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
-        await client.subscribe("water/howmuch")
+        await client.subscribe("boxthing")
         async for message in messages:
-            print("print: ", end='')
-            print(message)
             data = json.loads(message.payload)
             print(f"Message from mqtt: {data}")
+            
+            await mqtt_message_queue.put((data["deviceId"], {
+                "type": "wt",
+                "check": 1,
+            }))
 
 async def mqtt_producer(client):
     while True:
-        message = await mqtt_message_queue.get()
-        await client.publish("water/howmuch",json.dumps(message))
+        device_id, message = await mqtt_message_queue.get()
+        await client.publish(f"boxthing/{device_id}",json.dumps(message))
         
         
         
@@ -30,7 +33,7 @@ async def mqtt_main():
     ) as client:
         await asyncio.gather(
             mqtt_consumer(client),
-            #mqtt_producer(client)
+            mqtt_producer(client)
         )
         
 async def mqtt_test_coro():

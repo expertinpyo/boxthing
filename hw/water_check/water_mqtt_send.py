@@ -17,9 +17,7 @@ stream.close()
 EMULATE_HX711=False
 
 referenceUnit = 394
-check_data_next = 0
-check_data_before = 0
-check_cnt = 0
+
 
 if not EMULATE_HX711:
     import RPi.GPIO as GPIO
@@ -78,6 +76,9 @@ async def mqtt_test_coro(water_data):
         await asyncio.sleep(5)        
 
 async def load_cell():
+    check_data_next = 0
+    check_data_before = 0
+    check_cnt = 0
     while True:
         try:
             val = hx.get_weight(5)

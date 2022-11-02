@@ -241,7 +241,7 @@ class HX711:
     def get_weight_A(self, times=3):
         value = self.get_value_A(times)
         value = value / self.REFERENCE_UNIT
-        return value
+        return -1 * value
 
     def get_weight_B(self, times=3):
         value = self.get_value_B(times)

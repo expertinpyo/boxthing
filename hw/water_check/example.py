@@ -5,7 +5,7 @@ import sys
 
 EMULATE_HX711=False
 
-referenceUnit = 1
+referenceUnit = 394
 
 if not EMULATE_HX711:
     import RPi.GPIO as GPIO
@@ -63,7 +63,7 @@ while True:
         
         # Prints the weight. Comment if you're debbuging the MSB and LSB issue.
         val = hx.get_weight(5)
-        print(val)
+        print(int(val))
 
         # To get weight from both channels (if you have load cells hooked up 
         # to both channel A and B), do something like this

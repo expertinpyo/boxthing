@@ -42,7 +42,7 @@ async def amount_water():
 
             hx.power_down()
             hx.power_up()
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.001)
 
         except (KeyboardInterrupt, SystemExit):
             await cleanAndExit()

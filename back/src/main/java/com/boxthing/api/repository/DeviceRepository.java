@@ -1,6 +1,6 @@
-package com.boxthing.api.v1.repository;
+package com.boxthing.api.repository;
 
-import com.boxthing.api.v1.domain.Device;
+import com.boxthing.api.domain.Device;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DeviceRepository extends JpaRepository<Device, Long> {

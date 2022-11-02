@@ -1,6 +1,6 @@
-package com.boxthing.api.v1.dto;
+package com.boxthing.api.dto;
 
-import com.boxthing.api.v1.domain.User;
+import com.boxthing.api.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

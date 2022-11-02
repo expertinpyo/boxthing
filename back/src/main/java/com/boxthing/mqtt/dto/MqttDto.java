@@ -1,4 +1,4 @@
-package com.boxthing.dto;
+package com.boxthing.mqtt.dto;
 
 import lombok.Builder;
 import lombok.Getter;

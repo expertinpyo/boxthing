@@ -1,6 +1,6 @@
-package com.boxthing.api.v1.dto;
+package com.boxthing.api.dto;
 
-import com.boxthing.api.v1.domain.Device;
+import com.boxthing.api.domain.Device;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;

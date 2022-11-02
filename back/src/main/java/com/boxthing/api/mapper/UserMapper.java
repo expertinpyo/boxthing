@@ -1,8 +1,8 @@
-package com.boxthing.api.v1.domain.mapper;
+package com.boxthing.api.mapper;
 
-import com.boxthing.api.v1.domain.User;
-import com.boxthing.api.v1.dto.UserDto.UserGoogleRequestDto;
-import com.boxthing.api.v1.dto.UserDto.UserNullDto;
+import com.boxthing.api.domain.User;
+import com.boxthing.api.dto.UserDto.UserGoogleRequestDto;
+import com.boxthing.api.dto.UserDto.UserNullDto;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

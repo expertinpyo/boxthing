@@ -1,6 +1,6 @@
 package com.boxthing.config;
 
-import com.boxthing.api.v1.repository.DeviceRepository;
+import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.security.oauth2.CustomAuthorizationRequestResolver;
 import com.boxthing.security.oauth2.CustomSuccessHandler;
 import lombok.RequiredArgsConstructor;

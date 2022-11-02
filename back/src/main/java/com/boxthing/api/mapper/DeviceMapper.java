@@ -1,7 +1,7 @@
-package com.boxthing.api.v1.domain.mapper;
+package com.boxthing.api.mapper;
 
-import com.boxthing.api.v1.domain.Device;
-import com.boxthing.api.v1.dto.DeviceDto.DeviceRequestDto;
+import com.boxthing.api.domain.Device;
+import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

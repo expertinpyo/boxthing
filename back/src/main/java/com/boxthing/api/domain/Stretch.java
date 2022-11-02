@@ -1,4 +1,4 @@
-package com.boxthing.api.v1.domain;
+package com.boxthing.api.domain;
 
 import com.boxthing.Enums.StretchType;
 import javax.persistence.Entity;

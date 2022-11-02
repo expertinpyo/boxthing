@@ -1,9 +1,9 @@
 package com.boxthing.security.oauth2;
 
-import com.boxthing.api.v1.domain.Device;
-import com.boxthing.api.v1.domain.mapper.DeviceMapper;
-import com.boxthing.api.v1.dto.DeviceDto.DeviceRequestDto;
-import com.boxthing.api.v1.repository.DeviceRepository;
+import com.boxthing.api.domain.Device;
+import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
+import com.boxthing.api.mapper.DeviceMapper;
+import com.boxthing.api.repository.DeviceRepository;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;

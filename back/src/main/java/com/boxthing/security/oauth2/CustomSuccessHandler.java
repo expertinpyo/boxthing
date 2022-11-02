@@ -1,15 +1,15 @@
 package com.boxthing.security.oauth2;
 
-import com.boxthing.api.v1.domain.Device;
-import com.boxthing.api.v1.domain.User;
-import com.boxthing.api.v1.domain.mapper.DeviceMapper;
-import com.boxthing.api.v1.domain.mapper.UserMapper;
-import com.boxthing.api.v1.dto.DeviceDto.DeviceRequestDto;
-import com.boxthing.api.v1.dto.UserDto.*;
-import com.boxthing.api.v1.repository.DeviceRepository;
-import com.boxthing.api.v1.repository.UserRepository;
+import com.boxthing.api.domain.Device;
+import com.boxthing.api.domain.User;
+import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
+import com.boxthing.api.dto.UserDto.*;
+import com.boxthing.api.mapper.DeviceMapper;
+import com.boxthing.api.mapper.UserMapper;
+import com.boxthing.api.repository.DeviceRepository;
+import com.boxthing.api.repository.UserRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
-import com.boxthing.dto.MqttDto.MqttResponseDto;
+import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
 import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.ServletException;

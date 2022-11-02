@@ -1,6 +1,6 @@
 package com.boxthing.security.oauth2;
 
-import com.boxthing.api.v1.repository.DeviceRepository;
+import com.boxthing.api.repository.DeviceRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

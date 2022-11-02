@@ -1,7 +1,7 @@
-package com.boxthing.api.v1.domain;
+package com.boxthing.api.domain;
 
 import com.boxthing.Enums.StretchType;
-import com.boxthing.api.v1.domain.inheritance.BaseLogEntity;
+import com.boxthing.api.inheritance.BaseLogEntity;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

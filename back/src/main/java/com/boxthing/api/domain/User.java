@@ -1,4 +1,4 @@
-package com.boxthing.api.v1.domain;
+package com.boxthing.api.domain;
 
 import java.time.LocalDateTime;
 import javax.persistence.Column;

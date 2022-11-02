@@ -1,10 +1,10 @@
 package com.boxthing.config;
 
-import com.boxthing.api.v1.repository.DeviceRepository;
-import com.boxthing.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.InItHandler;
-import com.boxthing.mqtt.MqttInboundHandler;
-import com.boxthing.mqtt.WaterLogHandler;
+import com.boxthing.api.repository.DeviceRepository;
+import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
+import com.boxthing.mqtt.handler.InItHandler;
+import com.boxthing.mqtt.handler.MqttInboundHandler;
+import com.boxthing.mqtt.handler.WaterLogHandler;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -73,6 +73,8 @@ public class MqttConfig {
                     .subFlowMapping(
                         "waterlog_create", sf -> sf.handle(waterLogHandler.waterCreatHandler()))
                     .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
+                    .subFlowMapping(
+                        "waterlog_today", sf -> sf.handle(waterLogHandler.waterTodayHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();

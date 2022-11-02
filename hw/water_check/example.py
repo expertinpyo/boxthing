@@ -69,18 +69,21 @@ while True:
         
         int_val = int(val)
         if -3 <= int_val - check_data_next <= 3:
+            print("similar")
             if check_cnt < 5:
                 check_cnt += 1
             if check_cnt == 5 and int_val > 10:
-                print(check_data_next)
+                check_cnt += 1
+                print(check_data_next, check_data_before)
                 cha = check_data_before - check_data_next
                 if cha > 0:
                     print(f"You Drinked {cha}g water!")
         else:
-            check_cnt = 0
-            if check_cnt == 5 and int_val > 10:
+            print("reset!")
+            if check_cnt == 6 and check_data_next > 10:
                 check_data_before = check_data_next
-                check_data_next = int_val
+            check_cnt = 0
+            check_data_next = int_val
         #print(int(val))
 
         # To get weight from both channels (if you have load cells hooked up 

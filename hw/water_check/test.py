@@ -1,7 +1,7 @@
-import water_yield_send
+import water_check
 import asyncio
 async def main():
-    async for w in water_yield_send.amount_water():
+    async for w in water_check.amount_water():
         print(w)
         
         

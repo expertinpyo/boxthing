@@ -29,7 +29,14 @@ const Water = () => {
   const reach = useRecoilValue(reachState)
 
   return (
-    <div css={{ width: "100%", height: "100%", position: "relative" }}>
+    <div
+      css={{
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        opacity: "0.5",
+      }}
+    >
       <WaterSVG />
       <div className="box">
         <div className="percent">

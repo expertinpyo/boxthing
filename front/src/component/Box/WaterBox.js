@@ -1,11 +1,11 @@
 /** @jsxImportSource @emotion/react */
-import { defaultBoxStyle } from "../../style/shared";
+import { defaultBoxStyle } from "../../style/shared"
 
-import { motion } from "framer-motion";
-import { Water } from "../Health/Water";
-import WaterInfo from "../Health/WaterInfo";
+import { motion } from "framer-motion"
+import { Water } from "../Water/Water"
+import WaterInfo from "../Water/WaterInfo"
 
-function HealthBox({ key }) {
+function WaterBox({ key }) {
   return (
     <motion.div
       key={key}
@@ -38,7 +38,7 @@ function HealthBox({ key }) {
         <WaterInfo />
       </div>
     </motion.div>
-  );
+  )
 }
 
-export default HealthBox;
+export default WaterBox

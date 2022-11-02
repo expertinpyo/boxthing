@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRecoilValue } from "recoil"
-import { reachState } from "../../store/health"
+import { reachState } from "../../store/water"
 import "./Water.css"
 
 const WaterSVG = () => {
@@ -31,22 +31,22 @@ const Water = () => {
   return (
     <div css={{ width: "100%", height: "100%", position: "relative" }}>
       <WaterSVG />
-      <div class="box">
-        <div class="percent">
-          <div class="percentNum" id="count">
+      <div className="box">
+        <div className="percent">
+          <div className="percentNum" id="count">
             {reach}
           </div>
-          <div class="percentB">%</div>
+          <div className="percentB">%</div>
         </div>
         <div
           id="water"
-          class="water"
+          className="water"
           style={{ transform: `translate(0, ${100 - reach}%)` }}
         >
-          <svg viewBox="0 0 560 20" class="water_wave water_wave_back">
+          <svg viewBox="0 0 560 20" className="water_wave water_wave_back">
             <use xlinkHref="#wave"></use>
           </svg>
-          <svg viewBox="0 0 560 20" class="water_wave water_wave_front">
+          <svg viewBox="0 0 560 20" className="water_wave water_wave_front">
             <use xlinkHref="#wave"></use>
           </svg>
         </div>
@@ -66,7 +66,7 @@ const WaterAnimation = ({ start, end }) => {
     interval = setInterval(function () {
       percent++
       cnt.innerHTML = percent
-      water.style.transform = "translate(0" + "," + (100 - percent) + "%)"
+      water.style.transform = `translate(0, ${100 - percent}%)`
       if (percent === end) {
         clearInterval(interval)
       }
@@ -76,22 +76,22 @@ const WaterAnimation = ({ start, end }) => {
   return (
     <div css={{ width: 250, height: 250, position: "relative" }}>
       <WaterSVG />
-      <div class="box">
-        <div class="percent">
-          <div class="percentNum" id="_count">
+      <div className="box">
+        <div className="percent">
+          <div className="percentNum" id="_count">
             {start}
           </div>
-          <div class="percentB">%</div>
+          <div className="percentB">%</div>
         </div>
         <div
           id="_water"
-          class="water"
+          className="water"
           style={{ transform: `translate(0, ${100 - reach}%)` }}
         >
-          <svg viewBox="0 0 560 20" class="water_wave water_wave_back">
+          <svg viewBox="0 0 560 20" className="water_wave water_wave_back">
             <use xlinkHref="#wave"></use>
           </svg>
-          <svg viewBox="0 0 560 20" class="water_wave water_wave_front">
+          <svg viewBox="0 0 560 20" className="water_wave water_wave_front">
             <use xlinkHref="#wave"></use>
           </svg>
         </div>

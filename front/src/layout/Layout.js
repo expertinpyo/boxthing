@@ -1,7 +1,5 @@
 /** @jsxImportSource @emotion/react */
 
-import StretchingModal from "../component/Modal/StretchingModal"
-import WaterModal from "../component/Modal/WaterModal"
 import Header from "./Header"
 import Main from "./Main"
 

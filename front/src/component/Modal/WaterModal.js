@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import { defaultBoxStyle } from "../../style/shared"
-import { WaterAnimation } from "../Health/Water"
+import { WaterAnimation } from "../Water/Water"
 
 import { motion } from "framer-motion"
 

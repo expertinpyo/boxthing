@@ -33,7 +33,7 @@ async def amount_water():
                     check_cnt += 1
                     cha = check_data_before - check_data_next
                     if cha > 0:
-                        yield cha
+                        yield (check_data_next,cha)
             else:
                 if check_cnt == 6 and check_data_next > 10:
                     check_data_before = check_data_next

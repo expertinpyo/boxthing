@@ -2,6 +2,7 @@ package com.boxthing.config;
 
 import com.boxthing.api.v1.repository.DeviceRepository;
 import com.boxthing.dto.MqttDto.MqttRequestDto;
+import com.boxthing.mqtt.InItHandler;
 import com.boxthing.mqtt.MqttInboundHandler;
 import com.boxthing.mqtt.WaterLogHandler;
 import com.google.gson.Gson;
@@ -33,6 +34,7 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
+  private final InItHandler inItHandler;
   private final MqttInboundHandler inboundHandler;
   private final WaterLogHandler waterLogHandler;
   private static final String BROKER_URL = "ssl://k7a408.p.ssafy.io:8883";
@@ -62,13 +64,15 @@ public class MqttConfig {
             MqttRequestDto::getType,
             mapping ->
                 mapping
-                    .subFlowMapping("register", sf -> sf.handle(inboundHandler.registerHandler()))
-                    .subFlowMapping("logout", sf -> sf.handle(inboundHandler.logoutHandler()))
+                    .subFlowMapping("register", sf -> sf.handle(inItHandler.registerHandler()))
+                    .subFlowMapping("init", sf -> sf.handle(inItHandler.bootHandler()))
                     .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
-                    .subFlowMapping("log", sf -> sf.handle(inboundHandler.logHandler()))
+                    .subFlowMapping("disconnect", sf -> sf.handle(inboundHandler.logoutHandler()))
                     .subFlowMapping(
-                        "waterPOST", sf -> sf.handle(waterLogHandler.waterCreatHandler()))
-                    .subFlowMapping("waterGet", sf -> sf.handle(waterLogHandler.waterGetHandler()))
+                        "access_token", sf -> sf.handle(inboundHandler.accessTokenHandler()))
+                    .subFlowMapping(
+                        "waterlog_create", sf -> sf.handle(waterLogHandler.waterCreatHandler()))
+                    .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();

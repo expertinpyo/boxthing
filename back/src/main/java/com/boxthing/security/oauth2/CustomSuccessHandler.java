@@ -108,7 +108,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       deviceRepository.save(device);
 
       MqttResponseDto responseDto =
-          MqttResponseDto.builder().type("google token").data(user.getGoogleRefreshJws()).build();
+          MqttResponseDto.builder().type("access_token").data(accessToken).build();
       gateway.publish(
           String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
     }
@@ -122,7 +122,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       userRepository.save(user);
       log.info("possible");
       MqttResponseDto responseDto =
-          MqttResponseDto.builder().type("github token").data(user.getGithubJws()).build();
+          MqttResponseDto.builder().type("access_token").data(user.getGithubJws()).build();
       gateway.publish(
           String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
 

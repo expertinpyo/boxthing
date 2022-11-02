@@ -5,13 +5,10 @@ import com.boxthing.api.v1.dto.WaterLogDto.WaterLogRequestDto;
 import com.boxthing.api.v1.dto.WaterLogDto.WaterLogResponseDto;
 import java.util.ArrayList;
 import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public abstract class WaterLogMapper {
-
-  WaterLogMapper INSTANCE = Mappers.getMapper(WaterLogMapper.class);
 
   public abstract WaterLog toEntity(final WaterLogRequestDto dto);
 
@@ -25,7 +22,6 @@ public abstract class WaterLogMapper {
               .build();
       response.add(dto);
     }
-
     return response;
   }
 }

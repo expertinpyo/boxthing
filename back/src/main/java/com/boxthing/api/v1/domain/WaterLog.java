@@ -36,7 +36,7 @@ public class WaterLog extends BaseLogEntity {
 
   @Builder
   public WaterLog(Float amount, User user) {
-    this.user = user;
     this.amount = amount;
+    this.user = user;
   }
 }

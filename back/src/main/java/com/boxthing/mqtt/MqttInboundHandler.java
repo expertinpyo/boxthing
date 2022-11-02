@@ -14,6 +14,7 @@ import com.boxthing.dto.MqttDto.MqttRequestDto;
 import com.boxthing.dto.MqttDto.MqttResponseDto;
 import com.boxthing.security.oauth2.QRCreator;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -47,31 +48,54 @@ public class MqttInboundHandler {
           throws MessagingException, NullPointerException {
         MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
         String deviceId = requestDto.getDeviceId();
-        String site = (String) requestDto.getData();
-        // make new qrcode for deviceId
+        log.info("Data : {}", requestDto.getData());
+        LinkedTreeMap<String, String> data =
+            (LinkedTreeMap<java.lang.String, java.lang.String>) requestDto.getData();
+        String site = data.get("provider");
 
         String qrUrl = qrCreator.hashedUri(deviceId, site);
         if (qrUrl == null) {
           return;
         }
+        LinkedTreeMap<String, String> responseData = new LinkedTreeMap<>();
+        responseData.put("provider", qrUrl);
 
-        MqttResponseDto responseDto = MqttResponseDto.builder().type("qr").data(qrUrl).build();
+        MqttResponseDto responseDto =
+            MqttResponseDto.builder().type("qr").data(responseData).build();
         gateway.publish(String.format("%s/%s", BASE_TOPIC, deviceId), gson.toJson(responseDto));
       }
     };
   }
 
-  public MessageHandler logHandler() {
+  public MessageHandler accessTokenHandler() {
     return new MessageHandler() {
+      @SneakyThrows
       @Override
-      public void handleMessage(Message<?> message) throws MessagingException {
+      public void handleMessage(Message<?> message)
+          throws MessagingException, NullPointerException {
         MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
         String deviceId = requestDto.getDeviceId();
-        @SuppressWarnings("unchecked")
-        List<MqttLogDto> data = (List<MqttLogDto>) requestDto.getData();
+        LinkedTreeMap<String, String> data =
+            (LinkedTreeMap<java.lang.String, java.lang.String>) requestDto.getData();
+        String site = data.get("provider");
 
-        // store some logs for deviceId
-        log.info("Storing log='{}' from device='{}'\n", data.toString(), deviceId);
+        Device device = deviceRepository.findBySerialNumber(deviceId);
+        if (device == null || device.getUser() == null) {
+          return;
+        }
+        LinkedTreeMap<String, String> responseData = new LinkedTreeMap<>();
+        responseData.put("provider", site);
+        if (site.equals("google")) {
+          responseData.put("access_token", device.getUser().getGoogleRefreshJws());
+        } else if (site.equals("github")) {
+          responseData.put("access_token", device.getUser().getGithubJws());
+        } else {
+          return;
+        }
+
+        MqttResponseDto responseDto =
+            MqttResponseDto.builder().type("access_token").data(responseData).build();
+        gateway.publish(String.format("%s/%s", BASE_TOPIC, deviceId), gson.toJson(responseDto));
       }
     };
   }
@@ -117,24 +141,6 @@ public class MqttInboundHandler {
         deviceRepository.save(device);
         // store some logs for deviceId
         log.info("Logout completed\n");
-      }
-    };
-  }
-
-  public MessageHandler registerHandler() {
-    return new MessageHandler() {
-      @Override
-      public void handleMessage(Message<?> message) throws MessagingException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
-        String deviceId = requestDto.getDeviceId();
-        if (deviceRepository.findBySerialNumber(deviceId) != null) {
-          log.info("Already existed Serial Number");
-          return;
-        }
-        DeviceRequestDto deviceRequestDto =
-            DeviceRequestDto.builder().serialNumber(deviceId).build();
-        deviceRepository.save(deviceMapper.toEntity(deviceRequestDto));
-        log.info("Device has been registered");
       }
     };
   }

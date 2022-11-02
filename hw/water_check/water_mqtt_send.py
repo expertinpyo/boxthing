@@ -1,7 +1,18 @@
 #! /usr/bin/python2
-
+import asyncio
+import json
+import websockets.server as websockets
+import asyncio_mqtt as aiomqtt
+import os
 import time
 import sys
+
+mqtt_message_queue = asyncio.Queue()
+
+stream = os.popen("cat /proc/cpuinfo | grep Serial | awk '{print$3}'")
+serial_number = stream.read().replace("\n","")
+stream.close()
+
 
 EMULATE_HX711=False
 
@@ -27,71 +38,82 @@ def cleanAndExit():
     sys.exit()
 
 hx = HX711(13, 8)
-# I've found out that, for some reason, the order of the bytes is not always the same between versions of python, numpy and the hx711 itself.
-# Still need to figure out why does it change.
-# If you're experiencing super random values, change these values to MSB or LSB until to get more stable values.
-# There is some code below to debug and log the order of the bits and the bytes.
-# The first parameter is the order in which the bytes are used to build the "long" value.
-# The second paramter is the order of the bits inside each byte.
-# According to the HX711 Datasheet, the second parameter is MSB so you shouldn't need to modify it.
 hx.set_reading_format("MSB", "MSB")
-
-# HOW TO CALCULATE THE REFFERENCE UNIT
-# To set the reference unit to 1. Put 1kg on your sensor or anything you have and know exactly how much it weights.
-# In this case, 92 is 1 gram because, with 1 as a reference unit I got numbers near 0 without any weight
-# and I got numbers around 184000 when I added 2kg. So, according to the rule of thirds:
-# If 2000 grams is 184000 then 1000 grams is 184000 / 2000 = 92.
-#hx.set_reference_unit(113)
 hx.set_reference_unit(referenceUnit)
-
 hx.reset()
-
 hx.tare()
-
 print("Tare done! Add weight now...")
 
-# to use both channels, you'll need to tare them both
-#hx.tare_A()
-#hx.tare_B()
+async def mqtt_consumer(client):
+    async with client.unfiltered_messages() as messages:
+        await client.subscribe(f"boxthing/{serial_number}")
+        async for message in messages:
+            data = json.loads(message.payload)
+            print(f"Message from mqtt: {data}")
 
-while True:
-    try:
-        # These three lines are usefull to debug wether to use MSB or LSB in the reading formats
-        # for the first parameter of "hx.set_reading_format("LSB", "MSB")".
-        # Comment the two lines "val = hx.get_weight(5)" and "print val" and uncomment these three lines to see what it prints.
+async def mqtt_producer(client):
+    while True:
+        message = await mqtt_message_queue.get()
+        print(message)
+        await client.publish("boxthing",json.dumps(message))
         
-        # np_arr8_string = hx.get_np_arr8_string()
-        # binary_string = hx.get_binary_string()
-        # print binary_string + " " + np_arr8_string
+async def mqtt_main():
+    async with aiomqtt.Client(
+        hostname="k7a408.p.ssafy.io",
+        port=8883,
+        tls_params=aiomqtt.TLSParameters(),
+    ) as client:
+        await asyncio.gather(
+            mqtt_consumer(client),
+            mqtt_producer(client),
+        )
         
-        # Prints the weight. Comment if you're debbuging the MSB and LSB issue.
-        val = hx.get_weight(5)
-        
-        int_val = int(val)
-        if -3 <= int_val - check_data_next <= 3:
-            if check_cnt < 5:
-                check_cnt += 1
-            if check_cnt == 5 and int_val > 10:
-                check_cnt += 1
-                cha = check_data_before - check_data_next
-                if cha > 0:
-                    print(f"You Drinked {cha}g water!")
-        else:
-            if check_cnt == 6 and check_data_next > 10:
-                check_data_before = check_data_next
-            check_cnt = 0
-            check_data_next = int_val
-        #print(int(val))
+async def mqtt_test_coro(water_data):
+    while True:
+        await mqtt_message_queue.put({
+            "type": "wt",
+            "deviceId": serial_number,
+            "amount": water_data,
+        })
+        await asyncio.sleep(5)        
 
-        # To get weight from both channels (if you have load cells hooked up 
-        # to both channel A and B), do something like this
-        #val_A = hx.get_weight_A(5)
-        #val_B = hx.get_weight_B(5)
-        #print "A: %s  B: %s" % ( val_A, val_B )
+async def load_cell():
+    while True:
+        try:
+            val = hx.get_weight(5)
+            
+            int_val = int(val)
+            if -3 <= int_val - check_data_next <= 3:
+                if check_cnt < 5:
+                    check_cnt += 1
+                if check_cnt == 5 and int_val > 10:
+                    check_cnt += 1
+                    cha = check_data_before - check_data_next
+                    if cha > 0:
+                        print(f"You Drinked {cha}g water!")
+                        await mqtt_test_coro(cha)
+            else:
+                if check_cnt == 6 and check_data_next > 10:
+                    check_data_before = check_data_next
+                check_cnt = 0
+                check_data_next = int_val
+            hx.power_down()
+            hx.power_up()
+            time.sleep(0.1)
 
-        hx.power_down()
-        hx.power_up()
-        time.sleep(0.1)
+        except (KeyboardInterrupt, SystemExit):
+            cleanAndExit()
 
-    except (KeyboardInterrupt, SystemExit):
-        cleanAndExit()
+
+async def main():
+    await asyncio.gather(
+        mqtt_main(),
+        load_cell(),
+    )
+    
+if __name__ == "__main__":
+    # 다음줄은 윈도우에서 실행할 경우 필요
+    #asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    #asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

@@ -6,6 +6,9 @@ import sys
 EMULATE_HX711=False
 
 referenceUnit = 394
+check_data_next = 0
+check_data_before = 0
+check_cnt = 0
 
 if not EMULATE_HX711:
     import RPi.GPIO as GPIO
@@ -63,7 +66,22 @@ while True:
         
         # Prints the weight. Comment if you're debbuging the MSB and LSB issue.
         val = hx.get_weight(5)
-        print(int(val))
+        
+        int_val = int(val)
+        if -3 <= int_val - check_data_next <= 3:
+            if check_cnt < 5:
+                check_cnt += 1
+            if check_cnt == 5 and int_val > 10:
+                print(check_data_next)
+                cha = check_data_before - check_data_next
+                if cha > 0:
+                    print(f"You Drinked {cha}g water!")
+        else:
+            check_cnt = 0
+            if check_cnt == 5 and int_val > 10:
+                check_data_before = check_data_next
+                check_data_next = int_val
+        #print(int(val))
 
         # To get weight from both channels (if you have load cells hooked up 
         # to both channel A and B), do something like this

@@ -20,7 +20,6 @@ import com.boxthing.util.GsonUtil.LocalDateTimeAdapter;
 import com.boxthing.util.ObjectConvertUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.LinkedTreeMap;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +54,8 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttWaterReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
+        MqttRequestDto<MqttWaterReqData> requestDto =
+            objectConvertUtil.ObjectConverter(message.getPayload());
         String deviceId = requestDto.getDeviceId();
         MqttWaterReqData data = requestDto.getData();
 
@@ -76,7 +76,8 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttWaterBeforeReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
+        MqttRequestDto<MqttWaterBeforeReqData> requestDto =
+            objectConvertUtil.ObjectConverter(message.getPayload());
 
         String deviceId = requestDto.getDeviceId();
         MqttWaterBeforeReqData data = requestDto.getData();
@@ -127,7 +128,10 @@ public class WaterLogHandler {
         List<WaterLog> list = waterLogQueryDsl.findallByUserAndToday(user);
 
         MqttResponseDto responseDto =
-            MqttResponseDto.builder().type("waterlog_today").data(waterLogMapper.toList(list)).build();
+            MqttResponseDto.builder()
+                .type("waterlog_today")
+                .data(waterLogMapper.toList(list))
+                .build();
         log.info("response : {}", responseDto);
         log.info("gson: {}", gson.toJson(responseDto));
         gateway.publish(

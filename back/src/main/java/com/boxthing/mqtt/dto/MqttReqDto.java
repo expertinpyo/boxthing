@@ -40,6 +40,7 @@ public class MqttReqDto {
   @NoArgsConstructor
   public static class MqttWaterReqData {
     Float amount;
+
     @Builder
     public MqttWaterReqData(Float amount) {
       this.amount = amount;
@@ -57,5 +58,4 @@ public class MqttReqDto {
       this.before = before;
     }
   }
-
 }

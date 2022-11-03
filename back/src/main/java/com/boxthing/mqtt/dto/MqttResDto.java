@@ -21,7 +21,6 @@ public class MqttResDto {
     }
   }
 
-
   @Getter
   @ToString
   @NoArgsConstructor
@@ -54,7 +53,7 @@ public class MqttResDto {
   @Getter
   @ToString
   @NoArgsConstructor
-  public static class MqttAccessTokenResDto{
+  public static class MqttAccessTokenResDto {
     String accessToken;
     String provider;
 

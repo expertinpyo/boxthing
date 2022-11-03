@@ -15,10 +15,11 @@ import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttProviderResDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
-import com.boxthing.security.oauth2.QRCreator;
+import com.boxthing.util.AccessTokenRefresh;
 import com.boxthing.util.ObjectConvertUtil;
+import com.boxthing.util.QRCreator;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -45,13 +46,16 @@ public class MqttInboundHandler {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
 
+  private final AccessTokenRefresh accessTokenRefresh;
+
   public MessageHandler qrHandler() {
     return new MessageHandler() {
       @SneakyThrows
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttProviderReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
+        MqttRequestDto<MqttProviderReqData> requestDto =
+            objectConvertUtil.ObjectConverter(message.getPayload());
 
         String deviceId = requestDto.getDeviceId();
         MqttProviderReqData data = requestDto.getData();
@@ -60,10 +64,8 @@ public class MqttInboundHandler {
         if (qrUrl == null) {
           return;
         }
-        MqttProviderResDto responseResDto = MqttProviderResDto.builder()
-            .provider(data.getProvider())
-            .link(qrUrl)
-            .build();
+        MqttProviderResDto responseResDto =
+            MqttProviderResDto.builder().provider(data.getProvider()).link(qrUrl).build();
 
         MqttResponseDto responseDto =
             MqttResponseDto.builder().type("qr").data(responseResDto).build();
@@ -80,7 +82,8 @@ public class MqttInboundHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttProviderReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
+        MqttRequestDto<MqttProviderReqData> requestDto =
+            objectConvertUtil.ObjectConverter(message.getPayload());
         String deviceId = requestDto.getDeviceId();
         MqttProviderReqData data = requestDto.getData();
 
@@ -88,10 +91,11 @@ public class MqttInboundHandler {
         if (device == null || device.getUser() == null) {
           return;
         }
-        MqttAccessTokenResDto tokenDto = MqttAccessTokenResDto.builder().provider(data.getProvider()).build();
-        if (data.getProvider().equals("google")){
+        MqttAccessTokenResDto tokenDto =
+            MqttAccessTokenResDto.builder().provider(data.getProvider()).build();
+        if (data.getProvider().equals("google")) {
           tokenDto.setAccessToken(device.getUser().getGoogleRefreshJws());
-        } else if(data.getProvider().equals("github")) {
+        } else if (data.getProvider().equals("github")) {
           tokenDto.setAccessToken(device.getUser().getGithubJws());
         }
 
@@ -143,6 +147,34 @@ public class MqttInboundHandler {
         deviceRepository.save(device);
         // store some logs for deviceId
         log.info("Logout completed\n");
+      }
+    };
+  }
+
+  public MessageHandler refreshHandler() {
+    return new MessageHandler() {
+      @Override
+      public void handleMessage(Message<?> message)
+          throws MessagingException, NullPointerException {
+        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+        log.info("{}", requestDto);
+        String deviceId = requestDto.getDeviceId();
+        //
+        Device device = deviceRepository.findBySerialNumber(deviceId);
+        User user = device.getUser();
+        log.info("{} {}", device, user);
+        //        if (device == null
+        //            || device.getUser() == null
+        //            || device.getUser().getGoogleRefreshJws() == null) {
+        //          return;
+        //        }
+        //
+
+        try {
+          accessTokenRefresh.getAccessToken(user.getGoogleRefreshJws());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
       }
     };
   }

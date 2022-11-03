@@ -62,7 +62,8 @@ public class MqttConfig {
             MqttRequestDto::getType,
             mapping ->
                 mapping
-//                    .subFlowMapping("register", sf -> sf.handle(inItHandler.registerHandler()))
+                    //                    .subFlowMapping("register", sf ->
+                    // sf.handle(inItHandler.registerHandler()))
                     .subFlowMapping("init", sf -> sf.handle(inItHandler.bootHandler()))
                     .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
                     .subFlowMapping("disconnect", sf -> sf.handle(inboundHandler.logoutHandler()))
@@ -78,6 +79,8 @@ public class MqttConfig {
                         sf -> sf.handle(postureLogHandler.postureCreateHandler()))
                     .subFlowMapping(
                         "posturelog", sf -> sf.handle(postureLogHandler.postureHandler()))
+                    .subFlowMapping(
+                        "refresh_token", sf -> sf.handle(inboundHandler.refreshHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();

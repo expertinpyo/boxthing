@@ -1,4 +1,4 @@
-package com.boxthing.security.oauth2;
+package com.boxthing.util;
 
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;

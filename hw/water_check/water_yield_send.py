@@ -45,4 +45,4 @@ async def amount_water():
             await asyncio.sleep(0.1)
 
         except (KeyboardInterrupt, SystemExit):
-            cleanAndExit()
+            await cleanAndExit()

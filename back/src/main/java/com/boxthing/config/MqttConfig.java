@@ -2,8 +2,9 @@ package com.boxthing.config;
 
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.handler.InItHandler;
+import com.boxthing.mqtt.handler.InitHandler;
 import com.boxthing.mqtt.handler.MqttInboundHandler;
+import com.boxthing.mqtt.handler.PostureLogHandler;
 import com.boxthing.mqtt.handler.WaterLogHandler;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -34,20 +35,18 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
-  private final InItHandler inItHandler;
+  private final InitHandler inItHandler;
   private final MqttInboundHandler inboundHandler;
   private final WaterLogHandler waterLogHandler;
-  private static final String BROKER_URL = "ssl://k7a408.p.ssafy.io:8883";
-  private static final String BASE_TOPIC = "boxthing";
+  private final PostureLogHandler postureLogHandler;
+  private final MqttProperties mqttProperties;
   private static final String OUTBOUND_CHANNEL = "outboundChannel";
   private final Gson gson = new Gson();
-
-  private DeviceRepository deviceRepository;
 
   @Bean
   public MqttPahoClientFactory mqttPahoClientFactory() {
     MqttConnectOptions options = new MqttConnectOptions();
-    options.setServerURIs(new String[] {BROKER_URL});
+    options.setServerURIs(new String[] {mqttProperties.getBROKER_URL()});
 
     DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
     factory.setConnectionOptions(options);
@@ -75,6 +74,8 @@ public class MqttConfig {
                     .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
                     .subFlowMapping(
                         "waterlog_today", sf -> sf.handle(waterLogHandler.waterTodayHandler()))
+                    .subFlowMapping("posturelog_create", sf -> sf.handle(postureLogHandler.postureCreateHandler()))
+                    .subFlowMapping("posturelog", sf-> sf.handle(postureLogHandler.postureHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();
@@ -108,7 +109,9 @@ public class MqttConfig {
   public MqttPahoMessageDrivenChannelAdapter mqttInboundChannelAdapter() {
     MqttPahoMessageDrivenChannelAdapter adapter =
         new MqttPahoMessageDrivenChannelAdapter(
-            MqttAsyncClient.generateClientId(), mqttPahoClientFactory(), BASE_TOPIC);
+            MqttAsyncClient.generateClientId(),
+            mqttPahoClientFactory(),
+            mqttProperties.getBASE_TOPIC());
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);

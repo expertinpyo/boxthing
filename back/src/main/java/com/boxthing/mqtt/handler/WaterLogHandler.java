@@ -11,6 +11,7 @@ import com.boxthing.api.querydsl.WaterLogQueryDsl;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.WaterLogRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
+import com.boxthing.config.MqttProperties;
 import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
 import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
 import com.boxthing.util.GsonUtil.LocalDateTimeAdapter;
@@ -33,7 +34,8 @@ public class WaterLogHandler {
 
   private final WaterLogQueryDsl waterLogQueryDsl;
   private final MqttOutboundGateway gateway;
-  private static final String BASE_TOPIC = "boxthing";
+
+  private final MqttProperties mqttProperties;
   private final Gson gson =
       new GsonBuilder()
           .setDateFormat(PATTERN_DATETIME)
@@ -97,7 +99,9 @@ public class WaterLogHandler {
                 .build();
         log.info("response : {}", responseDto);
         log.info("gson: {}", gson.toJson(responseDto));
-        gateway.publish(String.format("%s/%s", BASE_TOPIC, deviceId), gson.toJson(responseDto));
+        gateway.publish(
+            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
+            gson.toJson(responseDto));
       }
     };
   }
@@ -125,7 +129,9 @@ public class WaterLogHandler {
             MqttResponseDto.builder().type("waterGet").data(waterLogMapper.toList(list)).build();
         log.info("response : {}", responseDto);
         log.info("gson: {}", gson.toJson(responseDto));
-        gateway.publish(String.format("%s/%s", BASE_TOPIC, deviceId), gson.toJson(responseDto));
+        gateway.publish(
+            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
+            gson.toJson(responseDto));
       }
     };
   }

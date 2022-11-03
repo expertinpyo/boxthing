@@ -34,3 +34,6 @@ spring:
             redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - notifications
+mqtt:
+  BASE_TOPIC: "${BASE_TOPIC}"
+  BROKER_URL: "${BROKER_URL}"

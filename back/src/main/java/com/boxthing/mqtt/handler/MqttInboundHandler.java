@@ -9,6 +9,7 @@ import com.boxthing.api.mapper.UserMapper;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
+import com.boxthing.config.MqttProperties;
 import com.boxthing.mqtt.dto.MqttDto.MqttLogDto;
 import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
 import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
@@ -29,8 +30,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class MqttInboundHandler {
+
   private final MqttOutboundGateway gateway;
-  private static final String BASE_TOPIC = "boxthing";
+  private final MqttProperties mqttProperties;
   private final Gson gson = new Gson();
   private final QRCreator qrCreator;
 
@@ -62,7 +64,9 @@ public class MqttInboundHandler {
 
         MqttResponseDto responseDto =
             MqttResponseDto.builder().type("qr").data(responseData).build();
-        gateway.publish(String.format("%s/%s", BASE_TOPIC, deviceId), gson.toJson(responseDto));
+        gateway.publish(
+            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
+            gson.toJson(responseDto));
       }
     };
   }
@@ -95,7 +99,9 @@ public class MqttInboundHandler {
 
         MqttResponseDto responseDto =
             MqttResponseDto.builder().type("access_token").data(responseData).build();
-        gateway.publish(String.format("%s/%s", BASE_TOPIC, deviceId), gson.toJson(responseDto));
+        gateway.publish(
+            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
+            gson.toJson(responseDto));
       }
     };
   }

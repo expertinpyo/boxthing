@@ -1,9 +1,7 @@
 package com.boxthing.api.domain;
 
 import com.boxthing.api.inheritance.BaseLogEntity;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,24 +19,24 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @ToString
-@Table(name = "worklog")
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // 초기화 느낌으로 필요한 듯 싶음
-public class WorkLog extends BaseLogEntity {
+@Table(name = "posturelog")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class PostureLog extends BaseLogEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Integer time;
-
-  @ManyToOne(targetEntity = User.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+  @ManyToOne(targetEntity = User.class)
   @JoinColumn(name = "user_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
 
+  private Integer point;
+
   @Builder
-  public WorkLog(User user, Integer time) {
+  public PostureLog(User user, Integer point) {
     this.user = user;
-    this.time = time;
+    this.point = point;
   }
 }

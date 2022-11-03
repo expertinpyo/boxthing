@@ -21,11 +21,19 @@ import Welcome from "./layout/Welcome"
 
 import { ToastContainer, toast, cssTransition } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import { getWeather } from "./component/API/Weather"
 
-const bounce = cssTransition({
-  enter: "animate__animated animate__bounceIn",
-  exit: "animate__animated animate__bounceOut",
-})
+import backgroundVideo from "./asset/windysunny.mp4"
+
+function success(position: any) {
+  const latitude = position.coords.latitude
+  const longitude = position.coords.longitude
+  getWeather(latitude, longitude)
+}
+
+function error() {
+  console.log("Unable to retrieve your location")
+}
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState)
@@ -47,9 +55,11 @@ function App() {
       setCurrentTime(new Date())
     }, 1000)
 
-    toast("캘린더가 업데이트 되었습니다!", {
-      position: toast.POSITION.BOTTOM_RIGHT,
-    })
+    // toast("캘린더가 업데이트 되었습니다!", {
+    //   position: toast.POSITION.BOTTOM_RIGHT,
+    // })
+
+    navigator.geolocation.getCurrentPosition(success, error)
 
     return () => {
       window.removeEventListener("resize", handleResize)
@@ -66,6 +76,17 @@ function App() {
         {stretchModal ? <StretchingModal /> : null}
       </AnimatePresence>
       <ToastContainer />
+      <div className="video-container">
+        <video
+          autoPlay
+          muted
+          loop
+          id="myVideo"
+          // style={{ height: "100%", width: "100%", objectFit: "cover" }}
+        >
+          <source src={backgroundVideo} type="video/mp4" />
+        </video>
+      </div>
     </div>
   )
 }

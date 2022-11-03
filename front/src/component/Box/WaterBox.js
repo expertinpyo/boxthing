@@ -65,7 +65,7 @@ function WaterBox({ key }) {
         <div css={{ width: "100%", height: "100%" }}>
           {state ? (
             <div css={{ width: "100%", height: "100%" }}>
-              <Water />
+              <Water size={{ boxwidth: "300px", boxheight: "300px" }} />
               <WaterDailyGraph />
             </div>
           ) : (

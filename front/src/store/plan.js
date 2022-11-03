@@ -92,11 +92,11 @@ const planState = atom({
         self: true,
       },
       start: {
-        dateTime: "2022-10-31T11:15:00+09:00",
+        dateTime: "2022-11-03T13:45:00+09:00",
         timeZone: "Asia/Seoul",
       },
       end: {
-        dateTime: "2022-10-31T11:30:00+09:00",
+        dateTime: "2022-11-03T13:59:00+09:00",
         timeZone: "Asia/Seoul",
       },
       iCalUID: "5kdtfcmv5qhuj6qas12need0ct@google.com",

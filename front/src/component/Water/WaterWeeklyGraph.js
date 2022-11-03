@@ -17,9 +17,20 @@ const WaterWeeklyGraph = () => {
     },
     series: [
       {
-        name: "销量",
+        name: "총 음수량",
         type: "bar",
-        data: [5, 0, 2, 1, 3, 2, 5, 7, 8, 9],
+        data: [1200, 1300, 1350, 2000, 1300, 1400],
+        markLine: {
+          silent: true,
+          lineStyle: {
+            color: "#333",
+          },
+          data: [
+            {
+              yAxis: 1300,
+            },
+          ],
+        },
       },
     ],
   }

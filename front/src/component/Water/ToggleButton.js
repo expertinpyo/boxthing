@@ -27,7 +27,7 @@ const ToggleButton = ({ onClick }) => {
         ref={toggleContainer}
         style={{
           clipPath: toggleState ? "inset(0 0 0 50%)" : "inset(0 50% 0 0)",
-          backgroundColor: toggleState ? "#D74046" : "dodgerblue",
+          backgroundColor: toggleState ? "#11D200" : "dodgerblue",
         }}
       >
         <div class="toggle">

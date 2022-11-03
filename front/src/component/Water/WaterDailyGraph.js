@@ -28,13 +28,24 @@ const WaterDailyGraph = () => {
         show: false,
       },
     },
-    series: [
-      {
-        name: "销量",
-        type: "line",
-        data: [5, 0, 2],
+    series: {
+      symbol: "none",
+      name: "누적 음수량",
+      type: "line",
+      smooth: 0.5,
+      data: [100, 300, 500, 1300],
+      markLine: {
+        silent: true,
+        lineStyle: {
+          color: "#333",
+        },
+        data: [
+          {
+            yAxis: 1300,
+          },
+        ],
       },
-    ],
+    },
   }
   return <ReactECharts option={option} style={{ height: "100%" }} />
 }

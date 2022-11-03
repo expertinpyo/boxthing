@@ -3,7 +3,7 @@
 import RPi.GPIO as GPIO
 import time
 import threading
-
+GPIO.setwarnings(False)
 
 
 class HX711:
@@ -222,7 +222,7 @@ class HX711:
 
 
     def get_value_A(self, times=3):
-        return self.read_median(times) - self.get_offset_A()
+        return self.read_median(times)
 
 
     def get_value_B(self, times=3):

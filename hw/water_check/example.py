@@ -67,7 +67,7 @@ while True:
         # Prints the weight. Comment if you're debbuging the MSB and LSB issue.
         val = hx.get_weight(5)
         
-        int_val = int(val)
+        int_val = int(val) + 220
         if -3 <= int_val - check_data_next <= 3:
             if check_cnt < 5:
                 check_cnt += 1

@@ -9,7 +9,7 @@ import com.boxthing.api.mapper.UserMapper;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
-import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
+import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
 import com.google.gson.Gson;
 import java.io.IOException;
 import javax.servlet.ServletException;

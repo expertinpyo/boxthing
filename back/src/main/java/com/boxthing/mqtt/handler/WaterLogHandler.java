@@ -12,9 +12,12 @@ import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.WaterLogRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
 import com.boxthing.config.MqttProperties;
-import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterBeforeReqData;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterReqData;
+import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
 import com.boxthing.util.GsonUtil.LocalDateTimeAdapter;
+import com.boxthing.util.ObjectConvertUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
@@ -45,24 +48,24 @@ public class WaterLogHandler {
   private final WaterLogRepository waterLogRepository;
   private final WaterLogMapper waterLogMapper;
 
+  private final ObjectConvertUtil objectConvertUtil;
+
   public MessageHandler waterCreatHandler() {
     return new MessageHandler() {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+        MqttRequestDto<MqttWaterReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
         String deviceId = requestDto.getDeviceId();
-        LinkedTreeMap data = (LinkedTreeMap) requestDto.getData();
-        Double rawAmount = (Double) data.get("amount");
-        Float amount = rawAmount.floatValue();
+        MqttWaterReqData data = requestDto.getData();
 
-        log.info("device : {}", deviceRepository.findBySerialNumber(deviceId));
+        Float amount = data.getAmount().floatValue();
+
         Device device = deviceRepository.findBySerialNumber(deviceId);
         User user = device.getUser();
-        log.info("user : {}", user);
+
         WaterLogRequestDto waterDto =
             WaterLogRequestDto.builder().amount(amount).user(user).build();
-        log.info("waterDto, {}", waterDto.toString());
         waterLogRepository.save(waterLogMapper.toEntity(waterDto));
       }
     };
@@ -73,8 +76,10 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+        MqttRequestDto<MqttWaterBeforeReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
+
         String deviceId = requestDto.getDeviceId();
+        MqttWaterBeforeReqData data = requestDto.getData();
 
         Device device = deviceRepository.findBySerialNumber(deviceId);
         User user = device.getUser();
@@ -83,18 +88,15 @@ public class WaterLogHandler {
           log.info("This device doesn't have any user");
           return;
         }
+        Integer before = data.getBefore();
 
-        LinkedTreeMap data = (LinkedTreeMap) requestDto.getData();
-        log.info("data : {}", data);
-        Double beforeDouble = (Double) data.get("before");
-        Integer before = beforeDouble.intValue();
         log.info("before : {}", before);
         List<WaterLog> list = waterLogQueryDsl.findAllByUserAndDate(user, before);
         log.info("result list : {}", list);
 
         MqttResponseDto responseDto =
             MqttResponseDto.builder()
-                .type("waterGet")
+                .type("waterlog")
                 .data(waterLogMapper.toDateList(list))
                 .build();
         log.info("response : {}", responseDto);
@@ -122,11 +124,10 @@ public class WaterLogHandler {
           return;
         }
 
-        LinkedTreeMap data = (LinkedTreeMap) requestDto.getData();
         List<WaterLog> list = waterLogQueryDsl.findallByUserAndToday(user);
 
         MqttResponseDto responseDto =
-            MqttResponseDto.builder().type("waterGet").data(waterLogMapper.toList(list)).build();
+            MqttResponseDto.builder().type("waterlog_today").data(waterLogMapper.toList(list)).build();
         log.info("response : {}", responseDto);
         log.info("gson: {}", gson.toJson(responseDto));
         gateway.publish(

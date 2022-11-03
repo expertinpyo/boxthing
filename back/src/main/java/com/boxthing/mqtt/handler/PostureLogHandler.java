@@ -2,20 +2,12 @@ package com.boxthing.mqtt.handler;
 
 import static com.boxthing.util.GsonUtil.PATTERN_DATETIME;
 
-import com.boxthing.api.domain.Device;
-import com.boxthing.api.domain.User;
-import com.boxthing.api.dto.WaterLogDto.WaterLogRequestDto;
-import com.boxthing.api.mapper.WaterLogMapper;
-import com.boxthing.api.querydsl.WaterLogQueryDsl;
 import com.boxthing.api.repository.DeviceRepository;
-import com.boxthing.api.repository.WaterLogRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
 import com.boxthing.config.MqttProperties;
-import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
 import com.boxthing.util.GsonUtil.LocalDateTimeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.LinkedTreeMap;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +34,7 @@ public class PostureLogHandler {
     return new MessageHandler() {
       @Override
       public void handleMessage(Message<?> message)
-          throws MessagingException, NullPointerException {
-        }
+          throws MessagingException, NullPointerException {}
     };
   }
 
@@ -51,9 +42,7 @@ public class PostureLogHandler {
     return new MessageHandler() {
       @Override
       public void handleMessage(Message<?> message)
-          throws MessagingException, NullPointerException {
-      }
+          throws MessagingException, NullPointerException {}
     };
   }
-
 }

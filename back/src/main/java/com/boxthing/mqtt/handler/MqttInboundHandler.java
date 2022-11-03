@@ -10,14 +10,16 @@ import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
 import com.boxthing.config.MqttProperties;
-import com.boxthing.mqtt.dto.MqttDto.MqttLogDto;
-import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttProviderReqData;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
+import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
+import com.boxthing.mqtt.dto.MqttResDto.MqttProviderResDto;
+import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
 import com.boxthing.security.oauth2.QRCreator;
+import com.boxthing.util.ObjectConvertUtil;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ public class MqttInboundHandler {
   private final Gson gson = new Gson();
   private final QRCreator qrCreator;
 
+  private final ObjectConvertUtil objectConvertUtil;
   private final DeviceRepository deviceRepository;
   private final DeviceMapper deviceMapper;
 
@@ -48,22 +51,22 @@ public class MqttInboundHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
-        String deviceId = requestDto.getDeviceId();
-        log.info("Data : {}", requestDto.getData());
-        LinkedTreeMap<String, String> data =
-            (LinkedTreeMap<java.lang.String, java.lang.String>) requestDto.getData();
-        String site = data.get("provider");
+        MqttRequestDto<MqttProviderReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
 
-        String qrUrl = qrCreator.hashedUri(deviceId, site);
+        String deviceId = requestDto.getDeviceId();
+        MqttProviderReqData data = requestDto.getData();
+
+        String qrUrl = qrCreator.hashedUri(deviceId, data.getProvider());
         if (qrUrl == null) {
           return;
         }
-        LinkedTreeMap<String, String> responseData = new LinkedTreeMap<>();
-        responseData.put("provider", qrUrl);
+        MqttProviderResDto responseResDto = MqttProviderResDto.builder()
+            .provider(data.getProvider())
+            .link(qrUrl)
+            .build();
 
         MqttResponseDto responseDto =
-            MqttResponseDto.builder().type("qr").data(responseData).build();
+            MqttResponseDto.builder().type("qr").data(responseResDto).build();
         gateway.publish(
             String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
             gson.toJson(responseDto));
@@ -77,28 +80,23 @@ public class MqttInboundHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+        MqttRequestDto<MqttProviderReqData> requestDto = objectConvertUtil.ObjectConverter(message.getPayload());
         String deviceId = requestDto.getDeviceId();
-        LinkedTreeMap<String, String> data =
-            (LinkedTreeMap<java.lang.String, java.lang.String>) requestDto.getData();
-        String site = data.get("provider");
+        MqttProviderReqData data = requestDto.getData();
 
         Device device = deviceRepository.findBySerialNumber(deviceId);
         if (device == null || device.getUser() == null) {
           return;
         }
-        LinkedTreeMap<String, String> responseData = new LinkedTreeMap<>();
-        responseData.put("provider", site);
-        if (site.equals("google")) {
-          responseData.put("access_token", device.getUser().getGoogleRefreshJws());
-        } else if (site.equals("github")) {
-          responseData.put("access_token", device.getUser().getGithubJws());
-        } else {
-          return;
+        MqttAccessTokenResDto tokenDto = MqttAccessTokenResDto.builder().provider(data.getProvider()).build();
+        if (data.getProvider().equals("google")){
+          tokenDto.setAccessToken(device.getUser().getGoogleRefreshJws());
+        } else if(data.getProvider().equals("github")) {
+          tokenDto.setAccessToken(device.getUser().getGithubJws());
         }
 
         MqttResponseDto responseDto =
-            MqttResponseDto.builder().type("access_token").data(responseData).build();
+            MqttResponseDto.builder().type("access_token").data(tokenDto).build();
         gateway.publish(
             String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
             gson.toJson(responseDto));
@@ -110,10 +108,8 @@ public class MqttInboundHandler {
     return new MessageHandler() {
       @Override
       public void handleMessage(Message<?> message) throws MessagingException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+        MqttRequestDto<Object> requestDto = (MqttRequestDto<Object>) message.getPayload();
         String deviceId = requestDto.getDeviceId();
-        @SuppressWarnings("unchecked")
-        List<MqttLogDto> data = (List<MqttLogDto>) requestDto.getData();
         Device device = deviceRepository.findBySerialNumber(deviceId);
         User user = device.getUser();
 

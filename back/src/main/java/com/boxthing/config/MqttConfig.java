@@ -1,7 +1,6 @@
 package com.boxthing.config;
 
-import com.boxthing.api.repository.DeviceRepository;
-import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
 import com.boxthing.mqtt.handler.InitHandler;
 import com.boxthing.mqtt.handler.MqttInboundHandler;
 import com.boxthing.mqtt.handler.PostureLogHandler;
@@ -63,7 +62,7 @@ public class MqttConfig {
             MqttRequestDto::getType,
             mapping ->
                 mapping
-                    .subFlowMapping("register", sf -> sf.handle(inItHandler.registerHandler()))
+//                    .subFlowMapping("register", sf -> sf.handle(inItHandler.registerHandler()))
                     .subFlowMapping("init", sf -> sf.handle(inItHandler.bootHandler()))
                     .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
                     .subFlowMapping("disconnect", sf -> sf.handle(inboundHandler.logoutHandler()))
@@ -74,15 +73,18 @@ public class MqttConfig {
                     .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
                     .subFlowMapping(
                         "waterlog_today", sf -> sf.handle(waterLogHandler.waterTodayHandler()))
-                    .subFlowMapping("posturelog_create", sf -> sf.handle(postureLogHandler.postureCreateHandler()))
-                    .subFlowMapping("posturelog", sf-> sf.handle(postureLogHandler.postureHandler()))
+                    .subFlowMapping(
+                        "posturelog_create",
+                        sf -> sf.handle(postureLogHandler.postureCreateHandler()))
+                    .subFlowMapping(
+                        "posturelog", sf -> sf.handle(postureLogHandler.postureHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();
   }
 
-  private GenericTransformer<String, MqttRequestDto> mqttRequestTransformer() {
-    return new GenericTransformer<String, MqttRequestDto>() {
+  private GenericTransformer<String, MqttRequestDto<Object>> mqttRequestTransformer() {
+    return new GenericTransformer<String, MqttRequestDto<Object>>() {
       @Override
       public MqttRequestDto transform(String payload) {
         Type type = new TypeToken<MqttRequestDto>() {}.getType();

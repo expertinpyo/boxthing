@@ -8,9 +8,11 @@ import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
 import com.boxthing.config.MqttConfig.MqttOutboundGateway;
 import com.boxthing.config.MqttProperties;
-import com.boxthing.mqtt.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.dto.MqttDto.MqttResponseDto;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
+import com.boxthing.mqtt.dto.MqttResDto.MqttLoginResDto;
+import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
 import com.boxthing.security.oauth2.QRCreator;
+import com.boxthing.util.ObjectConvertUtil;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Component;
 public class InitHandler {
   private final MqttOutboundGateway gateway;
 
+  private final ObjectConvertUtil objectConvertUtil;
   private final MqttProperties mqttProperties;
   private final Gson gson = new Gson();
   private final QRCreator qrCreator;
@@ -44,19 +47,15 @@ public class InitHandler {
         MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
         String deviceId = requestDto.getDeviceId();
         Device device = deviceRepository.findBySerialNumber(deviceId);
-        LinkedTreeMap<String, Boolean> data = new LinkedTreeMap<>();
 
-        if (device == null) {
-          data.put("is_registered", false);
-          data.put("is_login", false);
-        } else if (device.getUser() == null) {
-          data.put("is_registered", true);
-          data.put("is_login", false);
+
+        MqttLoginResDto data = MqttLoginResDto.builder().build();
+
+        if (device == null || device.getUser() == null){
+          data.setIsLogin(false);
         } else {
-          data.put("is_registered", true);
-          data.put("is_login", true);
+          data.setIsLogin(true);
         }
-
         MqttResponseDto responseDto = MqttResponseDto.builder().type("init").data(data).build();
         gateway.publish(
             String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
@@ -65,29 +64,29 @@ public class InitHandler {
     };
   }
 
-  public MessageHandler registerHandler() {
-    return new MessageHandler() {
-      @Override
-      public void handleMessage(Message<?> message) throws MessagingException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
-        String deviceId = requestDto.getDeviceId();
-        if (deviceRepository.findBySerialNumber(deviceId) != null) {
-          log.info("Already existed Serial Number");
-          return;
-        }
-        DeviceRequestDto deviceRequestDto =
-            DeviceRequestDto.builder().serialNumber(deviceId).build();
-        deviceRepository.save(deviceMapper.toEntity(deviceRequestDto));
-        log.info("Device has been registered");
-        HashMap is_registered = new HashMap<String, Boolean>();
-        is_registered.put("is_registered", true);
-
-        MqttResponseDto responseDto =
-            MqttResponseDto.builder().type("register").data(is_registered).build();
-        gateway.publish(
-            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
-            gson.toJson(responseDto));
-      }
-    };
-  }
+//  public MessageHandler registerHandler() {
+//    return new MessageHandler() {
+//      @Override
+//      public void handleMessage(Message<?> message) throws MessagingException {
+//        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+//        String deviceId = requestDto.getDeviceId();
+//        if (deviceRepository.findBySerialNumber(deviceId) != null) {
+//          log.info("Already existed Serial Number");
+//          return;
+//        }
+//        DeviceRequestDto deviceRequestDto =
+//            DeviceRequestDto.builder().serialNumber(deviceId).build();
+//        deviceRepository.save(deviceMapper.toEntity(deviceRequestDto));
+//        log.info("Device has been registered");
+//        HashMap is_registered = new HashMap<String, Boolean>();
+//        is_registered.put("is_registered", true);
+//
+//        MqttResponseDto responseDto =
+//            MqttResponseDto.builder().type("register").data(is_registered).build();
+//        gateway.publish(
+//            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
+//            gson.toJson(responseDto));
+//      }
+//    };
+//  }
 }

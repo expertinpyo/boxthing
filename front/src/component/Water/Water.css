@@ -12,8 +12,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #020438;
+  background: #fff;
   border-radius: 100%;
+  /* border: 1px solid black; */
   overflow: hidden;
 }
 .box .percent {
@@ -27,8 +28,8 @@
   display: -webkit-flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 64px;
+  color: #020438;
+  font-size: 80px;
 }
 .box .water {
   position: absolute;

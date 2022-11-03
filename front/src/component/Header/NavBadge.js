@@ -2,7 +2,7 @@
 
 import { useRecoilValue } from "recoil"
 import { unreadNotiState } from "../../store/noti"
-import WarningFrame from "../../asset/nav_icon/warningFrame.png"
+import WarningFrame from "../../asset/nav_icon/warning.png"
 const NavBadge = () => {
   const unread = useRecoilValue(unreadNotiState)
 
@@ -17,7 +17,7 @@ const NavBadge = () => {
             top: -5,
             right: -5,
             color: "white",
-            fontSize: 12,
+            fontSize: 20,
             fontWeight: "bold",
             lineHeight: 0,
             display: "flex",
@@ -30,7 +30,9 @@ const NavBadge = () => {
             alt=""
             css={{ width: "100%", position: "relative" }}
           />
-          <div css={{ position: "absolute", zIndex: "1" }}>{unread.length}</div>
+          <div css={{ marginTop: 5, position: "absolute", zIndex: "1" }}>
+            {unread.length}
+          </div>
         </div>
       ) : (
         false

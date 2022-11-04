@@ -1,12 +1,14 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import "./App.css"
 import { useSetRecoilState, useRecoilState, useRecoilValue } from "recoil"
 import { timerState } from "./store/timer"
 import Layout from "./layout/Layout"
 import WaterModal from "./component/Modal/WaterModal"
 import StretchingModal from "./component/Modal/StretchingModal"
+
+import { apiKey } from "./component/API/Weather"
 
 import { AnimatePresence } from "framer-motion"
 
@@ -21,25 +23,17 @@ import Welcome from "./layout/Welcome"
 
 import { ToastContainer, toast, cssTransition } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import { getWeather } from "./component/API/Weather"
 
-import backgroundVideo from "./asset/windysunny.mp4"
-
-function success(position: any) {
-  const latitude = position.coords.latitude
-  const longitude = position.coords.longitude
-  getWeather(latitude, longitude)
-}
-
-function error() {
-  console.log("Unable to retrieve your location")
-}
+import { weatherState, weatherVideoState } from "./store/weather"
+import axios from "axios"
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState)
   const [waterModal, openWaterModal] = useRecoilState(waterModalState)
   const [postureModal, openPostureModal] = useRecoilState(postureModalState)
   const [stretchModal, openStretchModal] = useRecoilState(stretchModalState)
+  const weather = useRecoilValue(weatherVideoState)
+  const setWeather = useSetRecoilState(weatherState)
 
   const login = useRecoilValue(loginState)
 
@@ -59,13 +53,31 @@ function App() {
     //   position: toast.POSITION.BOTTOM_RIGHT,
     // })
 
-    navigator.geolocation.getCurrentPosition(success, error)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latitude = position.coords.latitude
+        const longitude = position.coords.longitude
+        axios
+          .get(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`,
+            {}
+          )
+          .then((response) => {
+            console.log(response.data.weather[0].id)
+            setWeather(response.data.weather[0].id)
+          })
+          .catch((error) => "Clear")
+      },
+      () => {
+        console.log("Unable to retrieve your location")
+      }
+    )
 
     return () => {
       window.removeEventListener("resize", handleResize)
       clearInterval(timer)
     }
-  }, [setCurrentTime])
+  }, [setCurrentTime, setWeather])
 
   return (
     <div className="App">
@@ -84,7 +96,7 @@ function App() {
           id="myVideo"
           // style={{ height: "100%", width: "100%", objectFit: "cover" }}
         >
-          <source src={backgroundVideo} type="video/mp4" />
+          <source src={weather} type="video/mp4" />
         </video>
       </div>
     </div>

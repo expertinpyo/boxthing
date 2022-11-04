@@ -58,7 +58,7 @@ public class MqttConfig {
     return IntegrationFlows.from(mqttInboundChannelAdapter())
         .transform(mqttRequestTransformer())
         .filter(mqttRequestFilter())
-        .<MqttRequestDto, String>route(
+        .<MqttRequestDto<Object>, String>route(
             MqttRequestDto::getType,
             mapping ->
                 mapping
@@ -79,8 +79,6 @@ public class MqttConfig {
                         sf -> sf.handle(postureLogHandler.postureCreateHandler()))
                     .subFlowMapping(
                         "posturelog", sf -> sf.handle(postureLogHandler.postureHandler()))
-                    .subFlowMapping(
-                        "refresh_token", sf -> sf.handle(inboundHandler.refreshHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();
@@ -89,8 +87,8 @@ public class MqttConfig {
   private GenericTransformer<String, MqttRequestDto<Object>> mqttRequestTransformer() {
     return new GenericTransformer<String, MqttRequestDto<Object>>() {
       @Override
-      public MqttRequestDto transform(String payload) {
-        Type type = new TypeToken<MqttRequestDto>() {}.getType();
+      public MqttRequestDto<Object> transform(String payload) {
+        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
         return gson.fromJson(payload, type);
       }
     };

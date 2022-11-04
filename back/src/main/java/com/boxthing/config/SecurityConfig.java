@@ -1,6 +1,5 @@
 package com.boxthing.config;
 
-import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.security.oauth2.CustomAuthorizationRequestResolver;
 import com.boxthing.security.oauth2.CustomSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +22,6 @@ public class SecurityConfig {
   // Spring Security 5.7.0 부터는 SecurityFilterChain을 빈으로 등록하여 사용하는 것을 권장함
   private final ClientRegistrationRepository clientRegistrationRepository;
   private final CustomSuccessHandler successHandler;
-
-  private final DeviceRepository deviceRepository;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

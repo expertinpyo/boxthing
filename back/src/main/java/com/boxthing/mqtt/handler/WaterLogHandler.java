@@ -1,6 +1,7 @@
 package com.boxthing.mqtt.handler;
 
 import static com.boxthing.util.GsonUtil.PATTERN_DATETIME;
+import static com.boxthing.util.ObjectConvertUtil.jsonConverter;
 
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.domain.User;
@@ -17,9 +18,10 @@ import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterBeforeReqData;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterReqData;
 import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
 import com.boxthing.util.GsonUtil.LocalDateTimeAdapter;
-import com.boxthing.util.ObjectConvertUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -47,15 +49,13 @@ public class WaterLogHandler {
   private final WaterLogRepository waterLogRepository;
   private final WaterLogMapper waterLogMapper;
 
-  private final ObjectConvertUtil objectConvertUtil;
-
   public MessageHandler waterCreatHandler() {
     return new MessageHandler() {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttWaterReqData> requestDto =
-            objectConvertUtil.ObjectConverter(message.getPayload());
+        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
+        MqttRequestDto<MqttWaterReqData> requestDto = jsonConverter(message.getPayload());
         String deviceId = requestDto.getDeviceId();
         MqttWaterReqData data = requestDto.getData();
 
@@ -76,8 +76,8 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttWaterBeforeReqData> requestDto =
-            objectConvertUtil.ObjectConverter(message.getPayload());
+        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
+        MqttRequestDto<MqttWaterBeforeReqData> requestDto = jsonConverter(message.getPayload());
 
         String deviceId = requestDto.getDeviceId();
         MqttWaterBeforeReqData data = requestDto.getData();

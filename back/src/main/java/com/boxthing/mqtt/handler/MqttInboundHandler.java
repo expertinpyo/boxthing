@@ -1,5 +1,7 @@
 package com.boxthing.mqtt.handler;
 
+import static com.boxthing.util.ObjectConvertUtil.jsonConverter;
+
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.domain.User;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
@@ -16,10 +18,10 @@ import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttProviderResDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
 import com.boxthing.util.AccessTokenRefresh;
-import com.boxthing.util.ObjectConvertUtil;
 import com.boxthing.util.QRCreator;
 import com.google.gson.Gson;
-import java.io.IOException;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -39,7 +41,6 @@ public class MqttInboundHandler {
   private final Gson gson = new Gson();
   private final QRCreator qrCreator;
 
-  private final ObjectConvertUtil objectConvertUtil;
   private final DeviceRepository deviceRepository;
   private final DeviceMapper deviceMapper;
 
@@ -54,13 +55,17 @@ public class MqttInboundHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttProviderReqData> requestDto =
-            objectConvertUtil.ObjectConverter(message.getPayload());
-
+        log.info("message : {}", message);
+        log.info("payload : {}", message.getPayload());
+        Type type = new TypeToken<MqttRequestDto<MqttProviderReqData>>() {}.getType();
+        MqttRequestDto<MqttProviderReqData> requestDto = jsonConverter2(message.getPayload());
+        log.info("{}", requestDto);
         String deviceId = requestDto.getDeviceId();
         MqttProviderReqData data = requestDto.getData();
 
+        //
         String qrUrl = qrCreator.hashedUri(deviceId, data.getProvider());
+        log.info("{} {} {}", deviceId, data, qrUrl);
         if (qrUrl == null) {
           return;
         }
@@ -82,8 +87,8 @@ public class MqttInboundHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        MqttRequestDto<MqttProviderReqData> requestDto =
-            objectConvertUtil.ObjectConverter(message.getPayload());
+        Type type = new TypeToken<MqttRequestDto<MqttProviderReqData>>() {}.getType();
+        MqttRequestDto<MqttProviderReqData> requestDto = jsonConverter(message.getPayload());
         String deviceId = requestDto.getDeviceId();
         MqttProviderReqData data = requestDto.getData();
 
@@ -94,7 +99,9 @@ public class MqttInboundHandler {
         MqttAccessTokenResDto tokenDto =
             MqttAccessTokenResDto.builder().provider(data.getProvider()).build();
         if (data.getProvider().equals("google")) {
-          tokenDto.setAccessToken(device.getUser().getGoogleRefreshJws());
+          String accessToken =
+              accessTokenRefresh.getAccessToken(device.getUser().getGoogleRefreshJws());
+          tokenDto.setAccessToken(accessToken);
         } else if (data.getProvider().equals("github")) {
           tokenDto.setAccessToken(device.getUser().getGithubJws());
         }
@@ -151,31 +158,9 @@ public class MqttInboundHandler {
     };
   }
 
-  public MessageHandler refreshHandler() {
-    return new MessageHandler() {
-      @Override
-      public void handleMessage(Message<?> message)
-          throws MessagingException, NullPointerException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
-        log.info("{}", requestDto);
-        String deviceId = requestDto.getDeviceId();
-        //
-        Device device = deviceRepository.findBySerialNumber(deviceId);
-        User user = device.getUser();
-        log.info("{} {}", device, user);
-        //        if (device == null
-        //            || device.getUser() == null
-        //            || device.getUser().getGoogleRefreshJws() == null) {
-        //          return;
-        //        }
-        //
-
-        try {
-          accessTokenRefresh.getAccessToken(user.getGoogleRefreshJws());
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    };
+  private <T> T jsonConverter2(Object object) {
+    Gson gson = new Gson();
+    Type type = new TypeToken<T>() {}.getType();
+    return gson.fromJson(gson.toJson(object), type);
   }
 }

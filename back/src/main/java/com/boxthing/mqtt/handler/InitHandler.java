@@ -10,7 +10,6 @@ import com.boxthing.config.MqttProperties;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttLoginResDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
-import com.boxthing.util.ObjectConvertUtil;
 import com.boxthing.util.QRCreator;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
 public class InitHandler {
   private final MqttOutboundGateway gateway;
 
-  private final ObjectConvertUtil objectConvertUtil;
   private final MqttProperties mqttProperties;
   private final Gson gson = new Gson();
   private final QRCreator qrCreator;

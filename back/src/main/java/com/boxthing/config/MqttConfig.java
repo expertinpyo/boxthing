@@ -57,29 +57,16 @@ public class MqttConfig {
     return IntegrationFlows.from(mqttInboundChannelAdapter())
         .transform(mqttRequestTransformer())
         .filter(mqttRequestFilter())
-        .<MqttRequestDto<Object>, String>route(
-            MqttRequestDto::getType,
-            mapping ->
-                mapping
-                    //                    .subFlowMapping("register", sf ->
-                    // sf.handle(inItHandler.registerHandler()))
-                    .subFlowMapping("init", sf -> sf.handle(inItHandler.bootHandler()))
-                    .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
-                    .subFlowMapping("disconnect", sf -> sf.handle(inboundHandler.logoutHandler()))
-                    .subFlowMapping(
-                        "access_token", sf -> sf.handle(inboundHandler.accessTokenHandler()))
-                    .subFlowMapping(
-                        "waterlog_create", sf -> sf.handle(waterLogHandler.waterCreatHandler()))
-                    .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
-                    .subFlowMapping(
-                        "waterlog_today", sf -> sf.handle(waterLogHandler.waterTodayHandler()))
-                    .subFlowMapping(
-                        "posturelog_create",
-                        sf -> sf.handle(postureLogHandler.postureCreateHandler()))
-                    .subFlowMapping(
-                        "posturelog", sf -> sf.handle(postureLogHandler.postureHandler()))
-                    .defaultOutputChannel("errorChannel")
-                    .resolutionRequired(false))
+        .enrichHeaders(
+            h ->
+                h.headerExpression(
+                    "trimmedTopic",
+                    "'mqtt-'+headers['"
+                        + MqttHeaders.RECEIVED_TOPIC
+                        + "'].substring("
+                        + (mqttProperties.getBASE_TOPIC() + "/server/").length()
+                        + ")"))
+        .route("headers['trimmedTopic']")
         .get();
   }
 
@@ -102,18 +89,18 @@ public class MqttConfig {
         if (requestDto.getDeviceId() == null) {
           return false;
         }
-        return true;
         // TODO: deviceId가 우리 db에 있는지 검증
+
+        return true;
       }
     };
   }
 
   public MqttPahoMessageDrivenChannelAdapter mqttInboundChannelAdapter() {
+    String topic = mqttProperties.getBASE_TOPIC() + "/server/#";
     MqttPahoMessageDrivenChannelAdapter adapter =
         new MqttPahoMessageDrivenChannelAdapter(
-            MqttAsyncClient.generateClientId(),
-            mqttPahoClientFactory(),
-            mqttProperties.getBASE_TOPIC());
+            MqttAsyncClient.generateClientId(), mqttPahoClientFactory(), topic);
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);

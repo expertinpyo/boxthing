@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
@@ -158,9 +160,11 @@ public class MqttInboundHandler {
     };
   }
 
-  private <T> T jsonConverter2(Object object) {
-    Gson gson = new Gson();
-    Type type = new TypeToken<T>() {}.getType();
-    return gson.fromJson(gson.toJson(object), type);
+  @Bean
+  @ServiceActivator(inputChannel = "mqtt-qr")
+  public MessageHandler qrHandlerNew() {
+    return message -> {
+      System.out.println("message payload: " + message.getPayload());
+    };
   }
 }

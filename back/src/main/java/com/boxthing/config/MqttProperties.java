@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "mqtt")
 @Data
 public class MqttProperties {
-  private String BASE_TOPIC;
-  private String BROKER_URL;
+  private String baseTopic;
+  private String brokerUrl;
 }

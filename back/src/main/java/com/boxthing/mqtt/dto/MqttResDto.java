@@ -12,12 +12,14 @@ public class MqttResDto {
   @NoArgsConstructor
   public static class MqttResponseDto {
     String type;
+    String message;
     Object data;
 
     @Builder
-    public MqttResponseDto(String type, Object data) {
+    public MqttResponseDto(String type, Object data, String message) {
       this.type = type;
       this.data = data;
+      this.message = message;
     }
   }
 

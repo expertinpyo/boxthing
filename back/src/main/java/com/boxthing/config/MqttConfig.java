@@ -45,7 +45,7 @@ public class MqttConfig {
   @Bean
   public MqttPahoClientFactory mqttPahoClientFactory() {
     MqttConnectOptions options = new MqttConnectOptions();
-    options.setServerURIs(new String[] {mqttProperties.getBROKER_URL()});
+    options.setServerURIs(new String[] {mqttProperties.getBrokerUrl()});
     DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
     factory.setConnectionOptions(options);
 
@@ -113,7 +113,7 @@ public class MqttConfig {
         new MqttPahoMessageDrivenChannelAdapter(
             MqttAsyncClient.generateClientId(),
             mqttPahoClientFactory(),
-            mqttProperties.getBASE_TOPIC());
+            mqttProperties.getBaseTopic());
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);

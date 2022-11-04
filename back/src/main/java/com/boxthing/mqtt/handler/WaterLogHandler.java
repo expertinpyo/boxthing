@@ -1,7 +1,7 @@
 package com.boxthing.mqtt.handler;
 
 import static com.boxthing.util.GsonUtil.PATTERN_DATETIME;
-import static com.boxthing.util.ObjectConvertUtil.jsonConverter;
+import static com.boxthing.util.UtilMethods.jsonConverter;
 
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.domain.User;

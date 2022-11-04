@@ -34,7 +34,6 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
-<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
   private final InitHandler inItHandler;
   private final MqttInboundHandler inboundHandler;
   private final WaterLogHandler waterLogHandler;
@@ -58,7 +57,6 @@ public class MqttConfig {
     return IntegrationFlows.from(mqttInboundChannelAdapter())
         .transform(mqttRequestTransformer())
         .filter(mqttRequestFilter())
-<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
         .<MqttRequestDto<Object>, String>route(
             MqttRequestDto::getType,
             mapping ->
@@ -85,7 +83,6 @@ public class MqttConfig {
         .get();
   }
 
-<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
   private GenericTransformer<String, MqttRequestDto<Object>> mqttRequestTransformer() {
     return new GenericTransformer<String, MqttRequestDto<Object>>() {
       @Override
@@ -101,7 +98,6 @@ public class MqttConfig {
       @Override
       public boolean accept(Message<?> message) {
         MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
-<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
         log.info("serialNumber : {}", requestDto.getDeviceId());
         if (requestDto.getDeviceId() == null) {
           return false;

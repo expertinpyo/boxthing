@@ -68,6 +68,7 @@ while True:
         val = hx.get_weight(5)
         
         int_val = int(val) + 220
+        print(int_val)
         if -3 <= int_val - check_data_next <= 3:
             if check_cnt < 5:
                 check_cnt += 1
@@ -91,7 +92,7 @@ while True:
 
         hx.power_down()
         hx.power_up()
-        time.sleep(0.1)
+        time.sleep(0.001)
 
     except (KeyboardInterrupt, SystemExit):
         cleanAndExit()

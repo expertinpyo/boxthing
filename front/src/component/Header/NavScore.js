@@ -12,7 +12,7 @@ const NavScore = () => {
         bottom: 0,
         right: -5,
         color: score > 80 ? "green" : "red",
-        fontSize: 20,
+        fontSize: 16,
         fontWeight: "bold",
         lineHeight: 0,
         display: "flex",

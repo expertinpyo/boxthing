@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect } from "react";
-import { WaterAnimation } from "../Water/Water";
+import Hurry from "../../asset/nav_icon/hurry.gif";
 
-const WaterModal = ({ state, setter }) => {
+const PlanModal = ({ state, setter }) => {
   useEffect(() => {
     if (state) {
       setTimeout(() => {
@@ -11,7 +11,6 @@ const WaterModal = ({ state, setter }) => {
       }, 3000);
     }
   }, [state, setter]);
-
   return (
     <div
       css={{
@@ -19,9 +18,9 @@ const WaterModal = ({ state, setter }) => {
         width: "100%",
         height: "100%",
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
         // transform: "translate(-50%, -50%)",
         background: "rgba(255, 255, 255, 0.375)",
         zIndex: 3,
@@ -30,10 +29,10 @@ const WaterModal = ({ state, setter }) => {
         opacity: state ? 1 : 0,
       }}
     >
-      <WaterAnimation />
-      <div css={{ fontWeight: "bold" }}>250ml 섭취하셨습니다!</div>
+      <img src={Hurry} alt="" css={{ width: 200 }} />
+      <div css={{ fontWeight: "bold" }}>일정이 임박했습니다!</div>
     </div>
   );
 };
 
-export default WaterModal;
+export default PlanModal;

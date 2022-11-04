@@ -29,6 +29,8 @@ function PostureBox({ key }) {
       <div css={{ position: "relative", width: "100%", height: "100%" }}>
         <div css={{ position: "absolute", top: 0, right: 0, zIndex: 10 }}>
           <ToggleButton
+            leftText={"RUNTIME"}
+            rightText={"TODAY"}
             onClick={() => {
               setState((pre) => !pre)
             }}
@@ -41,7 +43,9 @@ function PostureBox({ key }) {
           }}
         >
           {state ? (
-            <>
+            <PostureGraph />
+          ) : (
+            <div css={{ width: "100%", height: "100%" }}>
               <PostureLineGraph />
               <div
                 css={{
@@ -63,9 +67,7 @@ function PostureBox({ key }) {
                 >{`오늘 하루 자세 평균 점수 : `}</span>
                 <span css={{ fontWeight: "bold", color: "green" }}>79</span>
               </div>
-            </>
-          ) : (
-            <PostureGraph />
+            </div>
           )}
         </div>
       </div>

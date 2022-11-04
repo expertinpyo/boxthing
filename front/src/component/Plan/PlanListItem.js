@@ -8,7 +8,7 @@ const PlanListItem = ({ item }) => {
     <div
       css={{
         width: "100%",
-        height: "15%",
+        height: "20%",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -30,6 +30,7 @@ const PlanListItem = ({ item }) => {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            fontSize: "1.2rem",
           }}
         >
           {item.summary}
@@ -37,7 +38,7 @@ const PlanListItem = ({ item }) => {
         <div
           css={{
             color: "var(--font-sub-color)",
-            fontSize: "0.75rem",
+            fontSize: "1rem",
             width: "100%",
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -47,7 +48,14 @@ const PlanListItem = ({ item }) => {
           {item.description}
         </div>
       </div>
-      <div css={{ width: "30%", display: "flex", justifyContent: "flex-end" }}>
+      <div
+        css={{
+          width: "30%",
+          display: "flex",
+          justifyContent: "flex-end",
+          fontSize: "1.1rem",
+        }}
+      >
         {`${start.getHours().toString().padStart(2, "0")}:${start
           .getMinutes()
           .toString()

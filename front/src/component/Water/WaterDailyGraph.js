@@ -7,6 +7,12 @@ const WaterDailyGraph = () => {
     title: {
       text: "오늘의 음수",
     },
+    grid: {
+      top: "10%",
+      left: "5%",
+      right: "5%",
+      bottom: "5%",
+    },
     xAxis: {
       data: [
         "8-9",

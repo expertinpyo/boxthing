@@ -13,10 +13,10 @@ const PostureGraph = () => {
       trigger: "axis",
     },
     grid: {
-      top: 60,
-      left: 30,
-      right: 60,
-      bottom: 30,
+      top: "10%",
+      left: "5%",
+      right: "5%",
+      bottom: "5%",
     },
     visualMap: {
       show: false,

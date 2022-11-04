@@ -20,7 +20,7 @@ const NavListItem = ({ img, path }) => {
         height: "90%",
         aspectRatio: "1/1",
         borderRadius: 9999,
-        padding: 16,
+        padding: 8,
         lineHeight: 0,
         position: "relative",
       }}

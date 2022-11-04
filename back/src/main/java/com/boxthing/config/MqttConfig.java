@@ -1,7 +1,10 @@
 package com.boxthing.config;
 
-import com.boxthing.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.MqttInboundHandler;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
+import com.boxthing.mqtt.handler.InitHandler;
+import com.boxthing.mqtt.handler.MqttInboundHandler;
+import com.boxthing.mqtt.handler.PostureLogHandler;
+import com.boxthing.mqtt.handler.WaterLogHandler;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -31,17 +34,19 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
+<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
+  private final InitHandler inItHandler;
   private final MqttInboundHandler inboundHandler;
-  private static final String BROKER_URL = "ssl://k7a408.p.ssafy.io:8883";
-  private static final String BASE_TOPIC = "boxthing";
+  private final WaterLogHandler waterLogHandler;
+  private final PostureLogHandler postureLogHandler;
+  private final MqttProperties mqttProperties;
   private static final String OUTBOUND_CHANNEL = "outboundChannel";
   private final Gson gson = new Gson();
 
   @Bean
   public MqttPahoClientFactory mqttPahoClientFactory() {
     MqttConnectOptions options = new MqttConnectOptions();
-    options.setServerURIs(new String[] {BROKER_URL});
-
+    options.setServerURIs(new String[] {mqttProperties.getBROKER_URL()});
     DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
     factory.setConnectionOptions(options);
 
@@ -53,22 +58,39 @@ public class MqttConfig {
     return IntegrationFlows.from(mqttInboundChannelAdapter())
         .transform(mqttRequestTransformer())
         .filter(mqttRequestFilter())
-        .<MqttRequestDto, String>route(
+<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
+        .<MqttRequestDto<Object>, String>route(
             MqttRequestDto::getType,
             mapping ->
                 mapping
+                    //                    .subFlowMapping("register", sf ->
+                    // sf.handle(inItHandler.registerHandler()))
+                    .subFlowMapping("init", sf -> sf.handle(inItHandler.bootHandler()))
                     .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
-                    .subFlowMapping("log", sf -> sf.handle(inboundHandler.logHandler()))
+                    .subFlowMapping("disconnect", sf -> sf.handle(inboundHandler.logoutHandler()))
+                    .subFlowMapping(
+                        "access_token", sf -> sf.handle(inboundHandler.accessTokenHandler()))
+                    .subFlowMapping(
+                        "waterlog_create", sf -> sf.handle(waterLogHandler.waterCreatHandler()))
+                    .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
+                    .subFlowMapping(
+                        "waterlog_today", sf -> sf.handle(waterLogHandler.waterTodayHandler()))
+                    .subFlowMapping(
+                        "posturelog_create",
+                        sf -> sf.handle(postureLogHandler.postureCreateHandler()))
+                    .subFlowMapping(
+                        "posturelog", sf -> sf.handle(postureLogHandler.postureHandler()))
                     .defaultOutputChannel("errorChannel")
                     .resolutionRequired(false))
         .get();
   }
 
-  private GenericTransformer<String, MqttRequestDto> mqttRequestTransformer() {
-    return new GenericTransformer<String, MqttRequestDto>() {
+<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
+  private GenericTransformer<String, MqttRequestDto<Object>> mqttRequestTransformer() {
+    return new GenericTransformer<String, MqttRequestDto<Object>>() {
       @Override
-      public MqttRequestDto transform(String payload) {
-        Type type = new TypeToken<MqttRequestDto>() {}.getType();
+      public MqttRequestDto<Object> transform(String payload) {
+        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
         return gson.fromJson(payload, type);
       }
     };
@@ -79,13 +101,13 @@ public class MqttConfig {
       @Override
       public boolean accept(Message<?> message) {
         MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+<<<<<<< back/src/main/java/com/boxthing/config/MqttConfig.java
+        log.info("serialNumber : {}", requestDto.getDeviceId());
         if (requestDto.getDeviceId() == null) {
           return false;
         }
-
-        // TODO: deviceId가 우리 db에 있는지 검증
-
         return true;
+        // TODO: deviceId가 우리 db에 있는지 검증
       }
     };
   }
@@ -93,7 +115,9 @@ public class MqttConfig {
   public MqttPahoMessageDrivenChannelAdapter mqttInboundChannelAdapter() {
     MqttPahoMessageDrivenChannelAdapter adapter =
         new MqttPahoMessageDrivenChannelAdapter(
-            MqttAsyncClient.generateClientId(), mqttPahoClientFactory(), BASE_TOPIC);
+            MqttAsyncClient.generateClientId(),
+            mqttPahoClientFactory(),
+            mqttProperties.getBASE_TOPIC());
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);

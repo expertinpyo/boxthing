@@ -13,7 +13,7 @@ const WaterNavItem = () => {
         height: "90%",
         aspectRatio: "1/1",
         borderRadius: 9999,
-        padding: 16,
+        padding: 8,
         // lineHeight: 0,
         position: "relative",
       }}
@@ -23,7 +23,7 @@ const WaterNavItem = () => {
           size={{ boxwidth: "100%", boxheight: "100%" }}
           opacity={"1"}
           wrapperposition={"relative"}
-          text={"20px"}
+          text={"1rem"}
         />
       </Link>
     </div>

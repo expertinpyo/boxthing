@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+
 import ReactECharts from "echarts-for-react"
 import cloneDeep from "lodash.clonedeep"
 import { sample_data } from "./sampleData"
@@ -9,6 +11,12 @@ const PostureLineGraph = () => {
     },
     tooltip: {
       trigger: "axis",
+    },
+    grid: {
+      top: "10%",
+      left: "5%",
+      right: "5%",
+      bottom: "5%",
     },
     xAxis: {
       data: sample_data.map((item) => {

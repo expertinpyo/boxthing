@@ -1,28 +1,28 @@
-import { useRef, useState } from "react"
-import "./ToggleButton.css"
+import { useRef, useState } from "react";
+import "./ToggleButton.css";
 
-const ToggleButton = ({ onClick }) => {
-  const [toggleState, setToggleState] = useState(true)
-  const toggleContainer = useRef(null)
+const ToggleButton = ({ onClick, leftText, rightText }) => {
+  const [toggleState, setToggleState] = useState(true);
+  const toggleContainer = useRef(null);
 
   return (
     <div
       id="container"
       onClick={() => {
-        onClick()
-        setToggleState((pre) => !pre)
+        onClick();
+        setToggleState((pre) => !pre);
       }}
     >
-      <div class="inner-container">
-        <div class="toggle">
-          <p>Today</p>
+      <div className="inner-container">
+        <div className="toggle">
+          <p>{rightText}</p>
         </div>
-        <div class="toggle">
-          <p>Week</p>
+        <div className="toggle">
+          <p>{leftText}</p>
         </div>
       </div>
       <div
-        class="inner-container"
+        className="inner-container"
         id="toggle-container"
         ref={toggleContainer}
         style={{
@@ -30,15 +30,15 @@ const ToggleButton = ({ onClick }) => {
           backgroundColor: toggleState ? "#11D200" : "dodgerblue",
         }}
       >
-        <div class="toggle">
-          <p>Today</p>
+        <div className="toggle">
+          <p>{rightText}</p>
         </div>
-        <div class="toggle">
-          <p>Week</p>
+        <div className="toggle">
+          <p>{leftText}</p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ToggleButton
+export default ToggleButton;

@@ -20,13 +20,13 @@ const PlanUpcoming = ({ item }) => {
     >
       {item.length !== 0 ? (
         <>
-          <div css={{ fontSize: 12, color: "var(--font-sub-color)" }}>
+          <div css={{ fontSize: 14, color: "var(--font-sub-color)" }}>
             임박한 일정
           </div>
           <div
             css={{
               width: "100%",
-              fontSize: 32,
+              fontSize: 48,
               fontWeight: "bold",
               color: upcomingPlanTimer[1] ? "red" : "black",
             }}
@@ -35,8 +35,8 @@ const PlanUpcoming = ({ item }) => {
           </div>
 
           <div>
-            <div css={{ fontSize: 20 }}>{item[0].summary}</div>
-            <div css={{ fontSize: 12 }}>{item[0].description}</div>
+            <div css={{ fontSize: "1.5rem" }}>{item[0].summary}</div>
+            <div css={{ fontSize: "1rem" }}>{item[0].description}</div>
           </div>
         </>
       ) : (

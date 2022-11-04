@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
 import "./NotiListItem.css"
-import { defaultBoxStyle } from "../../style/shared"
 
 const noti_type_object = {
   assign: {
@@ -54,19 +53,19 @@ const noti_type_object = {
   },
 }
 
-const NotiListItem = ({ item }) => {
-  const calculateLeftTime = (updated_at) => {
-    const temp = new Date() - new Date(updated_at)
-    const years = temp / (1000 * 60 * 60 * 24 * 365)
-    if (years > 0) return `${Math.floor(years)} years ago`
-    const days = (temp % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24)
-    if (days > 0) return `${Math.floor(days)} days ago`
-    const hours = (temp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    if (hours > 0) return `${Math.floor(hours)} hours ago`
-    const minutes = (temp % (1000 * 60 * 60)) / (1000 * 60)
-    return `${Math.floor(minutes)} minutes ago`
-  }
+const calculateLeftTime = (updated_at) => {
+  const temp = new Date() - new Date(updated_at)
+  const years = temp / (1000 * 60 * 60 * 24 * 365)
+  if (years > 0) return `${Math.floor(years)} years ago`
+  const days = (temp % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24)
+  if (days > 0) return `${Math.floor(days)} days ago`
+  const hours = (temp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  if (hours > 0) return `${Math.floor(hours)} hours ago`
+  const minutes = (temp % (1000 * 60 * 60)) / (1000 * 60)
+  return `${Math.floor(minutes)} minutes ago`
+}
 
+const NotiListItem = ({ item }) => {
   return (
     <div
       css={{
@@ -104,7 +103,7 @@ const NotiListItem = ({ item }) => {
         >
           <div
             css={{
-              fontSize: 12,
+              fontSize: "1rem",
               color: "var(--font-sub-color)",
               width: "100%",
               whiteSpace: "nowrap",
@@ -116,6 +115,7 @@ const NotiListItem = ({ item }) => {
           </div>
           <div
             css={{
+              fontSize: "1.2rem",
               width: "100%",
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -141,7 +141,7 @@ const NotiListItem = ({ item }) => {
             // left: 10,
             // top: -20,
             // zIndex: 1,
-            fontSize: 12,
+            fontSize: "1rem",
             background: noti_type_object[item.reason].background,
             color: noti_type_object[item.reason].color,
             border: `${noti_type_object[item.reason].color} 2px solid`,
@@ -151,7 +151,7 @@ const NotiListItem = ({ item }) => {
         >
           {item.reason}
         </div>
-        <div css={{ color: "var(--font-sub-color)", fontSize: 14 }}>
+        <div css={{ color: "var(--font-sub-color)", fontSize: "1.1rem" }}>
           {calculateLeftTime(item.updated_at)}
         </div>
       </div>

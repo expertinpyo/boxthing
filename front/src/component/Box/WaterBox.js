@@ -56,6 +56,8 @@ function WaterBox({ key }) {
       >
         <div css={{ position: "absolute", top: 0, right: 0, zIndex: 10 }}>
           <ToggleButton
+            leftText={"WEEK"}
+            rightText={"TODAY"}
             onClick={() => {
               setState((pre) => !pre)
             }}

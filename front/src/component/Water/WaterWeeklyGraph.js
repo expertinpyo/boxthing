@@ -7,6 +7,12 @@ const WaterWeeklyGraph = () => {
     title: {
       text: "15일간 음수 히스토리",
     },
+    grid: {
+      top: "10%",
+      left: "5%",
+      right: "5%",
+      bottom: "5%",
+    },
     xAxis: {
       data: ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19"],
     },

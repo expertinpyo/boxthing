@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect } from "react"
-import { useRecoilValue } from "recoil"
-import { reachState } from "../../store/water"
-import "./Water.css"
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { reachState } from "../../store/water";
+import "./Water.css";
 
 const WaterSVG = () => {
   return (
@@ -22,8 +22,8 @@ const WaterSVG = () => {
         <path d="M140,20c-21.5-0.4-38.8-2.5-51.1-4.5c-13.4-2.2-26.5-5.2-27.3-5.4C46,6.5,42,4.7,31.5,2.7C24.3,1.4,13.6-0.1,0,0c0,0,0,0,0,0l0,20H140z"></path>
       </symbol>
     </svg>
-  )
-}
+  );
+};
 
 const Water = ({
   size = { boxwidth: "200px", boxheight: "200px" },
@@ -31,7 +31,7 @@ const Water = ({
   wrapperposition = "absolute",
   text = 80,
 }) => {
-  const reach = useRecoilValue(reachState)
+  const reach = useRecoilValue(reachState);
 
   return (
     <div
@@ -58,7 +58,9 @@ const Water = ({
         <div
           id="water"
           className="water"
-          style={{ transform: `translate(0, ${100 - reach}%)` }}
+          style={{
+            transform: `translate(0, ${100 - (reach <= 100 ? reach : 100)}%)`,
+          }}
         >
           <svg viewBox="0 0 560 20" className="water_wave water_wave_back">
             <use xlinkHref="#wave"></use>
@@ -69,26 +71,21 @@ const Water = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-const WaterAnimation = ({ start, end }) => {
-  const reach = useRecoilValue(reachState)
+const WaterAnimation = () => {
+  const [current, setCurrent] = useState(0);
+  const reach = useRecoilValue(reachState);
+  console.log(current);
 
   useEffect(() => {
-    let cnt = document.getElementById("_count")
-    let water = document.getElementById("_water")
-    let percent = cnt.innerText
-    let interval
-    interval = setInterval(function () {
-      percent++
-      cnt.innerHTML = percent
-      water.style.transform = `translate(0, ${100 - percent}%)`
-      if (percent === end) {
-        clearInterval(interval)
-      }
-    }, 60)
-  }, [end])
+    if (current < reach) {
+      setTimeout(() => {
+        setCurrent((current) => current + 1);
+      }, 60);
+    }
+  }, [current, setCurrent, reach]);
 
   return (
     <div css={{ width: 250, height: 250, position: "relative" }}>
@@ -96,14 +93,18 @@ const WaterAnimation = ({ start, end }) => {
       <div className="box">
         <div className="percent">
           <div className="percentNum" id="_count">
-            {start}
+            {current}
           </div>
           <div className="percentB">%</div>
         </div>
         <div
           id="_water"
           className="water"
-          style={{ transform: `translate(0, ${100 - reach}%)` }}
+          style={{
+            transform: `translate(0, ${
+              100 - (current <= 100 ? current : 100)
+            }%)`,
+          }}
         >
           <svg viewBox="0 0 560 20" className="water_wave water_wave_back">
             <use xlinkHref="#wave"></use>
@@ -114,7 +115,7 @@ const WaterAnimation = ({ start, end }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export { Water, WaterAnimation }
+export { Water, WaterAnimation };

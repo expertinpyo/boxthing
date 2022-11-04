@@ -58,7 +58,7 @@ public class MqttInboundHandler {
         log.info("message : {}", message);
         log.info("payload : {}", message.getPayload());
         Type type = new TypeToken<MqttRequestDto<MqttProviderReqData>>() {}.getType();
-        MqttRequestDto<MqttProviderReqData> requestDto = jsonConverter2(message.getPayload());
+        MqttRequestDto<MqttProviderReqData> requestDto = jsonConverter(message.getPayload(), type);
         log.info("{}", requestDto);
         String deviceId = requestDto.getDeviceId();
         MqttProviderReqData data = requestDto.getData();
@@ -88,7 +88,7 @@ public class MqttInboundHandler {
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
         Type type = new TypeToken<MqttRequestDto<MqttProviderReqData>>() {}.getType();
-        MqttRequestDto<MqttProviderReqData> requestDto = jsonConverter(message.getPayload());
+        MqttRequestDto<MqttProviderReqData> requestDto = jsonConverter(message.getPayload(), type);
         String deviceId = requestDto.getDeviceId();
         MqttProviderReqData data = requestDto.getData();
 

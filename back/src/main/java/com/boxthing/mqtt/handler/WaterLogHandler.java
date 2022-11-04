@@ -54,8 +54,8 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
-        MqttRequestDto<MqttWaterReqData> requestDto = jsonConverter(message.getPayload());
+        Type type = new TypeToken<MqttRequestDto<MqttWaterReqData>>() {}.getType();
+        MqttRequestDto<MqttWaterReqData> requestDto = jsonConverter(message.getPayload(), type);
         String deviceId = requestDto.getDeviceId();
         MqttWaterReqData data = requestDto.getData();
 
@@ -76,8 +76,9 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
-        MqttRequestDto<MqttWaterBeforeReqData> requestDto = jsonConverter(message.getPayload());
+        Type type = new TypeToken<MqttRequestDto<MqttWaterBeforeReqData>>() {}.getType();
+        MqttRequestDto<MqttWaterBeforeReqData> requestDto =
+            jsonConverter(message.getPayload(), type);
 
         String deviceId = requestDto.getDeviceId();
         MqttWaterBeforeReqData data = requestDto.getData();

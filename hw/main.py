@@ -19,9 +19,10 @@ class State:
 
     ws_connected = asyncio.Event()
     init_done = asyncio.Event()
+    google_logged_in = asyncio.Event()
+    github_logged_in = asyncio.Event()
 
     google_access_token = ""
-    google_refresh_token = ""
     github_access_token = ""
     github_notification_last_updated_at: datetime | None = None
 
@@ -37,9 +38,17 @@ async def ws_consumer(websocket):
 
         print(f"Message from websocket type: {type_list}, data: {data}")
 
-        if type_list[0] == "init":
-            pass
+        if type_list[0] == "github":
+            if type_list[1] == "qr":
+                await mqtt_message_queue.put(("github/qr", None))
 
+            if type_list[1] == "read":
+                # TODO: set notifications as read
+                pass
+
+        if type_list[0] == "log":
+            # Pass any log request to mqtt
+            await mqtt_message_queue.put(("/".join(type_list), data))
 
 async def ws_producer(websocket):
     while True:
@@ -82,21 +91,71 @@ async def mqtt_consumer(client):
             print(f"Message from mqtt topic: {topic_list}, data: {data}")
 
             if topic_list[0] == "init":
-                if data["is_login"]:
-                    await mqtt_message_queue.put(("access_token/google", None))
-                else:
+                state.google_access_token = data["google_access_token"]
+                state.github_access_token = data["github_access_token"]
+
+                if state.google_access_token:
+                    state.google_logged_in.set()
+                if state.github_access_token:
+                    state.github_logged_in.set()
+
+                if not state.google_access_token:
                     await mqtt_message_queue.put(("qr/google", None))
+                    continue
+
+                ws_data = {
+                    "google": {"is_login": True},
+                    "github": {
+                        "is_login": True if state.github_access_token else False
+                    },
+                }
+
+                await ws_message_queue.put(("init", ws_data))
+                state.init_done.set()
 
             if topic_list[0] == "qr":
-                await ws_message_queue.put(
-                    (
-                        "init",
-                        {
-                            "is_login": False,
-                            "link": data["link"],
+                if topic_list[1] == "google":
+                    ws_data = {
+                        "google": {"is_login": False, "link": data["link"]},
+                        "github": {
+                            "is_login": True if state.github_access_token else False
                         },
-                    )
-                )
+                    }
+
+                    await ws_message_queue.put(("init", ws_data))
+                    state.init_done.set()
+
+                if topic_list[1] == "github":
+                    ws_data = {
+                        "link": data["link"]
+                    }
+
+                    await ws_message_queue.put(("github/qr", ws_data))
+
+            if topic_list[0] == "login":
+                if topic_list[1] == "google":
+                    state.google_access_token = data["access_token"]
+                    state.google_logged_in.set()
+
+                    await ws_message_queue.put(("login", None))
+
+                if topic_list[1] == "github":
+                    state.github_access_token = data["access_token"]
+                    state.github_logged_in.set()
+
+                    await ws_message_queue.put(("github/login", None))
+
+            if topic_list[0] == "access_token":
+                if topic_list[1] == "google":
+                    state.google_access_token = data["access_token"]
+
+                if topic_list[1] == "github":
+                    state.github_access_token = data["access_token"]
+
+            if topic_list[0] == "log":
+                # Pass any log response to ws
+                await ws_message_queue.put(("/".join(topic_list), data))
+
 
 
 async def mqtt_producer(client):
@@ -125,13 +184,13 @@ async def mqtt_client():
 
 
 async def google_calendar_coroutine():
+    await state.google_logged_in.wait()
+
     while True:
         await state.ws_connected.wait()
 
-        events = []
-        if state.google_access_token:
-            events = google_calendar(state.google_access_token)
-            # TODO: Need access token expiration check
+        events = google_calendar(state.google_access_token)
+        # TODO: Need access token expiration check
 
         if events:
             await ws_message_queue.put(("calendar", events))
@@ -140,16 +199,16 @@ async def google_calendar_coroutine():
 
 
 async def github_notifications_coroutine():
+    await state.github_logged_in.wait()
+
     while True:
         await state.ws_connected.wait()
 
-        notifications = []
-        if state.github_access_token:
-            notifications, last_updated_at = github_notification(
-                state.github_access_token, state.github_notification_last_updated_at
-            )
-            if last_updated_at is not None:
-                state.github_notification_last_updated_at = last_updated_at
+        notifications, last_updated_at = github_notification(
+            state.github_access_token, state.github_notification_last_updated_at
+        )
+        if last_updated_at is not None:
+            state.github_notification_last_updated_at = last_updated_at
 
         if notifications:
             await ws_message_queue.put(("github/noti", notifications))

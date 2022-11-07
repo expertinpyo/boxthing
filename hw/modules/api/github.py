@@ -1,12 +1,11 @@
 import requests
 from datetime import datetime
-from typing import Optional
 
 GITHUB_API_BASE_URL = "https://api.github.com"
 PER_PAGE = 50
 
 
-def github_notification(token, last_updated_at: Optional[datetime] = None):
+def github_notification(token, last_updated_at: datetime | None = None):
     url = f"{GITHUB_API_BASE_URL}/notifications"
     headers = {
         "Accept": "application/vnd.github+json",

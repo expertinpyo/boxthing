@@ -51,5 +51,6 @@ class VoiceRecognition():
         if voice_porcupine_custom.hot_word_flag:
             print("\nFinish recording\n Start parsing")
             self.parse_command()
-            print("\nFinish parsing\n")
-            return self.var
+            print("\nFinish parsing\n command: " + self.var)
+            print("command mapping...")
+            self.map_commands()

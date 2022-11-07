@@ -187,8 +187,7 @@ def porcupine_parsing():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--access_key',
-                        help='AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)'
-                        )
+                        help='AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)')
 
     parser.add_argument(
         '--keywords',
@@ -201,8 +200,7 @@ def porcupine_parsing():
     parser.add_argument(
         '--keyword_paths',
         nargs='+',
-        help="Absolute paths to keyword model files. If not set it will be populated from `--keywords` argument"
-        )
+        help="Absolute paths to keyword model files. If not set it will be populated from `--keywords` argument")
 
     parser.add_argument(
         '--library_path', help='Absolute path to dynamic library.', default=pvporcupine.LIBRARY_PATH)
@@ -210,7 +208,7 @@ def porcupine_parsing():
     parser.add_argument(
         '--model_path',
         help='Absolute path to the file containing model parameters.',
-        )
+        default=pvporcupine.MODEL_PATH)
 
     parser.add_argument(
         '--sensitivities',
@@ -222,7 +220,7 @@ def porcupine_parsing():
         default=None)
 
     parser.add_argument('--audio_device_index',
-                        help='Index of input audio device.', type=int, default=0)
+                        help='Index of input audio device.', type=int, default=-1)
 
     parser.add_argument('--show_audio_devices', action='store_true')
 

@@ -11,8 +11,8 @@ from datetime import datetime
 from modules.api import google_calendar, github_notification
 
 
-ws_message_queue = asyncio.Queue()
-mqtt_message_queue = asyncio.Queue()
+ws_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
+mqtt_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
 
 
 class State:
@@ -31,13 +31,24 @@ state = State()
 
 async def ws_consumer(websocket):
     async for message in websocket:
-        data = json.loads(message)
-        print(f"Message from websocket: {data}")
+        message_dict = json.loads(message)
+        type_list = message_dict["type"].split("/")
+        data = message_dict["data"]
+
+        print(f"Message from websocket type: {type_list}, data: {data}")
+
+        if type_list[0] == "init":
+            pass
 
 
 async def ws_producer(websocket):
     while True:
-        message = await ws_message_queue.get()
+        type_, data = await ws_message_queue.get()
+        message = {
+            "type": type_,
+            "data": data,
+        }
+
         await websocket.send(json.dumps(message))
 
 
@@ -58,19 +69,30 @@ async def ws_handler(websocket):
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
-        await client.subscribe(f"{environ['MQTT_BASE_TOPIC']}/device/{environ['DEVICE_ID']}/#")
+        await client.subscribe(
+            f"{environ['MQTT_BASE_TOPIC']}/device/{environ['DEVICE_ID']}/#"
+        )
         async for message in messages:
             data = json.loads(message.payload)
-            topic = message.topic
+            topic_list = message.topic.split("/")[3:]
 
-            print(f"Message from mqtt topic: {topic}, data: {data}")
+            print(f"Message from mqtt topic: {topic_list}, data: {data}")
+
+            if topic_list[0] == "init":
+                pass
 
 
 async def mqtt_producer(client):
     while True:
-        message, topic = await mqtt_message_queue.get()
-        message["device_id"] = environ['DEVICE_ID']
-        await client.publish(f"{environ['MQTT_BASE_TOPIC']}/{topic}", json.dumps(message))
+        topic, data = await mqtt_message_queue.get()
+        message = {
+            "device_id": environ["DEVICE_ID"],
+            "data": data,
+        }
+
+        await client.publish(
+            f"{environ['MQTT_BASE_TOPIC']}/server/{topic}", json.dumps(message)
+        )
 
 
 async def mqtt_client():
@@ -95,7 +117,7 @@ async def google_calendar_coroutine():
             # TODO: Need access token expiration check
 
         if events:
-            await ws_message_queue.put(events)
+            await ws_message_queue.put(("calendar", events))
 
         await asyncio.sleep(5 * 60)
 
@@ -113,7 +135,7 @@ async def github_notifications_coroutine():
                 state.github_notification_last_updated_at = last_updated_at
 
         if notifications:
-            await ws_message_queue.put(notifications)
+            await ws_message_queue.put(("github/noti", notifications))
 
         await asyncio.sleep(1 * 60)
 
@@ -124,6 +146,8 @@ async def main():
     ws_server = await websockets.serve(
         ws_handler, "localhost", int(environ["WEBSOCKET_PORT"])
     )
+
+    await mqtt_message_queue.put(("init", None))
 
     await asyncio.gather(
         ws_server.serve_forever(),

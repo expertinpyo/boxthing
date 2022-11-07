@@ -1,7 +1,7 @@
 import cv2, dlib, math
 import cvlib as cv
 import time
-
+import asyncio
 def find_distance(img): # 얼굴 검출 및 거리 반환
     global first_area
     
@@ -71,58 +71,62 @@ def init():
 #준비
 predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat")
 detector = dlib.get_frontal_face_detector()
-
-webcam = cv2.VideoCapture(0)
-
 first_img = None
 first_dis = first_down = first_area = 0
-# 0 : 올바른 자세, 1 : 거북목, 2: 허리무리
-send_posture_flag = 0
-posture_score = 0
+webcam = cv2.VideoCapture(0)
+async def check_pose():   
+    # 0 : 올바른 자세, 1 : 거북목, 2: 허리무리
+    send_posture_flag = 0
+    posture_score = 0
 
-while True : 
-    init()
-    if first_dis or first_down or first_area :
-        break
-    
-print(first_dis, first_area)
+    while True : 
+        init()
+        if first_dis or first_down or first_area :
+            break
+        
+    print(first_dis, first_area)
 
 # 기준과 비교하며 자세판단
 # send_posture_flag & posture_score를 전송
 # mqtt로는 posture_score만 websocket으로는 둘다 전송
-try : 
-    while webcam.isOpened():
-        image = take_picture()
-        now_dis, now_down, now_area = find_distance(image)
-        
-        if now_dis - first_dis > 15 :
-            send_posture_flag = 2
-            posture_score = int(87-(now_dis-first_dis)/2)
-            if posture_score < 60 : posture_score = 60
-            print(send_posture_flag, "거북목", posture_score)
-        elif now_down - first_down > 12 :
-            send_posture_flag = 3
-            posture_score = int(80-(now_down - first_down)/4)
-            if posture_score < 60 : posture_score = 60
-            print(send_posture_flag, "허리무리", posture_score)
-        elif now_dis == 0 and now_down == 0 and now_area == 0: 
-            posture_score = -1
-            send_posture_flag = 4
-            print(send_posture_flag, "사람 없음", posture_score)
-        else :
-            send_posture_flag = 1
-            if now_dis - first_dis < 0 :
-                posture_score = int(100+(now_dis - first_dis))
-            else : 
-                posture_score = int(100-(now_dis - first_dis))
-            print(send_posture_flag, "올바른 자세", posture_score)
-        time.sleep(1)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-except KeyboardInterrupt:
-    print("종료")
-    pass
+    while True:
+        try : 
+            while webcam.isOpened():
+                image = take_picture()
+                now_dis, now_down, now_area = find_distance(image)
+                
+                if now_dis - first_dis > 15 :
+                    send_posture_flag = 2
+                    posture_score = int(87-(now_dis-first_dis)/2)
+                    if posture_score < 60 : posture_score = 60
+                    yield((send_posture_flag, "거북목", posture_score))
+                    print(send_posture_flag, "거북목", posture_score)
+                elif now_down - first_down > 12 :
+                    send_posture_flag = 3
+                    posture_score = int(80-(now_down - first_down)/4)
+                    if posture_score < 60 : posture_score = 60
+                    yield((send_posture_flag, "허리무리", posture_score))
+                    print(send_posture_flag, "허리무리", posture_score)
+                elif now_dis == 0 and now_down == 0 and now_area == 0: 
+                    posture_score = -1
+                    send_posture_flag = 4
+                    yield((send_posture_flag, "사람 없음", posture_score))
+                    print(send_posture_flag, "사람 없음", posture_score)
+                else :
+                    send_posture_flag = 1
+                    if now_dis - first_dis < 0 :
+                        posture_score = int(100+(now_dis - first_dis))
+                    else : 
+                        posture_score = int(100-(now_dis - first_dis))
+                    yield((send_posture_flag, "올바른 자세", posture_score))
+                    print(send_posture_flag, "올바른 자세", posture_score)
+                await asyncio.sleep(1)
+                
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+        except KeyboardInterrupt:
+            print("종료")
+            pass
 
-webcam.release()
-cv2.destroyAllWindows()
+        await webcam.release()
+        await cv2.destroyAllWindows()

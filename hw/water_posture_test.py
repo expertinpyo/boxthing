@@ -11,8 +11,8 @@ from modules.water import amount_water
 from modules.api import google_calendar, github_notification
 
 
-ws_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
-mqtt_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
+ws_message_queue = asyncio.Queue()
+mqtt_message_queue = asyncio.Queue()
 
 
 class State:
@@ -106,7 +106,7 @@ async def mqtt_client():
             mqtt_producer(client),
         )
 
-
+"""
 async def google_calendar_coroutine():
     while True:
         await state.has_ws_connection.wait()
@@ -138,7 +138,7 @@ async def github_notifications_coroutine():
             await ws_message_queue.put(("github/noti", notifications))
 
         await asyncio.sleep(1 * 60)
-
+"""
 async def water_coroutine():
     async for water in amount_water():
         await ws_message_queue.put(("water", water))
@@ -156,8 +156,8 @@ async def main():
     await asyncio.gather(
         ws_server.serve_forever(),
         mqtt_client(),
-        google_calendar_coroutine(),
-        github_notifications_coroutine(),
+        #google_calendar_coroutine(),
+        #github_notifications_coroutine(),
         water_coroutine(),
     )
 
@@ -166,5 +166,6 @@ if __name__ == "__main__":
     # 윈도우에서 실행할 경우
     if os.name == "nt":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    #asyncio.run(main())

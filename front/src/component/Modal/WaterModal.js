@@ -1,9 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { waterModalState } from "../../store/modal";
 import { WaterAnimation } from "../Water/Water";
 
-const WaterModal = ({ state, setter }) => {
+const WaterModal = () => {
+  const [state, setter] = useRecoilState(waterModalState);
+
   useEffect(() => {
     if (state) {
       setTimeout(() => {

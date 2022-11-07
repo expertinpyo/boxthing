@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
 
-import React, { useState, useEffect } from "react"
-import ReactECharts from "echarts-for-react"
-import cloneDeep from "lodash.clonedeep"
+import React, { useState, useEffect } from "react";
+import ReactECharts from "echarts-for-react";
+import cloneDeep from "lodash.clonedeep";
 
 const PostureGraph = () => {
   const DEFAULT_OPTION = {
@@ -49,16 +49,16 @@ const PostureGraph = () => {
     xAxis: [
       {
         type: "category",
-        boundaryGap: false,
+        boundaryGap: true,
         data: (function () {
-          let now = new Date()
-          let res = []
-          let len = 50
+          let now = new Date();
+          let res = [];
+          let len = 20;
           while (len--) {
-            res.unshift(now.toLocaleTimeString().replace(/^\D*/, ""))
-            now = new Date(now - 1000) // 3초 주기
+            res.unshift(now.toLocaleTimeString().replace(/^\D*/, "").slice(-5));
+            now = new Date(now - 1000); // 3초 주기
           }
-          return res
+          return res;
         })(),
       },
     ],
@@ -83,47 +83,50 @@ const PostureGraph = () => {
         },
         animationEasing: "elasticOut",
         animationDelay: function (idx) {
-          return idx * 10
+          return idx * 10;
         },
         animationDelayUpdate: function (idx) {
-          return idx * 10
+          return idx * 10;
         },
         data: (function () {
-          let res = []
-          let len = 50
+          let res = [];
+          let len = 50;
           while (len--) {
-            res.push(Math.round(Math.random() * 100))
+            res.push(Math.round(Math.random() * 100));
           }
-          return res
+          return res;
         })(),
       },
     ],
-  }
+  };
 
-  const [option, setOption] = useState(DEFAULT_OPTION)
+  const [option, setOption] = useState(DEFAULT_OPTION);
 
   function fetchNewData() {
-    const axisData = new Date().toLocaleTimeString().replace(/^\D*/, "")
-    const newOption = cloneDeep(option) // immutable
-    const data0 = newOption.series[0].data
-    data0.shift()
-    data0.push(Math.round(Math.random() * 100))
+    const axisData = new Date()
+      .toLocaleTimeString()
+      .replace(/^\D*/, "")
+      .slice(-5);
+    const newOption = cloneDeep(option); // immutable
+    const data0 = newOption.series[0].data;
+    data0.shift();
+    data0.push(Math.round(Math.random() * 100));
 
-    newOption.xAxis[0].data.shift()
-    newOption.xAxis[0].data.push(axisData)
+    newOption.xAxis[0].data.shift();
+    newOption.xAxis[0].data.push(axisData);
 
-    setOption(newOption)
+    setOption(newOption);
   }
 
   useEffect(() => {
     const timer = setInterval(() => {
-      fetchNewData()
-    }, 1000)
+      fetchNewData();
+    }, 1000);
 
-    return () => clearInterval(timer)
-  })
+    return () => clearInterval(timer);
+  });
 
-  return <ReactECharts option={option} style={{ height: "100%" }} />
-}
+  return <ReactECharts option={option} style={{ height: "100%" }} />;
+};
 
-export default PostureGraph
+export default PostureGraph;

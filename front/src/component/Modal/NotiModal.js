@@ -1,9 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect } from "react";
+import { useRecoilState } from "recoil";
 import NewPost from "../../asset/nav_icon/newNoti.gif";
+import { notiModalState } from "../../store/modal";
 
-const NotiModal = ({ state, setter }) => {
+const NotiModal = () => {
+  const [state, setter] = useRecoilState(notiModalState);
+
   useEffect(() => {
     if (state) {
       setTimeout(() => {

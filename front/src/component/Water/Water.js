@@ -77,7 +77,6 @@ const Water = ({
 const WaterAnimation = () => {
   const [current, setCurrent] = useState(0);
   const reach = useRecoilValue(reachState);
-  console.log(current);
 
   useEffect(() => {
     if (current < reach) {

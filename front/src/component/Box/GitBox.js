@@ -1,17 +1,36 @@
 /** @jsxImportSource @emotion/react */
 import { useRecoilValue } from "recoil";
-import { notiState, unreadNotiState } from "../../store/noti";
+import { notiState } from "../../store/noti";
 import { defaultBoxStyle } from "../../style/shared";
 import NotiListItem from "../Git/NotiListItem";
 
 import { motion } from "framer-motion";
+import { gitAuthenticationState } from "../../store/gitauth";
+import QrcodeBox from "../Welcome/QrcodeBox";
+import { useEffect } from "react";
+import { socketState } from "../../store/socket";
 
 function GitBox() {
-  const noti = useRecoilValue(notiState);
-  const unreadNoti = useRecoilValue(unreadNotiState);
+  const gitAuthenticated = useRecoilValue(gitAuthenticationState);
+  const socket = useRecoilValue(socketState);
 
-  console.log("noti", noti);
-  console.log("unreadNoti", unreadNoti);
+  const noti = useRecoilValue(notiState);
+  // const unreadNoti = useRecoilValue(unreadNotiState);
+
+  useEffect(() => {
+    if (socket && socket.readyState === 1 && !gitAuthenticated) {
+      socket.send(JSON.stringify({ type: "github/qr", data: null }));
+      console.log("send github/qr message to server!");
+    }
+
+    return () => {
+      if (socket && socket.readyState === 1 && gitAuthenticated) {
+        socket.send(JSON.stringify({ type: "github/read", data: null }));
+        console.log("send github/read message to server!");
+      }
+    };
+  }, [socket, gitAuthenticated]);
+
   return (
     <motion.div
       css={{
@@ -26,11 +45,25 @@ function GitBox() {
       exit={{ transform: "translateY(100%)" }}
       transition={{ duration: 0.5, ease: "circOut" }}
     >
-      <div css={{ width: "100%", height: "100%" }}>
-        {noti.map((item) => {
-          return <NotiListItem key={item.id} item={item} />;
-        })}
-      </div>
+      {gitAuthenticated ? (
+        <div css={{ width: "100%", height: "100%" }}>
+          {noti.map((item) => {
+            return <NotiListItem key={item.id} item={item} />;
+          })}
+        </div>
+      ) : (
+        <div
+          css={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <QrcodeBox />
+        </div>
+      )}
     </motion.div>
   );
 }

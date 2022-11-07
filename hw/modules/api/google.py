@@ -5,6 +5,10 @@ from dateutil import tz
 GOOGLE_CALENDAR_BASE_URL = "https://www.googleapis.com/calendar/v3"
 
 
+class GoogleAccessTokenExpired(Exception):
+    pass
+
+
 def google_calendar(token):
     # get google calendar list
     headers = {"Authorization": f"Bearer {token}"}
@@ -15,6 +19,9 @@ def google_calendar(token):
 
     while True:
         response = requests.get(url=url, headers=headers, params=params)
+        if response.status_code == 401:
+            raise GoogleAccessTokenExpired
+
         data = response.json()
 
         if "items" not in data:

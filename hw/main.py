@@ -7,7 +7,7 @@ import os
 from os import environ
 from datetime import datetime
 
-from modules.api import google_calendar, github_notification
+from modules.api import google_calendar, GoogleAccessTokenExpired, github_notification
 
 
 ws_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
@@ -21,6 +21,7 @@ class State:
     init_done = asyncio.Event()
     google_logged_in = asyncio.Event()
     github_logged_in = asyncio.Event()
+    google_refreshed = asyncio.Event()
 
     google_access_token = ""
     github_access_token = ""
@@ -49,6 +50,7 @@ async def ws_consumer(websocket):
         if type_list[0] == "log":
             # Pass any log request to mqtt
             await mqtt_message_queue.put(("/".join(type_list), data))
+
 
 async def ws_producer(websocket):
     while True:
@@ -126,28 +128,27 @@ async def mqtt_consumer(client):
                     state.init_done.set()
 
                 if topic_list[1] == "github":
-                    ws_data = {
-                        "link": data["link"]
-                    }
+                    ws_data = {"link": data["link"]}
 
                     await ws_message_queue.put(("github/qr", ws_data))
 
             if topic_list[0] == "login":
                 if topic_list[1] == "google":
                     state.google_access_token = data["access_token"]
-                    state.google_logged_in.set()
 
                     await ws_message_queue.put(("login", None))
+                    state.google_logged_in.set()
 
                 if topic_list[1] == "github":
                     state.github_access_token = data["access_token"]
-                    state.github_logged_in.set()
 
                     await ws_message_queue.put(("github/login", None))
+                    state.github_logged_in.set()
 
             if topic_list[0] == "access_token":
                 if topic_list[1] == "google":
                     state.google_access_token = data["access_token"]
+                    state.google_refreshed.set()
 
                 if topic_list[1] == "github":
                     state.github_access_token = data["access_token"]
@@ -155,7 +156,6 @@ async def mqtt_consumer(client):
             if topic_list[0] == "log":
                 # Pass any log response to ws
                 await ws_message_queue.put(("/".join(topic_list), data))
-
 
 
 async def mqtt_producer(client):
@@ -189,13 +189,19 @@ async def google_calendar_coroutine():
     while True:
         await state.ws_connected.wait()
 
-        events = google_calendar(state.google_access_token)
-        # TODO: Need access token expiration check
+        try:
+            events = google_calendar(state.google_access_token)
+            print(f"google calendar events: {events}")
 
-        if events:
-            await ws_message_queue.put(("calendar", events))
+            if events:
+                await ws_message_queue.put(("calendar", events))
 
-        await asyncio.sleep(5 * 60)
+            await asyncio.sleep(5 * 60)
+
+        except GoogleAccessTokenExpired:
+            state.google_refreshed.clear()
+            await mqtt_message_queue.put(("access_token/google", None))
+            await state.google_refreshed.wait()
 
 
 async def github_notifications_coroutine():
@@ -207,6 +213,10 @@ async def github_notifications_coroutine():
         notifications, last_updated_at = github_notification(
             state.github_access_token, state.github_notification_last_updated_at
         )
+        print(
+            f"github notifications: {notifications}, last_updated_at: {last_updated_at}"
+        )
+
         if last_updated_at is not None:
             state.github_notification_last_updated_at = last_updated_at
 
@@ -238,4 +248,4 @@ if __name__ == "__main__":
     if os.name == "nt":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    asyncio.run(main())
+    asyncio.run(main(), debug=True)

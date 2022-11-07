@@ -3,6 +3,7 @@ import json
 import websockets.server as websockets
 import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
+import os
 from os import environ
 from typing import Optional
 from datetime import datetime
@@ -57,17 +58,19 @@ async def ws_handler(websocket):
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
-        await client.subscribe(f"{environ['MQTT_BASE_TOPIC']}/{environ['DEVICE_ID']}")
+        await client.subscribe(f"{environ['MQTT_BASE_TOPIC']}/device/{environ['DEVICE_ID']}/#")
         async for message in messages:
             data = json.loads(message.payload)
-            print(f"Message from mqtt: {data}")
+            topic = message.topic
+
+            print(f"Message from mqtt topic: {topic}, data: {data}")
 
 
 async def mqtt_producer(client):
     while True:
-        message = await mqtt_message_queue.get()
-        message["deviceId"] = environ['DEVICE_ID']
-        await client.publish(environ["MQTT_BASE_TOPIC"], json.dumps(message))
+        message, topic = await mqtt_message_queue.get()
+        message["device_id"] = environ['DEVICE_ID']
+        await client.publish(f"{environ['MQTT_BASE_TOPIC']}/{topic}", json.dumps(message))
 
 
 async def mqtt_client():
@@ -84,6 +87,8 @@ async def mqtt_client():
 
 async def google_calendar_coroutine():
     while True:
+        await state.has_ws_connection.wait()
+
         events = []
         if state.google_access_token:
             events = google_calendar(state.google_access_token)
@@ -97,6 +102,8 @@ async def google_calendar_coroutine():
 
 async def github_notifications_coroutine():
     while True:
+        await state.has_ws_connection.wait()
+
         notifications = []
         if state.github_access_token:
             notifications, last_updated_at = github_notification(
@@ -118,10 +125,6 @@ async def main():
         ws_handler, "localhost", int(environ["WEBSOCKET_PORT"])
     )
 
-    # Websocket 연결이 생길때까지 블락
-    # TODO: 다른 모든 코루틴의 매 루프마다 has_ws_connection.wait()를 걸어두는건?
-    await state.has_ws_connection.wait()
-
     await asyncio.gather(
         ws_server.serve_forever(),
         mqtt_client(),
@@ -131,6 +134,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    # 다음줄은 윈도우에서 실행할 경우 필요
-    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # 윈도우에서 실행할 경우
+    if os.name == "nt":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
     asyncio.run(main())

@@ -4,8 +4,10 @@ import com.boxthing.api.domain.Device;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
 import com.boxthing.api.mapper.DeviceMapper;
 import com.boxthing.api.repository.DeviceRepository;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,7 +28,14 @@ public class QRCreator {
     String hashType = "SHA-256";
     MessageDigest md;
     md = MessageDigest.getInstance(hashType);
-    byte[] hashData = md.digest(serialNumber.getBytes());
+
+    // Salt를 위한 랜덤 스트링 추가
+    byte[] array = new byte[7]; // length is bounded by 7
+    new Random().nextBytes(array);
+    String generatedString = new String(array, Charset.forName("UTF-8"));
+    // 시리얼 넘버와 랜덤 스트링 간 합
+    String saltedString = serialNumber + generatedString;
+    byte[] hashData = md.digest(saltedString.getBytes());
 
     // SerialNumber hash화 진행
     for (byte b : hashData) {
@@ -35,9 +44,6 @@ public class QRCreator {
 
     log.info("hashed : {}", state);
     Device device = deviceRepository.findBySerialNumber(serialNumber);
-    if (device == null) {
-      deviceRepository.save(Device.builder().serialNumber(serialNumber).build());
-    }
 
     DeviceRequestDto dto = DeviceRequestDto.builder().state(String.valueOf(state)).build();
     deviceMapper.updateDeviceFromDto(dto, device);

@@ -11,15 +11,15 @@ public class MqttResDto {
   @ToString
   @NoArgsConstructor
   public static class MqttResponseDto {
-    String type;
+    String topic;
 
     Boolean success;
     String message;
     Object data;
 
     @Builder
-    public MqttResponseDto(String type, Object data, String message, Boolean success) {
-      this.type = type;
+    public MqttResponseDto(String topic, Object data, String message, Boolean success) {
+      this.topic = topic;
       this.data = data;
       this.message = message;
       this.success = success;
@@ -44,11 +44,13 @@ public class MqttResDto {
   @NoArgsConstructor
   public static class MqttLoginResDto {
 
-    Boolean isLogin;
+    String googleAccessToken;
+    String githubAccessToken;
 
     @Builder
-    public MqttLoginResDto(Boolean isLogin) {
-      this.isLogin = isLogin;
+    public MqttLoginResDto(String googleAccessToken, String githubAccessToken) {
+      this.googleAccessToken = googleAccessToken;
+      this.githubAccessToken = githubAccessToken;
     }
   }
 

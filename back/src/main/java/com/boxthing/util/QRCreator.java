@@ -8,13 +8,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@RestController
-@RequestMapping("login")
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class QRCreator {
@@ -38,7 +36,7 @@ public class QRCreator {
     log.info("hashed : {}", state);
     Device device = deviceRepository.findBySerialNumber(serialNumber);
     if (device == null) {
-      return null;
+      deviceRepository.save(Device.builder().serialNumber(serialNumber).build());
     }
 
     DeviceRequestDto dto = DeviceRequestDto.builder().state(String.valueOf(state)).build();

@@ -8,9 +8,9 @@ import com.boxthing.api.mapper.DeviceMapper;
 import com.boxthing.api.mapper.UserMapper;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
-import com.boxthing.config.MqttConfig.MqttOutboundGateway;
-import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
-import com.google.gson.Gson;
+import com.boxthing.enums.ResponseMessage;
+import com.boxthing.mqtt.MessageParser;
+import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,9 +38,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private final DeviceRepository deviceRepository;
   private final DeviceMapper deviceMapper;
 
-  private final MqttOutboundGateway gateway;
-  private static final String BASE_TOPIC = "boxthing";
-  private final Gson gson = new Gson();
+  private final MessageParser messageParser;
+
+  private static ResponseMessage responseMessage;
 
   @Override
   public void onAuthenticationSuccess(
@@ -55,25 +55,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String registrationId = oauthToken.getAuthorizedClientRegistrationId();
     String accessToken = client.getAccessToken().getTokenValue();
     String state = request.getParameter("state");
-
+    String type = "login";
     Device device = deviceRepository.findByState(state);
     if (device == null) {
       return;
     }
-    log.info("regId: {}, accessToken: {}, state: {}\n", registrationId, accessToken, state);
-    log.info("device : {}", device);
     // google 인증 성공
     if (registrationId.equals("google")) {
       OAuth2RefreshToken maybeRefreshToken = client.getRefreshToken();
       if (maybeRefreshToken == null) {
         // no refresh token
-        MqttResponseDto responseDto =
-            MqttResponseDto.builder()
-                .type("google token")
-                .data("Login failed, no refresh token")
-                .build();
-        gateway.publish(
-            String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
+        String msg = responseMessage.LOGIN_FAILED.getMessage();
+        messageParser.msgFail(msg, device.getSerialNumber(), type);
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -106,11 +99,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
               .build();
       deviceMapper.updateWithNull(dto, device);
       deviceRepository.save(device);
-
-      MqttResponseDto responseDto =
-          MqttResponseDto.builder().type("access_token").data(accessToken).build();
-      gateway.publish(
-          String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
+      String msg = responseMessage.SUCCEED.getMessage();
+      MqttAccessTokenResDto accessTokenResDto =
+          MqttAccessTokenResDto.builder().accessToken(accessToken).build();
+      messageParser.msgSucceed(msg, device.getSerialNumber(), type, accessTokenResDto);
     }
 
     // github 인증 성공
@@ -120,11 +112,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       UserGoogleRequestDto dto = UserGoogleRequestDto.builder().githubJws(accessToken).build();
       userMapper.updateUserFromDto(dto, user);
       userRepository.save(user);
-      log.info("possible");
-      MqttResponseDto responseDto =
-          MqttResponseDto.builder().type("access_token").data(user.getGithubJws()).build();
-      gateway.publish(
-          String.format("%s/%s", BASE_TOPIC, device.getSerialNumber()), gson.toJson(responseDto));
+      String msg = responseMessage.SUCCEED.getMessage();
+      MqttAccessTokenResDto accessTokenResDto =
+          MqttAccessTokenResDto.builder().accessToken(accessToken).build();
+      messageParser.msgSucceed(msg, device.getSerialNumber(), type, accessTokenResDto);
 
       DeviceRequestDto deviceDto =
           DeviceRequestDto.builder()

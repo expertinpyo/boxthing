@@ -1,11 +1,9 @@
 package com.boxthing.config;
 
 import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
-import com.boxthing.mqtt.handler.InitHandler;
-import com.boxthing.mqtt.handler.MqttInboundHandler;
-import com.boxthing.mqtt.handler.PostureLogHandler;
-import com.boxthing.mqtt.handler.WaterLogHandler;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +32,17 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
-  private final InitHandler inItHandler;
-  private final MqttInboundHandler inboundHandler;
-  private final WaterLogHandler waterLogHandler;
-  private final PostureLogHandler postureLogHandler;
   private final MqttProperties mqttProperties;
   private static final String OUTBOUND_CHANNEL = "outboundChannel";
-  private final Gson gson = new Gson();
+  private final Gson gson =
+      new GsonBuilder()
+          .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+          .create();
 
   @Bean
   public MqttPahoClientFactory mqttPahoClientFactory() {
     MqttConnectOptions options = new MqttConnectOptions();
-    options.setServerURIs(new String[] {mqttProperties.getBROKER_URL()});
+    options.setServerURIs(new String[] {mqttProperties.getBrokerUrl()});
     DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
     factory.setConnectionOptions(options);
 
@@ -57,29 +54,16 @@ public class MqttConfig {
     return IntegrationFlows.from(mqttInboundChannelAdapter())
         .transform(mqttRequestTransformer())
         .filter(mqttRequestFilter())
-        .<MqttRequestDto<Object>, String>route(
-            MqttRequestDto::getType,
-            mapping ->
-                mapping
-                    //                    .subFlowMapping("register", sf ->
-                    // sf.handle(inItHandler.registerHandler()))
-                    .subFlowMapping("init", sf -> sf.handle(inItHandler.bootHandler()))
-                    .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
-                    .subFlowMapping("disconnect", sf -> sf.handle(inboundHandler.logoutHandler()))
-                    .subFlowMapping(
-                        "access_token", sf -> sf.handle(inboundHandler.accessTokenHandler()))
-                    .subFlowMapping(
-                        "waterlog_create", sf -> sf.handle(waterLogHandler.waterCreatHandler()))
-                    .subFlowMapping("waterlog", sf -> sf.handle(waterLogHandler.waterHandler()))
-                    .subFlowMapping(
-                        "waterlog_today", sf -> sf.handle(waterLogHandler.waterTodayHandler()))
-                    .subFlowMapping(
-                        "posturelog_create",
-                        sf -> sf.handle(postureLogHandler.postureCreateHandler()))
-                    .subFlowMapping(
-                        "posturelog", sf -> sf.handle(postureLogHandler.postureHandler()))
-                    .defaultOutputChannel("errorChannel")
-                    .resolutionRequired(false))
+        .enrichHeaders(
+            h ->
+                h.headerExpression(
+                    "trimmedTopic",
+                    "'mqtt-'+headers['"
+                        + MqttHeaders.RECEIVED_TOPIC
+                        + "'].substring("
+                        + (mqttProperties.getBaseTopic() + "/server/").length()
+                        + ")"))
+        .route("headers['trimmedTopic']")
         .get();
   }
 
@@ -102,18 +86,18 @@ public class MqttConfig {
         if (requestDto.getDeviceId() == null) {
           return false;
         }
-        return true;
         // TODO: deviceId가 우리 db에 있는지 검증
+
+        return true;
       }
     };
   }
 
   public MqttPahoMessageDrivenChannelAdapter mqttInboundChannelAdapter() {
+    String topic = mqttProperties.getBaseTopic() + "/server/#";
     MqttPahoMessageDrivenChannelAdapter adapter =
         new MqttPahoMessageDrivenChannelAdapter(
-            MqttAsyncClient.generateClientId(),
-            mqttPahoClientFactory(),
-            mqttProperties.getBASE_TOPIC());
+            MqttAsyncClient.generateClientId(), mqttPahoClientFactory(), topic);
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);

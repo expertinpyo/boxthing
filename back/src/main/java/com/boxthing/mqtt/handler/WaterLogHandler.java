@@ -1,6 +1,5 @@
 package com.boxthing.mqtt.handler;
 
-import static com.boxthing.util.GsonUtil.PATTERN_DATETIME;
 import static com.boxthing.util.UtilMethods.jsonConverter;
 
 import com.boxthing.api.domain.Device;
@@ -11,18 +10,13 @@ import com.boxthing.api.mapper.WaterLogMapper;
 import com.boxthing.api.querydsl.WaterLogQueryDsl;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.WaterLogRepository;
-import com.boxthing.config.MqttConfig.MqttOutboundGateway;
-import com.boxthing.config.MqttProperties;
+import com.boxthing.enums.ResponseMessage;
+import com.boxthing.mqtt.MessageParser;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterBeforeReqData;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterReqData;
-import com.boxthing.mqtt.dto.MqttResDto.MqttResponseDto;
-import com.boxthing.util.GsonUtil.LocalDateTimeAdapter;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,25 +31,22 @@ import org.springframework.stereotype.Component;
 public class WaterLogHandler {
 
   private final WaterLogQueryDsl waterLogQueryDsl;
-  private final MqttOutboundGateway gateway;
 
-  private final MqttProperties mqttProperties;
-  private final Gson gson =
-      new GsonBuilder()
-          .setDateFormat(PATTERN_DATETIME)
-          .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter().nullSafe())
-          .create();
   private final DeviceRepository deviceRepository;
   private final WaterLogRepository waterLogRepository;
   private final WaterLogMapper waterLogMapper;
+
+  private final MessageParser messageParser;
+  private ResponseMessage responseMessage;
 
   public MessageHandler waterCreatHandler() {
     return new MessageHandler() {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        Type type = new TypeToken<MqttRequestDto<MqttWaterReqData>>() {}.getType();
-        MqttRequestDto<MqttWaterReqData> requestDto = jsonConverter(message.getPayload(), type);
+        Type typeToken = new TypeToken<MqttRequestDto<MqttWaterReqData>>() {}.getType();
+        MqttRequestDto<MqttWaterReqData> requestDto =
+            jsonConverter(message.getPayload(), typeToken);
         String deviceId = requestDto.getDeviceId();
         MqttWaterReqData data = requestDto.getData();
 
@@ -67,6 +58,11 @@ public class WaterLogHandler {
         WaterLogRequestDto waterDto =
             WaterLogRequestDto.builder().amount(amount).user(user).build();
         waterLogRepository.save(waterLogMapper.toEntity(waterDto));
+
+        String msg = responseMessage.CREATED.getMessage();
+        String type = "waterlog_create";
+
+        messageParser.msgSucceed(msg, deviceId, type);
       }
     };
   }
@@ -76,9 +72,9 @@ public class WaterLogHandler {
       @Override
       public void handleMessage(Message<?> message)
           throws MessagingException, NullPointerException {
-        Type type = new TypeToken<MqttRequestDto<MqttWaterBeforeReqData>>() {}.getType();
+        Type typeToken = new TypeToken<MqttRequestDto<MqttWaterBeforeReqData>>() {}.getType();
         MqttRequestDto<MqttWaterBeforeReqData> requestDto =
-            jsonConverter(message.getPayload(), type);
+            jsonConverter(message.getPayload(), typeToken);
 
         String deviceId = requestDto.getDeviceId();
         MqttWaterBeforeReqData data = requestDto.getData();
@@ -86,26 +82,25 @@ public class WaterLogHandler {
         Device device = deviceRepository.findBySerialNumber(deviceId);
         User user = device.getUser();
 
+        String msg;
+        String type = "waterlog";
+
         if (user == null) {
-          log.info("This device doesn't have any user");
+          msg = responseMessage.NO_USER_CONNECT.getMessage();
+          messageParser.msgFail(msg, deviceId, type);
           return;
         }
         Integer before = data.getBefore();
 
         log.info("before : {}", before);
         List<WaterLog> list = waterLogQueryDsl.findAllByUserAndDate(user, before);
-        log.info("result list : {}", list);
-
-        MqttResponseDto responseDto =
-            MqttResponseDto.builder()
-                .type("waterlog")
-                .data(waterLogMapper.toDateList(list))
-                .build();
-        log.info("response : {}", responseDto);
-        log.info("gson: {}", gson.toJson(responseDto));
-        gateway.publish(
-            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
-            gson.toJson(responseDto));
+        if (list.isEmpty()) {
+          msg = responseMessage.EMPTY_RESULT.getMessage();
+          messageParser.msgFail(msg, deviceId, type);
+          return;
+        }
+        msg = responseMessage.SUCCEED.getMessage();
+        messageParser.msgSucceed(msg, deviceId, type, waterLogMapper.toDateList(list));
       }
     };
   }
@@ -121,23 +116,18 @@ public class WaterLogHandler {
         Device device = deviceRepository.findBySerialNumber(deviceId);
         User user = device.getUser();
 
+        String msg;
+        String type = "waterlog_today";
+
         if (user == null) {
-          log.info("This device doesn't have any user");
+          msg = responseMessage.NO_USER_CONNECT.getMessage();
+          messageParser.msgFail(msg, deviceId, type);
           return;
         }
 
         List<WaterLog> list = waterLogQueryDsl.findallByUserAndToday(user);
-
-        MqttResponseDto responseDto =
-            MqttResponseDto.builder()
-                .type("waterlog_today")
-                .data(waterLogMapper.toList(list))
-                .build();
-        log.info("response : {}", responseDto);
-        log.info("gson: {}", gson.toJson(responseDto));
-        gateway.publish(
-            String.format("%s/%s", mqttProperties.getBASE_TOPIC(), deviceId),
-            gson.toJson(responseDto));
+        msg = responseMessage.SUCCEED.getMessage();
+        messageParser.msgSucceed(msg, deviceId, type, waterLogMapper.toList(list));
       }
     };
   }

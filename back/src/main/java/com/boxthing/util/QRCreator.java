@@ -36,7 +36,7 @@ public class QRCreator {
     log.info("hashed : {}", state);
     Device device = deviceRepository.findBySerialNumber(serialNumber);
     if (device == null) {
-      return null;
+      deviceRepository.save(Device.builder().serialNumber(serialNumber).build());
     }
 
     DeviceRequestDto dto = DeviceRequestDto.builder().state(String.valueOf(state)).build();

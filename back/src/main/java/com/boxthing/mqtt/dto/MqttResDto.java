@@ -12,14 +12,17 @@ public class MqttResDto {
   @NoArgsConstructor
   public static class MqttResponseDto {
     String type;
+
+    Boolean success;
     String message;
     Object data;
 
     @Builder
-    public MqttResponseDto(String type, Object data, String message) {
+    public MqttResponseDto(String type, Object data, String message, Boolean success) {
       this.type = type;
       this.data = data;
       this.message = message;
+      this.success = success;
     }
   }
 
@@ -27,12 +30,10 @@ public class MqttResDto {
   @ToString
   @NoArgsConstructor
   public static class MqttProviderResDto {
-    String provider;
     String link;
 
     @Builder
-    public MqttProviderResDto(String provider, String link) {
-      this.provider = provider;
+    public MqttProviderResDto(String link) {
       this.link = link;
     }
   }
@@ -57,12 +58,10 @@ public class MqttResDto {
   @NoArgsConstructor
   public static class MqttAccessTokenResDto {
     String accessToken;
-    String provider;
 
     @Builder
-    public MqttAccessTokenResDto(String accessToken, String provider) {
+    public MqttAccessTokenResDto(String accessToken) {
       this.accessToken = accessToken;
-      this.provider = provider;
     }
   }
 }

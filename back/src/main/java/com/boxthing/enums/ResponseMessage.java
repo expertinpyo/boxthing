@@ -8,6 +8,7 @@ public enum ResponseMessage {
   TOKEN_EXPIRED("토큰 만료"),
   BAD_REQUEST("올바르지 않은 요청"),
   BAD_ACCESSMENT("올바르지 않은 접근"),
+  NO_VALID_TOKEN("유효하지 않은 토큰"),
   LOGIN_FAILED("로그인 실패"),
   EMPTY_RESULT("결과 값 없음"),
   ;

@@ -1,7 +1,5 @@
 package com.boxthing.mqtt.handler;
 
-import static com.boxthing.util.UtilMethods.jsonConverter;
-
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.domain.User;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
@@ -18,12 +16,13 @@ import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttProviderResDto;
 import com.boxthing.util.AccessTokenRefresh;
 import com.boxthing.util.QRCreator;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
@@ -46,75 +45,71 @@ public class MqttInboundHandler {
   private final MessageParser messageParser;
   private ResponseMessage responseMessage;
 
-  public MessageHandler qrHandler() {
-    return new MessageHandler() {
-      @SneakyThrows
-      @Override
-      public void handleMessage(Message<?> message)
-          throws MessagingException, NullPointerException {
-        log.info("message : {}", message);
-        log.info("payload : {}", message.getPayload());
-        Type typeToken = new TypeToken<MqttRequestDto<MqttProviderReqData>>() {}.getType();
-        MqttRequestDto<MqttProviderReqData> requestDto =
-            jsonConverter(message.getPayload(), typeToken);
-        log.info("{}", requestDto);
-        String deviceId = requestDto.getDeviceId();
-        MqttProviderReqData data = requestDto.getData();
-
-        String msg;
-        String type = "qr";
-        //
-        String qrUrl = qrCreator.hashedUri(deviceId, data.getProvider());
-        if (qrUrl == null) {
-          msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
-          messageParser.msgFail(msg, deviceId, type);
-          return;
-        }
-        MqttProviderResDto responseResDto =
-            MqttProviderResDto.builder().provider(data.getProvider()).link(qrUrl).build();
-        msg = responseMessage.SUCCEED.getMessage();
-        messageParser.msgSucceed(msg, deviceId, type, responseResDto);
-      }
+  @Bean
+  @ServiceActivator(inputChannel = "mqtt-qr/google")
+  public MessageHandler qrGoogleHandler() {
+    return message -> {
+      log.info("message : {}", message);
+      log.info("payload : {}", message.getPayload());
+      MqttRequestDto<Object> requestDto = (MqttRequestDto<Object>) message.getPayload();
+      log.info("{}", requestDto);
+      String deviceId = requestDto.getDeviceId();
+      qrReturner("google", deviceId);
     };
   }
 
-  public MessageHandler accessTokenHandler() {
-    return new MessageHandler() {
-      @SneakyThrows
-      @Override
-      public void handleMessage(Message<?> message)
-          throws MessagingException, NullPointerException {
-        Type typeToken = new TypeToken<MqttRequestDto<MqttProviderReqData>>() {}.getType();
-        MqttRequestDto<MqttProviderReqData> requestDto =
-            jsonConverter(message.getPayload(), typeToken);
-        String deviceId = requestDto.getDeviceId();
-        MqttProviderReqData data = requestDto.getData();
+  @Bean
+  @ServiceActivator(inputChannel = "mqtt-qr/github")
+  public MessageHandler qrGithubHandler() {
+    return message -> {
+      log.info("message : {}", message);
+      log.info("payload : {}", message.getPayload());
+      MqttRequestDto<Object> requestDto = (MqttRequestDto<Object>) message.getPayload();
+      log.info("{}", requestDto);
+      String deviceId = requestDto.getDeviceId();
+      qrReturner("github", deviceId);
+    };
+  }
 
-        String msg;
-        String type = "access_token";
+  @Bean
+  @ServiceActivator(inputChannel = "mqtt-access_token/google")
+  public MessageHandler accessTokenGoogleHandler() {
+    return message -> {
+      MqttRequestDto<MqttProviderReqData> requestDto =
+          (MqttRequestDto<MqttProviderReqData>) message.getPayload();
+      String deviceId = requestDto.getDeviceId();
 
-        Device device = deviceRepository.findBySerialNumber(deviceId);
-        if (device == null || device.getUser() == null) {
-          if (device == null) {
-            msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
-          } else {
-            msg = responseMessage.NO_USER_CONNECT.getMessage();
-          }
+      String msg;
+      String type = "access_token/google";
+
+      Device device = deviceRepository.findBySerialNumber(deviceId);
+      //      if (device == null || device.getUser() == null) {
+      //        if (device == null) {
+      //          msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
+      //        } else {
+      //          msg = responseMessage.NO_USER_CONNECT.getMessage();
+      //        }
+      //        messageParser.msgFail(msg, deviceId, type);
+      //        return;
+      //      }
+
+      String accessToken = null;
+      try {
+        accessToken = accessTokenRefresh.getAccessToken(device.getUser().getGoogleRefreshJws());
+        if (accessToken == null) {
+          msg = responseMessage.NO_VALID_TOKEN.getMessage();
           messageParser.msgFail(msg, deviceId, type);
           return;
         }
         MqttAccessTokenResDto tokenDto =
-            MqttAccessTokenResDto.builder().provider(data.getProvider()).build();
-        if (data.getProvider().equals("google")) {
-          String accessToken =
-              accessTokenRefresh.getAccessToken(device.getUser().getGoogleRefreshJws());
-          tokenDto.setAccessToken(accessToken);
-        } else if (data.getProvider().equals("github")) {
-          tokenDto.setAccessToken(device.getUser().getGithubJws());
-        }
+            MqttAccessTokenResDto.builder().accessToken(accessToken).build();
         log.info("token dto : {}", tokenDto);
         msg = responseMessage.SUCCEED.getMessage();
         messageParser.msgSucceed(msg, deviceId, type, tokenDto);
+      } catch (IOException e) {
+        msg = responseMessage.NO_VALID_TOKEN.getMessage();
+        messageParser.msgFail(msg, deviceId, type);
+        throw new RuntimeException(e);
       }
     };
   }
@@ -164,4 +159,27 @@ public class MqttInboundHandler {
       }
     };
   }
+
+  @SneakyThrows
+  private void qrReturner(String provider, String deviceId) {
+    String msg;
+    String type = "qr/" + provider;
+    //
+    String qrUrl = qrCreator.hashedUri(deviceId, provider);
+    if (qrUrl == null) {
+      msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
+      messageParser.msgFail(msg, deviceId, type);
+      return;
+    }
+    MqttProviderResDto responseResDto = MqttProviderResDto.builder().link(qrUrl).build();
+    msg = responseMessage.SUCCEED.getMessage();
+    messageParser.msgSucceed(msg, deviceId, type, responseResDto);
+  }
+  //  @Bean
+  //  @ServiceActivator(inputChannel = "mqtt-qr")
+  //  public MessageHandler qrHandlerNew() {
+  //    return message -> {
+  //      System.out.println("message payload: " + message.getPayload());
+  //    };
+  //  }
 }

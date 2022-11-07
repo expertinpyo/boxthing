@@ -101,7 +101,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       deviceRepository.save(device);
       String msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
-          MqttAccessTokenResDto.builder().accessToken(accessToken).provider("google").build();
+          MqttAccessTokenResDto.builder().accessToken(accessToken).build();
       messageParser.msgSucceed(msg, device.getSerialNumber(), type, accessTokenResDto);
     }
 
@@ -114,7 +114,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       userRepository.save(user);
       String msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
-          MqttAccessTokenResDto.builder().accessToken(accessToken).provider("github").build();
+          MqttAccessTokenResDto.builder().accessToken(accessToken).build();
       messageParser.msgSucceed(msg, device.getSerialNumber(), type, accessTokenResDto);
 
       DeviceRequestDto deviceDto =

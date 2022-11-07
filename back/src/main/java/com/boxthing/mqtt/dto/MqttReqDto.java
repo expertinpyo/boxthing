@@ -11,14 +11,14 @@ public class MqttReqDto {
   @ToString
   @NoArgsConstructor
   public static class MqttRequestDto<T> {
+
     String deviceId;
-    String type;
+
     T data;
 
     @Builder
-    public MqttRequestDto(String deviceId, String type, T data) {
+    public MqttRequestDto(String deviceId, T data) {
       this.deviceId = deviceId;
-      this.type = type;
       this.data = data;
     }
   }

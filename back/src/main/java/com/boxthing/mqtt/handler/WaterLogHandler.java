@@ -100,7 +100,7 @@ public class WaterLogHandler {
           return;
         }
         msg = responseMessage.SUCCEED.getMessage();
-        messageParser.msgSucceed(msg, deviceId, type, waterLogMapper.toDateList(list), true);
+        messageParser.msgSucceed(msg, deviceId, type, waterLogMapper.toDateList(list));
       }
     };
   }
@@ -127,7 +127,7 @@ public class WaterLogHandler {
 
         List<WaterLog> list = waterLogQueryDsl.findallByUserAndToday(user);
         msg = responseMessage.SUCCEED.getMessage();
-        messageParser.msgSucceed(msg, deviceId, type, waterLogMapper.toList(list), true);
+        messageParser.msgSucceed(msg, deviceId, type, waterLogMapper.toList(list));
       }
     };
   }

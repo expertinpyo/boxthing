@@ -62,6 +62,8 @@ spotless  {
   lineEndings "UNIX"
 
   java {
+    targetExclude "build/**"
+
     importOrder()
     googleJavaFormat()
     formatAnnotations()
@@ -111,4 +113,3 @@ configurations {
     }
     querydsl.extendsFrom compileClasspath
 }
-

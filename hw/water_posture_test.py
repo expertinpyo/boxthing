@@ -7,7 +7,7 @@ import os
 from os import environ
 from typing import Optional
 from datetime import datetime
-from water_check import amount_water
+from modules.water import amount_water
 from modules.api import google_calendar, github_notification
 
 

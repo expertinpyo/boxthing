@@ -2,7 +2,7 @@ import asyncio
 import time
 import sys
 import RPi.GPIO as GPIO
-from hx711 import HX711
+from .hx711 import HX711
 
 async def cleanAndExit():
     print("Cleaning...")

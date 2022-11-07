@@ -72,10 +72,9 @@ def init():
 predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat")
 detector = dlib.get_frontal_face_detector()
 first_img = None
-
+first_dis = first_down = first_area = 0
+webcam = cv2.VideoCapture(0)
 async def check_pose():   
-    webcam = cv2.VideoCapture(0)
-    first_dis = first_down = first_area = 0
     # 0 : 올바른 자세, 1 : 거북목, 2: 허리무리
     send_posture_flag = 0
     posture_score = 0

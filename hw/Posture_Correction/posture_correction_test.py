@@ -128,5 +128,5 @@ async def check_pose():
             print("종료")
             pass
 
-        webcam.release()
-        cv2.destroyAllWindows()
+        await webcam.release()
+        await cv2.destroyAllWindows()

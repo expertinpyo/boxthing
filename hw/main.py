@@ -5,7 +5,6 @@ import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
 from os import environ
-from typing import Optional
 from datetime import datetime
 
 from modules.api import google_calendar, github_notification
@@ -18,12 +17,13 @@ mqtt_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queu
 class State:
     lock = asyncio.Lock()
 
-    has_ws_connection = asyncio.Event()
+    ws_connected = asyncio.Event()
+    init_done = asyncio.Event()
 
     google_access_token = ""
     google_refresh_token = ""
     github_access_token = ""
-    github_notification_last_updated_at: Optional[datetime] = None
+    github_notification_last_updated_at: datetime | None = None
 
 
 state = State()
@@ -53,18 +53,20 @@ async def ws_producer(websocket):
 
 
 async def ws_handler(websocket):
-    if state.has_ws_connection.is_set():
+    await state.init_done.wait()
+
+    if state.ws_connected.is_set():
         await websocket.close()
         return
 
-    state.has_ws_connection.set()
+    state.ws_connected.set()
 
     await asyncio.gather(
         ws_consumer(websocket),
         ws_producer(websocket),
     )
 
-    state.has_ws_connection.clear()
+    state.ws_connected.clear()
 
 
 async def mqtt_consumer(client):
@@ -73,13 +75,28 @@ async def mqtt_consumer(client):
             f"{environ['MQTT_BASE_TOPIC']}/device/{environ['DEVICE_ID']}/#"
         )
         async for message in messages:
-            data = json.loads(message.payload)
+            message_dict = json.loads(message.payload)
+            data = message_dict["data"]
             topic_list = message.topic.split("/")[3:]
 
             print(f"Message from mqtt topic: {topic_list}, data: {data}")
 
             if topic_list[0] == "init":
-                pass
+                if data["is_login"]:
+                    await mqtt_message_queue.put(("access_token/google", None))
+                else:
+                    await mqtt_message_queue.put(("qr/google", None))
+
+            if topic_list[0] == "qr":
+                await ws_message_queue.put(
+                    (
+                        "init",
+                        {
+                            "is_login": False,
+                            "link": data["link"],
+                        },
+                    )
+                )
 
 
 async def mqtt_producer(client):
@@ -109,7 +126,7 @@ async def mqtt_client():
 
 async def google_calendar_coroutine():
     while True:
-        await state.has_ws_connection.wait()
+        await state.ws_connected.wait()
 
         events = []
         if state.google_access_token:
@@ -124,7 +141,7 @@ async def google_calendar_coroutine():
 
 async def github_notifications_coroutine():
     while True:
-        await state.has_ws_connection.wait()
+        await state.ws_connected.wait()
 
         notifications = []
         if state.github_access_token:

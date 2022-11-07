@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MessageParser {
   private final MqttOutboundGateway gateway;
-
   private final Gson gson =
       new GsonBuilder()
           .setDateFormat(PATTERN_DATETIME)
@@ -28,39 +27,39 @@ public class MessageParser {
           .create();
   private final MqttProperties mqttProperties;
 
-  public void msgSucceed(String msg, String serialNumber, String type) {
+  public void msgSucceed(String msg, String serialNumber, String topic) {
     MqttResponseDto responseDto =
-        MqttResponseDto.builder().success(true).type(type).message(msg).build();
+        MqttResponseDto.builder().success(true).topic(topic).message(msg).build();
     log.info("responseDto : {}", responseDto);
     gateway.publish(
-        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, type),
+        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),
         gson.toJson(responseDto));
   }
 
-  public void msgSucceed(String msg, String serialNumber, String type, Object data) {
+  public void msgSucceed(String msg, String serialNumber, String topic, Object data) {
     MqttResponseDto responseDto =
-        MqttResponseDto.builder().type(type).message(msg).success(true).data(data).build();
+        MqttResponseDto.builder().topic(topic).message(msg).success(true).data(data).build();
     log.info("responseDto : {}", responseDto);
     gateway.publish(
-        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, type),
+        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),
         gson.toJson(responseDto));
   }
 
-  public void msgFail(String msg, String serialNumber, String type) {
+  public void msgFail(String msg, String serialNumber, String topic) {
     MqttResponseDto responseDto =
-        MqttResponseDto.builder().success(false).type(type).message(msg).build();
+        MqttResponseDto.builder().success(false).topic(topic).message(msg).build();
     log.info("responseDto : {}", responseDto);
     gateway.publish(
-        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, type),
+        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),
         gson.toJson(responseDto));
   }
 
-  public void msgFail(String msg, String serialNumber, String type, Object data) {
+  public void msgFail(String msg, String serialNumber, String topic, Object data) {
     MqttResponseDto responseDto =
-        MqttResponseDto.builder().type(type).message(msg).success(false).data(data).build();
+        MqttResponseDto.builder().topic(topic).message(msg).success(false).data(data).build();
     log.info("responseDto : {}", responseDto);
     gateway.publish(
-        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, type),
+        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),
         gson.toJson(responseDto));
   }
 }

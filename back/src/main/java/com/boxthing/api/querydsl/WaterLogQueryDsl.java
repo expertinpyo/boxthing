@@ -16,10 +16,10 @@ public class WaterLogQueryDsl {
   private final JPAQueryFactory jpaQueryFactory;
   private final QWaterLog waterLog = new QWaterLog("waterLog");
 
-  public List<WaterLog> findAllByUserAndDate(User user, int before) {
+  public List<WaterLog> findAllByUserAndDate(User user, int days) {
     LocalDateTime toDate = LocalDateTime.now().minusDays(1);
     toDate.withHour(23).withMinute(59).withSecond(59);
-    LocalDateTime startFrom = toDate.minusDays(before);
+    LocalDateTime startFrom = toDate.minusDays(days);
     startFrom.withHour(0).withHour(0).withSecond(0);
 
     return jpaQueryFactory

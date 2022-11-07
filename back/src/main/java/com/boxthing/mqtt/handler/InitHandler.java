@@ -1,16 +1,20 @@
 package com.boxthing.mqtt.handler;
 
+import static com.boxthing.mqtt.handler.MqttInboundHandler.responseMessage;
+
 import com.boxthing.api.domain.Device;
+import com.boxthing.api.domain.User;
 import com.boxthing.api.repository.DeviceRepository;
-import com.boxthing.enums.ResponseMessage;
 import com.boxthing.mqtt.MessageParser;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
 import com.boxthing.mqtt.dto.MqttResDto.MqttLoginResDto;
+import com.boxthing.util.AccessTokenRefresh;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.Message;
+import org.springframework.context.annotation.Bean;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,34 +23,63 @@ import org.springframework.stereotype.Component;
 public class InitHandler {
   private final DeviceRepository deviceRepository;
 
-  private ResponseMessage responseMessage;
   private final MessageParser messageParser;
 
+  private final AccessTokenRefresh accessTokenRefresh;
+
+  @Bean
+  @ServiceActivator(inputChannel = "mqtt-init")
   public MessageHandler bootHandler() {
 
-    return new MessageHandler() {
-      @Override
-      public void handleMessage(Message<?> message) throws MessagingException {
-        MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
-        String deviceId = requestDto.getDeviceId();
-        Device device = deviceRepository.findBySerialNumber(deviceId);
-        String msg;
-        String type = "init";
-        if (device == null || device.getUser() == null) {
-          log.info("empty");
-          if (device == null) {
-            msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
-          } else {
-            msg = responseMessage.NO_USER_CONNECT.getMessage();
+    return message -> {
+      MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+      String deviceId = requestDto.getDeviceId();
+      Device device = deviceRepository.findBySerialNumber(deviceId);
+      String msg = responseMessage.NO_VALID_TOKEN.getMessage();
+      String topic = "init";
+      //      if (device == null || device.getUser() == null) {
+      //        log.info("empty");
+      //        if (device == null) {
+      //          msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
+      //        } else {
+      //          msg = responseMessage.NO_USER_CONNECT.getMessage();
+      //        }
+      //        MqttLoginResDto data = MqttLoginResDto.builder()..build();
+      //        messageParser.msgFail(msg, deviceId, topic, data);
+      //        return;
+      //      }
+      MqttLoginResDto resDto =
+          MqttLoginResDto.builder().githubAccessToken("").googleAccessToken("").build();
+
+      if (device == null) {
+        deviceRepository.save(Device.builder().serialNumber(deviceId).build());
+        msg = responseMessage.NO_USER_CONNECT.getMessage();
+      } else if (device.getUser() == null) {
+        msg = responseMessage.NO_USER_CONNECT.getMessage();
+      } else {
+        User user = device.getUser();
+        if (user.getGoogleRefreshJws() != null) {
+          String googleAccessToke;
+          try {
+            googleAccessToke = accessTokenRefresh.getAccessToken(user.getGoogleRefreshJws());
+            if (googleAccessToke != null) {
+              resDto.setGoogleAccessToken(googleAccessToke);
+            }
+          } catch (IOException e) {
+            throw new RuntimeException(e);
           }
-          MqttLoginResDto data = MqttLoginResDto.builder().isLogin(false).build();
-          messageParser.msgFail(msg, deviceId, type, data);
-          return;
         }
-        MqttLoginResDto data = MqttLoginResDto.builder().isLogin(true).build();
-        msg = responseMessage.SUCCEED.getMessage();
-        messageParser.msgSucceed(msg, deviceId, type, data);
+        if (user.getGithubJws() != null) {
+          resDto.setGithubAccessToken(user.getGithubJws());
+        }
       }
+      if (resDto.getGithubAccessToken() != "" && resDto.getGoogleAccessToken() != "") {
+        msg = responseMessage.SUCCEED.getMessage();
+        messageParser.msgSucceed(msg, deviceId, topic, resDto);
+      } else {
+        messageParser.msgFail(msg, deviceId, topic, resDto);
+      }
+      //
     };
   }
 }

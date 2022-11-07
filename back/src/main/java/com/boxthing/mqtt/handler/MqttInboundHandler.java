@@ -23,9 +23,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,6 +31,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MqttInboundHandler {
 
+  public static ResponseMessage responseMessage;
   private final QRCreator qrCreator;
 
   private final DeviceRepository deviceRepository;
@@ -43,7 +42,6 @@ public class MqttInboundHandler {
 
   private final AccessTokenRefresh accessTokenRefresh;
   private final MessageParser messageParser;
-  private ResponseMessage responseMessage;
 
   @Bean
   @ServiceActivator(inputChannel = "mqtt-qr/google")
@@ -80,7 +78,7 @@ public class MqttInboundHandler {
       String deviceId = requestDto.getDeviceId();
 
       String msg;
-      String type = "access_token/google";
+      String topic = "access_token/google";
 
       Device device = deviceRepository.findBySerialNumber(deviceId);
       //      if (device == null || device.getUser() == null) {
@@ -98,82 +96,114 @@ public class MqttInboundHandler {
         accessToken = accessTokenRefresh.getAccessToken(device.getUser().getGoogleRefreshJws());
         if (accessToken == null) {
           msg = responseMessage.NO_VALID_TOKEN.getMessage();
-          messageParser.msgFail(msg, deviceId, type);
+          messageParser.msgFail(msg, deviceId, topic);
           return;
         }
         MqttAccessTokenResDto tokenDto =
             MqttAccessTokenResDto.builder().accessToken(accessToken).build();
         log.info("token dto : {}", tokenDto);
         msg = responseMessage.SUCCEED.getMessage();
-        messageParser.msgSucceed(msg, deviceId, type, tokenDto);
+        messageParser.msgSucceed(msg, deviceId, topic, tokenDto);
       } catch (IOException e) {
         msg = responseMessage.NO_VALID_TOKEN.getMessage();
-        messageParser.msgFail(msg, deviceId, type);
+        messageParser.msgFail(msg, deviceId, topic);
         throw new RuntimeException(e);
       }
     };
   }
 
-  public MessageHandler logoutHandler() {
-    return new MessageHandler() {
-      @Override
-      public void handleMessage(Message<?> message) throws MessagingException {
-        MqttRequestDto<Object> requestDto = (MqttRequestDto<Object>) message.getPayload();
-        String deviceId = requestDto.getDeviceId();
-        Device device = deviceRepository.findBySerialNumber(deviceId);
-        User user = device.getUser();
+  @Bean
+  @ServiceActivator(inputChannel = "mqtt-access_token/github")
+  public MessageHandler accessTokenGithubHandler() {
+    return message -> {
+      MqttRequestDto<MqttProviderReqData> requestDto =
+          (MqttRequestDto<MqttProviderReqData>) message.getPayload();
+      String deviceId = requestDto.getDeviceId();
 
-        if (user == null) {
-          return;
-        }
-        String msg;
-        String type = "logout";
+      String msg;
+      String topic = "access_token/github";
 
-        DeviceRequestDto deviceDto =
-            DeviceRequestDto.builder()
-                .state(device.getState())
-                .user(null)
-                .id(device.getId())
-                .serialNumber(device.getSerialNumber())
-                .build();
+      Device device = deviceRepository.findBySerialNumber(deviceId);
+      //      if (device == null || device.getUser() == null) {
+      //        if (device == null) {
+      //          msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
+      //        } else {
+      //          msg = responseMessage.NO_USER_CONNECT.getMessage();
+      //        }
+      //        messageParser.msgFail(msg, deviceId, type);
+      //        return;
+      //      }
 
-        UserNullDto userDto =
-            UserNullDto.builder()
-                .googleRefreshJws(null)
-                .githubJws(null)
-                .email(user.getEmail())
-                .id(user.getId())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .device(null)
-                .build();
-
-        userMapper.updateWithNull(userDto, user);
-        userRepository.save(user);
-
-        deviceMapper.updateWithNull(deviceDto, device);
-        deviceRepository.save(device);
-        // store some logs for deviceId
+      String accessToken = device.getUser().getGithubJws();
+      if (accessToken == null) {
+        msg = responseMessage.NO_VALID_TOKEN.getMessage();
+        messageParser.msgFail(msg, deviceId, topic);
+      } else {
         msg = responseMessage.SUCCEED.getMessage();
-        messageParser.msgSucceed(msg, deviceId, type);
+        MqttAccessTokenResDto tokenResDto =
+            MqttAccessTokenResDto.builder().accessToken(accessToken).build();
+        messageParser.msgSucceed(msg, deviceId, topic, tokenResDto);
       }
+    };
+  }
+
+  public MessageHandler logoutHandler() {
+    return message -> {
+      MqttRequestDto<Object> requestDto = (MqttRequestDto<Object>) message.getPayload();
+      String deviceId = requestDto.getDeviceId();
+      Device device = deviceRepository.findBySerialNumber(deviceId);
+      User user = device.getUser();
+
+      if (user == null) {
+        return;
+      }
+      String msg;
+      String type = "logout";
+
+      DeviceRequestDto deviceDto =
+          DeviceRequestDto.builder()
+              .state(device.getState())
+              .user(null)
+              .id(device.getId())
+              .serialNumber(device.getSerialNumber())
+              .build();
+
+      UserNullDto userDto =
+          UserNullDto.builder()
+              .googleRefreshJws(null)
+              .githubJws(null)
+              .email(user.getEmail())
+              .id(user.getId())
+              .createdAt(user.getCreatedAt())
+              .updatedAt(LocalDateTime.now())
+              .device(null)
+              .build();
+
+      userMapper.updateWithNull(userDto, user);
+      userRepository.save(user);
+
+      deviceMapper.updateWithNull(deviceDto, device);
+      deviceRepository.save(device);
+      // store some logs for deviceId
+      msg = responseMessage.SUCCEED.getMessage();
+      messageParser.msgSucceed(msg, deviceId, type);
     };
   }
 
   @SneakyThrows
   private void qrReturner(String provider, String deviceId) {
     String msg;
-    String type = "qr/" + provider;
+    String topic = "qr/" + provider;
     //
     String qrUrl = qrCreator.hashedUri(deviceId, provider);
     if (qrUrl == null) {
       msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
-      messageParser.msgFail(msg, deviceId, type);
+      messageParser.msgFail(msg, deviceId, topic);
       return;
     }
     MqttProviderResDto responseResDto = MqttProviderResDto.builder().link(qrUrl).build();
     msg = responseMessage.SUCCEED.getMessage();
-    messageParser.msgSucceed(msg, deviceId, type, responseResDto);
+    messageParser.msgSucceed(msg, deviceId, topic, responseResDto);
   }
   //  @Bean
   //  @ServiceActivator(inputChannel = "mqtt-qr")

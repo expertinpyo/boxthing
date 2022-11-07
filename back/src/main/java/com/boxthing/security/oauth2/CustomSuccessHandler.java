@@ -1,5 +1,7 @@
 package com.boxthing.security.oauth2;
 
+import static com.boxthing.mqtt.handler.MqttInboundHandler.responseMessage;
+
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.domain.User;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
@@ -8,7 +10,6 @@ import com.boxthing.api.mapper.DeviceMapper;
 import com.boxthing.api.mapper.UserMapper;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
-import com.boxthing.enums.ResponseMessage;
 import com.boxthing.mqtt.MessageParser;
 import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import java.io.IOException;
@@ -40,8 +41,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
   private final MessageParser messageParser;
 
-  private static ResponseMessage responseMessage;
-
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -55,7 +54,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String registrationId = oauthToken.getAuthorizedClientRegistrationId();
     String accessToken = client.getAccessToken().getTokenValue();
     String state = request.getParameter("state");
-    String type = "login";
+    String topic = "login";
     Device device = deviceRepository.findByState(state);
     if (device == null) {
       return;
@@ -66,7 +65,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       if (maybeRefreshToken == null) {
         // no refresh token
         String msg = responseMessage.LOGIN_FAILED.getMessage();
-        messageParser.msgFail(msg, device.getSerialNumber(), type);
+        messageParser.msgFail(msg, device.getSerialNumber(), topic);
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -102,7 +101,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       String msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
           MqttAccessTokenResDto.builder().accessToken(accessToken).build();
-      messageParser.msgSucceed(msg, device.getSerialNumber(), type, accessTokenResDto);
+      messageParser.msgSucceed(msg, device.getSerialNumber(), topic + "/google", accessTokenResDto);
     }
 
     // github 인증 성공
@@ -115,7 +114,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       String msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
           MqttAccessTokenResDto.builder().accessToken(accessToken).build();
-      messageParser.msgSucceed(msg, device.getSerialNumber(), type, accessTokenResDto);
+      messageParser.msgSucceed(msg, device.getSerialNumber(), topic + "/github", accessTokenResDto);
 
       DeviceRequestDto deviceDto =
           DeviceRequestDto.builder()

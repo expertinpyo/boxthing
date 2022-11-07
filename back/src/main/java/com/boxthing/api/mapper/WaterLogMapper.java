@@ -4,6 +4,7 @@ import com.boxthing.api.domain.WaterLog;
 import com.boxthing.api.dto.WaterLogDto.WaterLogRequestDto;
 import com.boxthing.api.dto.WaterLogDto.WaterLogResponseDto;
 import com.google.gson.internal.LinkedTreeMap;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -15,28 +16,29 @@ public abstract class WaterLogMapper {
 
   public abstract WaterLog toEntity(final WaterLogRequestDto dto);
 
-  public List<LinkedTreeMap> toDateList(List<WaterLog> waterLogs) {
+  public List<LinkedTreeMap> toDateList(List<WaterLog> waterLogs, int days) {
     List<LinkedTreeMap> response = new ArrayList<>();
+
+    LocalDate date = LocalDate.now().minusDays(days);
+
+    for (int i = 0; i < days; i++) {
+      LinkedTreeMap<String, Float> newDate = new LinkedTreeMap<String, Float>();
+      newDate.put(date.plusDays(i).toString(), (float) 0);
+      response.add(newDate);
+    }
+
     String now = null;
-    float cnt = 0;
 
     for (WaterLog waterLog : waterLogs) {
-      if (now == null) {
-        now = waterLog.getCreatedAt().toLocalDate().toString();
-        cnt += waterLog.getAmount();
-      } else if (now.equals(waterLog.getCreatedAt().toLocalDate().toString())) {
-        cnt += waterLog.getAmount();
-      } else {
-        LinkedTreeMap<String, Float> result = new LinkedTreeMap<>();
-        result.put(now, cnt);
-        response.add(result);
-        now = waterLog.getCreatedAt().toLocalDate().toString();
-        cnt = waterLog.getAmount();
+      String key = waterLog.getCreatedAt().toLocalDate().toString();
+      for (LinkedTreeMap<String, Float> map : response) {
+        if (map.containsKey(key)) {
+          map.put(key, map.get(key) + waterLog.getAmount());
+          break;
+        }
       }
     }
-    LinkedTreeMap<String, Float> last = new LinkedTreeMap<>();
-    last.put(now, cnt);
-    response.add(last);
+
     return response;
   }
 

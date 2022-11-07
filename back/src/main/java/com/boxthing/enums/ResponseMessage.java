@@ -11,6 +11,8 @@ public enum ResponseMessage {
   NO_VALID_TOKEN("유효하지 않은 토큰"),
   LOGIN_FAILED("로그인 실패"),
   EMPTY_RESULT("결과 값 없음"),
+  NO_GOOGLE_TOKEN("구글 토큰 없음"),
+  NO_GITHUB_TOKEN("깃허브 토큰 없음"),
   ;
 
   private String message;

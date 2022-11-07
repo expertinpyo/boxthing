@@ -32,6 +32,7 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
+
   private final MqttProperties mqttProperties;
   private static final String OUTBOUND_CHANNEL = "outboundChannel";
   private final Gson gson =

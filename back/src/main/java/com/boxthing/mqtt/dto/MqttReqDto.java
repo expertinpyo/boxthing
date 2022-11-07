@@ -50,12 +50,12 @@ public class MqttReqDto {
   @Getter
   @ToString
   @NoArgsConstructor
-  public static class MqttWaterBeforeReqData {
-    Integer before;
+  public static class MqttWaterDaysReqData {
+    Integer days;
 
     @Builder
-    public MqttWaterBeforeReqData(Integer before) {
-      this.before = before;
+    public MqttWaterDaysReqData(Integer days) {
+      this.days = days;
     }
   }
 }

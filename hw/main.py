@@ -7,8 +7,12 @@ import os
 from os import environ
 from datetime import datetime
 
-from modules.api import google_calendar, GoogleAccessTokenExpired, github_notification
-
+from modules.api import (
+    google_calendar,
+    GoogleAccessTokenExpired,
+    github_notification,
+    github_set_read,
+)
 
 ws_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
 mqtt_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
@@ -44,8 +48,9 @@ async def ws_consumer(websocket):
                 await mqtt_message_queue.put(("github/qr", None))
 
             if type_list[1] == "read":
-                # TODO: set notifications as read
-                pass
+                await github_set_read(
+                    state.github_access_token, state.github_notification_last_updated_at
+                )
 
         if type_list[0] == "log":
             # Pass any log request to mqtt
@@ -190,7 +195,7 @@ async def google_calendar_coroutine():
         await state.ws_connected.wait()
 
         try:
-            events = google_calendar(state.google_access_token)
+            events = await google_calendar(state.google_access_token)
             print(f"google calendar events: {events}")
 
             if events:
@@ -210,9 +215,10 @@ async def github_notifications_coroutine():
     while True:
         await state.ws_connected.wait()
 
-        notifications, last_updated_at = github_notification(
+        notifications, last_updated_at = await github_notification(
             state.github_access_token, state.github_notification_last_updated_at
         )
+
         print(
             f"github notifications: {notifications}, last_updated_at: {last_updated_at}"
         )
@@ -248,4 +254,5 @@ if __name__ == "__main__":
     if os.name == "nt":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    asyncio.run(main(), debug=True)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

@@ -1,4 +1,5 @@
-import requests
+import asyncio
+import aiohttp
 from datetime import datetime, timedelta
 from dateutil import tz
 
@@ -9,7 +10,31 @@ class GoogleAccessTokenExpired(Exception):
     pass
 
 
-def google_calendar(token):
+async def fetch_calendar(calendar, headers, params) -> list:
+    calendar_id = calendar["id"]
+    url = f"{GOOGLE_CALENDAR_BASE_URL}/calendars/{calendar_id}/events"
+
+    event_list = []
+
+    async with aiohttp.ClientSession() as session:
+        while True:
+            async with session.get(url=url, headers=headers, params=params) as response:
+                data = await response.json()
+
+                if "items" not in data:
+                    break
+
+                event_list += data["items"]
+
+                if "nextPageToken" not in data:
+                    break
+
+                params["pageToken"] = data["nextPageToken"]
+
+    return event_list
+
+
+async def google_calendar(token) -> list:
     # get google calendar list
     headers = {"Authorization": f"Bearer {token}"}
 
@@ -17,55 +42,47 @@ def google_calendar(token):
     calendar_list = []
     params = {}
 
-    while True:
-        response = requests.get(url=url, headers=headers, params=params)
-        if response.status_code == 401:
-            raise GoogleAccessTokenExpired
+    async with aiohttp.ClientSession() as session:
+        while True:
+            async with session.get(url=url, headers=headers, params=params) as response:
+                if response.status == 401:
+                    raise GoogleAccessTokenExpired
 
-        data = response.json()
+                data = await response.json()
 
-        if "items" not in data:
-            break
+                if "items" not in data:
+                    break
 
-        calendar_list += data["items"]
+                calendar_list += data["items"]
 
-        if "nextPageToken" not in data:
-            break
+                if "nextPageToken" not in data:
+                    break
 
-        params["page_token"] = data["nextPageToken"]
+                params["page_token"] = data["nextPageToken"]
 
-    event_list = []
     KST = tz.gettz("Asia/Seoul")
     today = datetime.now(tz=tz.UTC).astimezone(tz=KST)
     today_start = datetime(today.year, today.month, today.day, tzinfo=KST)
     today_end = today_start + timedelta(days=1)
 
-    for calendar in calendar_list:
-        calendar_id = calendar["id"]
-        url = f"{GOOGLE_CALENDAR_BASE_URL}/calendars/{calendar_id}/events"
+    params = {
+        "timeMin": today_start.isoformat(),
+        "timeMax": today_end.isoformat(),
+        "timeZone": "Asia/Seoul",
+        "singleEvents": "True",
+        "orderBy": "startTime",
+    }
 
-        params = {
-            "timeMin": today_start.isoformat(),
-            "timeMax": today_end.isoformat(),
-            "timeZone": "Asia/Seoul",
-            "singleEvents": "True",
-            "orderBy": "startTime",
-        }
+    event_list = await asyncio.gather(
+        *[fetch_calendar(calendar, headers, params) for calendar in calendar_list]
+    )
 
-        while True:
-            response = requests.get(url=url, headers=headers, params=params)
-            data = response.json()
+    flattened_list = []
+    for events, calendar in zip(event_list, calendar_list):
+        for event in events:
+            event["calendar"] = calendar
+            flattened_list.append(event)
 
-            if "items" not in data:
-                break
+    sorted_list = sorted(flattened_list, key=lambda x: x["start"]["dateTime"])
 
-            event_list += data["items"]
-
-            if "nextPageToken" not in data:
-                break
-
-            params["pageToken"] = data["nextPageToken"]
-
-    print(event_list)
-
-    return event_list
+    return sorted_list

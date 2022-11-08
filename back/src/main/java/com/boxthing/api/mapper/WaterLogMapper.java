@@ -30,7 +30,7 @@ public abstract class WaterLogMapper {
     String now = null;
 
     for (WaterLog waterLog : waterLogs) {
-      String key = waterLog.getCreatedAt().toLocalDate().toString();
+      String key = waterLog.getTimestamp().toLocalDate().toString();
       for (LinkedTreeMap<String, Float> map : response) {
         if (map.containsKey(key)) {
           map.put(key, map.get(key) + waterLog.getAmount());
@@ -45,9 +45,10 @@ public abstract class WaterLogMapper {
   public List<WaterLogResponseDto> toList(List<WaterLog> waterLogs) {
     List<WaterLogResponseDto> response = new ArrayList<WaterLogResponseDto>();
     for (WaterLog waterlog : waterLogs) {
+
       WaterLogResponseDto dto =
           WaterLogResponseDto.builder()
-              .createdAt(waterlog.getCreatedAt())
+              .timestamp(waterlog.getTimestamp().toOffsetDateTime().toString())
               .amount(waterlog.getAmount())
               .build();
       response.add(dto);

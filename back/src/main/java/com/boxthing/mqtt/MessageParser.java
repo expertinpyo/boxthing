@@ -27,27 +27,9 @@ public class MessageParser {
           .create();
   private final MqttProperties mqttProperties;
 
-  public void msgSucceed(String msg, String serialNumber, String topic) {
-    MqttResponseDto responseDto =
-        MqttResponseDto.builder().success(true).topic(topic).message(msg).build();
-    log.info("responseDto : {}", responseDto);
-    gateway.publish(
-        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),
-        gson.toJson(responseDto));
-  }
-
   public void msgSucceed(String msg, String serialNumber, String topic, Object data) {
     MqttResponseDto responseDto =
         MqttResponseDto.builder().topic(topic).message(msg).success(true).data(data).build();
-    log.info("responseDto : {}", responseDto);
-    gateway.publish(
-        String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),
-        gson.toJson(responseDto));
-  }
-
-  public void msgFail(String msg, String serialNumber, String topic) {
-    MqttResponseDto responseDto =
-        MqttResponseDto.builder().success(false).topic(topic).message(msg).build();
     log.info("responseDto : {}", responseDto);
     gateway.publish(
         String.format("%s/%s/%s", mqttProperties.getBaseTopic() + "/device", serialNumber, topic),

@@ -56,6 +56,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String state = request.getParameter("state");
     String topic = "login";
     Device device = deviceRepository.findByState(state);
+    String msg;
     if (device == null) {
       return;
     }
@@ -64,8 +65,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       OAuth2RefreshToken maybeRefreshToken = client.getRefreshToken();
       if (maybeRefreshToken == null) {
         // no refresh token
-        String msg = responseMessage.LOGIN_FAILED.getMessage();
-        messageParser.msgFail(msg, device.getSerialNumber(), topic);
+        msg = responseMessage.LOGIN_FAILED.getMessage();
+        messageParser.msgFail(msg, device.getSerialNumber(), topic, null);
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -98,7 +99,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
               .build();
       deviceMapper.updateWithNull(dto, device);
       deviceRepository.save(device);
-      String msg = responseMessage.SUCCEED.getMessage();
+      msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
           MqttAccessTokenResDto.builder().accessToken(accessToken).build();
       messageParser.msgSucceed(msg, device.getSerialNumber(), topic + "/google", accessTokenResDto);
@@ -108,10 +109,16 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     if (registrationId.equals("github")) {
       log.info("github");
       User user = device.getUser();
+      if (user.getGoogleRefreshJws().equals("")) {
+        msg = responseMessage.NO_GOOGLE_TOKEN.getMessage();
+        messageParser.msgFail(msg, device.getSerialNumber(), topic + "/github", null);
+        return;
+      }
+
       UserGoogleRequestDto dto = UserGoogleRequestDto.builder().githubJws(accessToken).build();
       userMapper.updateUserFromDto(dto, user);
       userRepository.save(user);
-      String msg = responseMessage.SUCCEED.getMessage();
+      msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
           MqttAccessTokenResDto.builder().accessToken(accessToken).build();
       messageParser.msgSucceed(msg, device.getSerialNumber(), topic + "/github", accessTokenResDto);

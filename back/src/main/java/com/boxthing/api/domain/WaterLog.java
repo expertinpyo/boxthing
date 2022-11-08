@@ -1,6 +1,7 @@
 package com.boxthing.api.domain;
 
-import com.boxthing.api.inheritance.BaseLogEntity;
+import java.time.ZonedDateTime;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,7 +22,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @ToString
 @Table(name = "waterlog")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WaterLog extends BaseLogEntity {
+public class WaterLog {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,14 +30,18 @@ public class WaterLog extends BaseLogEntity {
 
   private Float amount;
 
+  @Column(updatable = false, nullable = false)
+  private ZonedDateTime timestamp;
+
   @ManyToOne(targetEntity = User.class)
   @JoinColumn(name = "user_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
 
   @Builder
-  public WaterLog(Float amount, User user) {
+  public WaterLog(Float amount, ZonedDateTime timestamp, User user) {
     this.amount = amount;
+    this.timestamp = timestamp;
     this.user = user;
   }
 }

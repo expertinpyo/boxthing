@@ -1,5 +1,6 @@
 package com.boxthing.mqtt.dto;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,10 +41,12 @@ public class MqttReqDto {
   @NoArgsConstructor
   public static class MqttWaterReqData {
     Float amount;
+    String timestamp;
 
     @Builder
-    public MqttWaterReqData(Float amount) {
+    public MqttWaterReqData(Float amount, String timestamp) {
       this.amount = amount;
+      this.timestamp = timestamp;
     }
   }
 
@@ -56,6 +59,22 @@ public class MqttReqDto {
     @Builder
     public MqttWaterDaysReqData(Integer days) {
       this.days = days;
+    }
+  }
+
+  @Getter
+  @ToString
+  @NoArgsConstructor
+  public static class MqttPostureReqData {
+    @SerializedName("posture_score")
+    Integer postureScore;
+
+    String timestamp;
+
+    @Builder
+    public MqttPostureReqData(Integer postureScore, String timestamp) {
+      this.postureScore = postureScore;
+      this.timestamp = timestamp;
     }
   }
 }

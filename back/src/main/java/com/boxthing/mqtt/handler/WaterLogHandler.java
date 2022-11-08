@@ -17,6 +17,7 @@ import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterDaysReqData;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterReqData;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,22 +45,40 @@ public class WaterLogHandler {
     return message -> {
       Type typeToken = new TypeToken<MqttRequestDto<MqttWaterReqData>>() {}.getType();
       MqttRequestDto<MqttWaterReqData> requestDto = jsonConverter(message.getPayload(), typeToken);
-
+      ZonedDateTime time = ZonedDateTime.parse(requestDto.getData().getTimestamp());
+      log.info("time : {}", time);
       String deviceId = requestDto.getDeviceId();
       MqttWaterReqData data = requestDto.getData();
-
-      Float amount = data.getAmount().floatValue();
-
-      Device device = deviceRepository.findBySerialNumber(deviceId);
-      User user = device.getUser();
-
-      WaterLogRequestDto waterDto = WaterLogRequestDto.builder().amount(amount).user(user).build();
-      waterLogRepository.save(waterLogMapper.toEntity(waterDto));
 
       String msg = responseMessage.CREATED.getMessage();
       String topic = "water";
 
-      messageParser.msgSucceed(msg, deviceId, topic);
+      if (data == null) {
+        msg = responseMessage.NO_INPUT_DATA.getMessage();
+        messageParser.msgFail(msg, deviceId, topic, null);
+        return;
+      }
+
+      if (data.getAmount() == null) {
+        msg = responseMessage.INVALID_INPUT_VALUE.getMessage();
+        messageParser.msgFail(msg, deviceId, topic, null);
+        return;
+      }
+      log.info("data type : {}", data.getAmount().getClass().getName());
+      Float amount = data.getAmount().floatValue();
+
+      Device device = deviceRepository.findBySerialNumber(deviceId);
+      User user = device.getUser();
+      if (user == null) {
+        msg = responseMessage.NO_USER_CONNECT.getMessage();
+        messageParser.msgFail(msg, deviceId, topic, null);
+        return;
+      }
+
+      WaterLogRequestDto waterDto =
+          WaterLogRequestDto.builder().amount(amount).timestamp(time).user(user).build();
+      waterLogRepository.save(waterLogMapper.toEntity(waterDto));
+      messageParser.msgSucceed(msg, deviceId, topic, null);
     };
   }
 
@@ -74,24 +93,34 @@ public class WaterLogHandler {
       String deviceId = requestDto.getDeviceId();
       MqttWaterDaysReqData data = requestDto.getData();
 
-      Device device = deviceRepository.findBySerialNumber(deviceId);
-      User user = device.getUser();
-
       String msg;
       String topic = "log/water/stat";
 
-      if (user == null) {
+      Device device = deviceRepository.findBySerialNumber(deviceId);
+
+      if (device == null) {
         msg = responseMessage.NO_USER_CONNECT.getMessage();
-        messageParser.msgFail(msg, deviceId, topic);
+        messageParser.msgFail(msg, deviceId, topic, null);
         return;
       }
-      Integer days = data.getDays();
+      User user = device.getUser();
+
+      if (user == null) {
+        msg = responseMessage.NO_USER_CONNECT.getMessage();
+        messageParser.msgFail(msg, deviceId, topic, null);
+        return;
+      }
+
+      Integer days = 15;
+      if (data != null && data.getDays() != null) {
+        days = data.getDays();
+      }
 
       log.info("before : {}", days);
       List<WaterLog> list = waterLogQueryDsl.findAllByUserAndDate(user, days);
       if (list.isEmpty()) {
         msg = responseMessage.EMPTY_RESULT.getMessage();
-        messageParser.msgFail(msg, deviceId, topic);
+        messageParser.msgFail(msg, deviceId, topic, null);
         return;
       }
       msg = responseMessage.SUCCEED.getMessage();
@@ -114,7 +143,7 @@ public class WaterLogHandler {
 
       if (user == null) {
         msg = responseMessage.NO_USER_CONNECT.getMessage();
-        messageParser.msgFail(msg, deviceId, topic);
+        messageParser.msgFail(msg, deviceId, topic, null);
         return;
       }
 

@@ -95,8 +95,8 @@ public class MqttInboundHandler {
       try {
         accessToken = accessTokenRefresh.getAccessToken(device.getUser().getGoogleRefreshJws());
         if (accessToken == null) {
-          msg = responseMessage.NO_VALID_TOKEN.getMessage();
-          messageParser.msgFail(msg, deviceId, topic);
+          msg = responseMessage.NO_GOOGLE_TOKEN.getMessage();
+          messageParser.msgFail(msg, deviceId, topic, null);
           return;
         }
         MqttAccessTokenResDto tokenDto =
@@ -105,8 +105,8 @@ public class MqttInboundHandler {
         msg = responseMessage.SUCCEED.getMessage();
         messageParser.msgSucceed(msg, deviceId, topic, tokenDto);
       } catch (IOException e) {
-        msg = responseMessage.NO_VALID_TOKEN.getMessage();
-        messageParser.msgFail(msg, deviceId, topic);
+        msg = responseMessage.NO_GOOGLE_TOKEN.getMessage();
+        messageParser.msgFail(msg, deviceId, topic, null);
         throw new RuntimeException(e);
       }
     };
@@ -136,8 +136,8 @@ public class MqttInboundHandler {
 
       String accessToken = device.getUser().getGithubJws();
       if (accessToken == null) {
-        msg = responseMessage.NO_VALID_TOKEN.getMessage();
-        messageParser.msgFail(msg, deviceId, topic);
+        msg = responseMessage.NO_GITHUB_TOKEN.getMessage();
+        messageParser.msgFail(msg, deviceId, topic, null);
       } else {
         msg = responseMessage.SUCCEED.getMessage();
         MqttAccessTokenResDto tokenResDto =
@@ -186,7 +186,7 @@ public class MqttInboundHandler {
       deviceRepository.save(device);
       // store some logs for deviceId
       msg = responseMessage.SUCCEED.getMessage();
-      messageParser.msgSucceed(msg, deviceId, type);
+      messageParser.msgSucceed(msg, deviceId, type, null);
     };
   }
 
@@ -198,7 +198,7 @@ public class MqttInboundHandler {
     String qrUrl = qrCreator.hashedUri(deviceId, provider);
     if (qrUrl == null) {
       msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
-      messageParser.msgFail(msg, deviceId, topic);
+      messageParser.msgFail(msg, deviceId, topic, null);
       return;
     }
     MqttProviderResDto responseResDto = MqttProviderResDto.builder().link(qrUrl).build();

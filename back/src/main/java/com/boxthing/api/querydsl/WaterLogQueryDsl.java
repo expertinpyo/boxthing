@@ -4,7 +4,7 @@ import com.boxthing.api.domain.QWaterLog;
 import com.boxthing.api.domain.User;
 import com.boxthing.api.domain.WaterLog;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -17,27 +17,26 @@ public class WaterLogQueryDsl {
   private final QWaterLog waterLog = new QWaterLog("waterLog");
 
   public List<WaterLog> findAllByUserAndDate(User user, int days) {
-    LocalDateTime toDate = LocalDateTime.now().minusDays(1);
-    toDate.withHour(23).withMinute(59).withSecond(59);
-    LocalDateTime startFrom = toDate.minusDays(days);
-    startFrom.withHour(0).withHour(0).withSecond(0);
+    ZonedDateTime end = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0);
+    ZonedDateTime start = end.minusDays(days + 1).withHour(0).withMinute(0).withSecond(0);
 
     return jpaQueryFactory
         .select(waterLog)
         .from(waterLog)
-        .where(waterLog.user.eq(user), waterLog.createdAt.between(startFrom, toDate))
-        .orderBy(waterLog.createdAt.asc())
+        .where(waterLog.user.eq(user), waterLog.timestamp.between(start, end))
+        .orderBy(waterLog.timestamp.asc())
         .fetch();
   }
 
   public List<WaterLog> findallByUserAndToday(User user) {
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime startFrom = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+    ZonedDateTime end = ZonedDateTime.now();
+    ZonedDateTime start = end.withHour(0).withMinute(0).withSecond(0);
+
     return jpaQueryFactory
         .select(waterLog)
         .from(waterLog)
-        .where(waterLog.user.eq(user), waterLog.createdAt.between(startFrom, now))
-        .orderBy(waterLog.createdAt.asc())
+        .where(waterLog.user.eq(user), waterLog.timestamp.between(start, end))
+        .orderBy(waterLog.timestamp.asc())
         .fetch();
   }
 }

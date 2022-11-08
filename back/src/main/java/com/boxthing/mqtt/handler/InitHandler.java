@@ -35,7 +35,7 @@ public class InitHandler {
       MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
       String deviceId = requestDto.getDeviceId();
       Device device = deviceRepository.findBySerialNumber(deviceId);
-      String msg = responseMessage.NO_VALID_TOKEN.getMessage();
+      String msg;
       String topic = "init";
       //      if (device == null || device.getUser() == null) {
       //        log.info("empty");
@@ -53,7 +53,7 @@ public class InitHandler {
 
       if (device == null) {
         deviceRepository.save(Device.builder().serialNumber(deviceId).build());
-        msg = responseMessage.NO_USER_CONNECT.getMessage();
+        msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
       } else if (device.getUser() == null) {
         msg = responseMessage.NO_USER_CONNECT.getMessage();
       } else {
@@ -66,6 +66,8 @@ public class InitHandler {
               resDto.setGoogleAccessToken(googleAccessToke);
             }
           } catch (IOException e) {
+            msg = responseMessage.INVALID_TOKEN.getMessage();
+            messageParser.msgFail(msg, deviceId, topic, null);
             throw new RuntimeException(e);
           }
         }
@@ -73,13 +75,19 @@ public class InitHandler {
           resDto.setGithubAccessToken(user.getGithubJws());
         }
       }
-      if (resDto.getGithubAccessToken() != "" && resDto.getGoogleAccessToken() != "") {
+      if (!resDto.getGithubAccessToken().equals("") && !resDto.getGoogleAccessToken().equals("")) {
         msg = responseMessage.SUCCEED.getMessage();
         messageParser.msgSucceed(msg, deviceId, topic, resDto);
       } else {
+        if (resDto.getGoogleAccessToken().equals("") && resDto.getGithubAccessToken().equals("")) {
+          msg = responseMessage.INVALID_TOKEN.getMessage();
+        } else if (!resDto.getGithubAccessToken().equals("")) {
+          msg = responseMessage.NO_GOOGLE_TOKEN.getMessage();
+        } else {
+          msg = responseMessage.NO_GITHUB_TOKEN.getMessage();
+        }
         messageParser.msgFail(msg, deviceId, topic, resDto);
       }
-      //
     };
   }
 }

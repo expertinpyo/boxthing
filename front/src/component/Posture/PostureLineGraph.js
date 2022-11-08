@@ -1,10 +1,15 @@
 /** @jsxImportSource @emotion/react */
 
-import ReactECharts from "echarts-for-react"
-import cloneDeep from "lodash.clonedeep"
-import { sample_data } from "./sampleData"
+import ReactECharts from "echarts-for-react";
+// import cloneDeep from "lodash.clonedeep";
+import { useRecoilValue } from "recoil";
+import { postureState } from "../../store/posture";
+// import { sample_data } from "./sampleData";
+import moment from "moment";
 
 const PostureLineGraph = () => {
+  const posture = useRecoilValue(postureState);
+
   const DEFAULT_OPTION = {
     title: {
       text: "자세 데이터 통계 분석",
@@ -19,8 +24,9 @@ const PostureLineGraph = () => {
       bottom: "5%",
     },
     xAxis: {
-      data: sample_data.map((item) => {
-        return item[0]
+      boundaryGap: true,
+      data: posture.map((item) => {
+        return moment(item.timestamp).format("HH-mm");
       }),
     },
     yAxis: {
@@ -58,9 +64,15 @@ const PostureLineGraph = () => {
       name: "자세 점수",
       type: "line",
       smooth: 0.5,
-      data: sample_data.map((item) => {
-        if (item[1] > 100) return item[1] % 100
-        else return item[1]
+      animationEasing: "elasticOut",
+      animationDelay: function (idx) {
+        return idx * 10;
+      },
+      animationDelayUpdate: function (idx) {
+        return idx * 10;
+      },
+      data: posture.map((item) => {
+        return item["posture_score"];
       }),
       markLine: {
         silent: true,
@@ -74,9 +86,9 @@ const PostureLineGraph = () => {
         ],
       },
     },
-  }
+  };
 
-  return <ReactECharts option={DEFAULT_OPTION} style={{ height: "100%" }} />
-}
+  return <ReactECharts option={DEFAULT_OPTION} style={{ height: "100%" }} />;
+};
 
-export default PostureLineGraph
+export default PostureLineGraph;

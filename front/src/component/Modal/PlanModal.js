@@ -1,9 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect } from "react";
+import { useRecoilState } from "recoil";
 import Hurry from "../../asset/nav_icon/hurry.gif";
+import { planModalState } from "../../store/modal";
 
-const PlanModal = ({ state, setter }) => {
+const PlanModal = () => {
+  const [state, setter] = useRecoilState(planModalState);
+
   useEffect(() => {
     if (state) {
       setTimeout(() => {

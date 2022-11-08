@@ -1,8 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import PostIt from "../../asset/nav_icon/post-it.png"
+import { useRecoilValue } from "recoil";
+import PostIt from "../../asset/nav_icon/post-it.png";
+import { currentPostureScoreState } from "../../store/posture";
 
 const NavScore = () => {
-  const score = 100
+  const score = useRecoilValue(currentPostureScoreState);
   return (
     <div
       css={{
@@ -11,7 +13,7 @@ const NavScore = () => {
         aspectRatio: "1/1",
         bottom: 0,
         right: -5,
-        color: score > 80 ? "green" : "red",
+        color: score === 0 ? "white" : score > 80 ? "green" : "red",
         fontSize: 16,
         fontWeight: "bold",
         lineHeight: 0,
@@ -23,7 +25,7 @@ const NavScore = () => {
       <img src={PostIt} alt="" css={{ width: "100%", position: "relative" }} />
       <div css={{ position: "absolute", zIndex: "1" }}>{score}</div>
     </div>
-  )
-}
+  );
+};
 
-export default NavScore
+export default NavScore;

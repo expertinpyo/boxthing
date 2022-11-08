@@ -1,9 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect } from "react";
+import { useRecoilState } from "recoil";
 import Angry from "../../asset/angry.gif";
+import { postureModalState } from "../../store/modal";
 
-const PostureModal = ({ state, setter }) => {
+const PostureModal = () => {
+  const [state, setter] = useRecoilState(postureModalState);
+
   useEffect(() => {
     if (state) {
       setTimeout(() => {

@@ -1,11 +1,24 @@
 /** @jsxImportSource @emotion/react */
 
-import { useRecoilValue } from "recoil"
-import Break from "../../asset/plan/Break.gif"
-import { upcomingPlanTimerState } from "../../store/plan"
+import { useEffect, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import Break from "../../asset/plan/Break.gif";
+import { planModalState } from "../../store/modal";
+import { upcomingPlanTimerState } from "../../store/plan";
 
 const PlanUpcoming = ({ item }) => {
-  const upcomingPlanTimer = useRecoilValue(upcomingPlanTimerState)
+  const upcomingPlanTimer = useRecoilValue(upcomingPlanTimerState);
+  const [current, setCurrent] = useState(0);
+  const setPlanModal = useSetRecoilState(planModalState);
+
+  useEffect(() => {
+    if (item.length > current) {
+      setPlanModal(true);
+      setCurrent(item.length);
+    } else {
+      setCurrent(item.length);
+    }
+  }, [item, setPlanModal, current]);
   return (
     <div
       css={{
@@ -57,7 +70,7 @@ const PlanUpcoming = ({ item }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PlanUpcoming
+export default PlanUpcoming;

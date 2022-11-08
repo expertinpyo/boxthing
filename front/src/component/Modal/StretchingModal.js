@@ -6,8 +6,12 @@ import { defaultBoxStyle } from "../../style/shared";
 import { useEffect, useState } from "react";
 
 import { stretchingList } from "../../store/stretch";
+import { useRecoilState } from "recoil";
+import { stretchModalState } from "../../store/modal";
 
-function StretchingModal({ state, setter }) {
+const StretchingModal = () => {
+  const [state, setter] = useRecoilState(stretchModalState);
+
   const [choice, setChoice] = useState(0);
 
   useEffect(() => {
@@ -15,7 +19,7 @@ function StretchingModal({ state, setter }) {
       setChoice(Math.floor(Math.random() * 10));
       setTimeout(() => {
         setter((pre) => !pre);
-      }, 3000);
+      }, 10000);
     }
   }, [state, setter]);
 
@@ -125,6 +129,6 @@ function StretchingModal({ state, setter }) {
       </div>
     </div>
   );
-}
+};
 
 export default StretchingModal;

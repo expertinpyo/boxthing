@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
-import NewPost from "../../asset/nav_icon/newNoti.gif";
-import { notiModalState } from "../../store/modal";
+import Hello from "../../asset/hello.gif";
+import { welcomeModalState } from "../../store/modal";
 
-const NotiModal = () => {
-  const [state, setter] = useRecoilState(notiModalState);
+const WelcomeModal = () => {
+  const [state, setter] = useRecoilState(welcomeModalState);
 
   useEffect(() => {
     if (state) {
@@ -33,10 +33,10 @@ const NotiModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={NewPost} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold" }}>새로운 Github 알림이 도착했어요!</div>
+      <img src={Hello} alt="" css={{ width: 200 }} />
+      <div css={{ fontWeight: "bold" }}>환영합니다!</div>
     </div>
   );
 };
 
-export default NotiModal;
+export default WelcomeModal;

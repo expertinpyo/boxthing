@@ -1,8 +1,24 @@
 /** @jsxImportSource @emotion/react */
 
-import ReactECharts from "echarts-for-react"
+import ReactECharts from "echarts-for-react";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
+import { drinkedHistoryState } from "../../store/water";
 
 const WaterDailyGraph = () => {
+  const drinkedHistory = useRecoilValue(drinkedHistoryState);
+  const [first, setFirst] = useState(true);
+
+  const socket = useRecoilValue(socketState);
+  useEffect(() => {
+    if (socket && socket.readyState === 1 && first) {
+      socket.send(JSON.stringify({ type: "log/water/today", data: null }));
+      console.log("send log/water/today message to server!");
+      setFirst(false);
+    }
+  }, [socket, first, setFirst]);
+
   const option = {
     title: {
       text: "오늘의 음수",
@@ -14,20 +30,10 @@ const WaterDailyGraph = () => {
       bottom: "5%",
     },
     xAxis: {
-      data: [
-        "8-9",
-        "9-10",
-        "10-11",
-        "11-12",
-        "12-13",
-        "13-14",
-        "14-15",
-        "15-16",
-        "16-17",
-        "17-18",
-        "18-19",
-        "19-20",
-      ],
+      boundaryGap: true,
+      data: drinkedHistory.map((item) => {
+        return item.when;
+      }),
     },
     yAxis: {
       splitLine: {
@@ -39,7 +45,9 @@ const WaterDailyGraph = () => {
       name: "누적 음수량",
       type: "line",
       smooth: 0.5,
-      data: [100, 300, 500, 1300],
+      data: drinkedHistory.map((item) => {
+        return item.value;
+      }),
       markLine: {
         silent: true,
         lineStyle: {
@@ -52,8 +60,8 @@ const WaterDailyGraph = () => {
         ],
       },
     },
-  }
-  return <ReactECharts option={option} style={{ height: "100%" }} />
-}
+  };
+  return <ReactECharts option={option} style={{ height: "100%" }} />;
+};
 
-export default WaterDailyGraph
+export default WaterDailyGraph;

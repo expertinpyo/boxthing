@@ -1,6 +1,7 @@
 package com.boxthing.api.domain;
 
-import com.boxthing.api.inheritance.BaseLogEntity;
+import java.time.ZonedDateTime;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,22 +22,26 @@ import org.hibernate.annotations.OnDeleteAction;
 @ToString
 @Table(name = "posturelog")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostureLog extends BaseLogEntity {
+public class PostureLog {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  private Integer postureScore;
+
+  @Column(updatable = false, nullable = false)
+  private ZonedDateTime timestamp;
 
   @ManyToOne(targetEntity = User.class)
   @JoinColumn(name = "user_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
 
-  private Integer point;
-
   @Builder
-  public PostureLog(User user, Integer point) {
+  public PostureLog(Integer postureScore, ZonedDateTime timestamp, User user) {
+    this.postureScore = postureScore;
+    this.timestamp = timestamp;
     this.user = user;
-    this.point = point;
   }
 }

@@ -1,7 +1,7 @@
 package com.boxthing.api.dto;
 
 import com.boxthing.api.domain.User;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +15,13 @@ public class WaterLogDto {
   public static class WaterLogRequestDto {
     private Float amount;
     private User user;
+    private ZonedDateTime timestamp;
 
     @Builder
-    public WaterLogRequestDto(Float amount, User user) {
-      this.user = user;
+    public WaterLogRequestDto(Float amount, User user, ZonedDateTime timestamp) {
       this.amount = amount;
+      this.user = user;
+      this.timestamp = timestamp;
     }
   }
 
@@ -28,12 +30,12 @@ public class WaterLogDto {
   @NoArgsConstructor
   public static class WaterLogResponseDto {
     private Float amount;
-    private LocalDateTime createdAt;
+    private String timestamp;
 
     @Builder
-    public WaterLogResponseDto(Float amount, LocalDateTime createdAt) {
+    public WaterLogResponseDto(Float amount, String timestamp) {
       this.amount = amount;
-      this.createdAt = createdAt;
+      this.timestamp = timestamp;
     }
   }
 }

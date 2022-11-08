@@ -9,7 +9,7 @@ from typing import Optional
 from datetime import datetime
 from modules.water import amount_water
 from modules.api import google_calendar, github_notification
-
+from modules.posture import check_pose
 
 ws_message_queue = asyncio.Queue()
 mqtt_message_queue = asyncio.Queue()
@@ -106,7 +106,7 @@ async def mqtt_client():
             mqtt_producer(client),
         )
 
-"""
+
 async def google_calendar_coroutine():
     while True:
         await state.has_ws_connection.wait()
@@ -138,12 +138,17 @@ async def github_notifications_coroutine():
             await ws_message_queue.put(("github/noti", notifications))
 
         await asyncio.sleep(1 * 60)
-"""
+
 async def water_coroutine():
     async for water in amount_water():
         await ws_message_queue.put(("water", water))
         await mqtt_message_queue.put(("water", water))
 
+async def posture_coroutine():
+    async for pose in check_pose():
+        await ws_message_queue.put(("pose", pose))
+        await mqtt_message_queue.put(("pose", pose))
+        
 async def main():
     load_dotenv()
 

@@ -65,7 +65,8 @@ def init():
         print(i+1)
         time.sleep(1)
 
-    first_img = take_picture()
+    #first_img = take_picture()
+    first_img = cv2.imread('/home/pi/Pictures/picture1.jpg')
     first_dis, first_down, first_area = find_distance(first_img)
   
 #준비

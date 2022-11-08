@@ -2,23 +2,28 @@ import asyncio
 import json
 import websockets.server as websockets
 import asyncio_mqtt as aiomqtt
+import os
 
 mqtt_message_queue = asyncio.Queue()
 
+stream = os.popen("cat /proc/cpuinfo | grep Serial | awk '{print$3}'")
+serial_number = stream.read().replace("\n","")
+stream.close()
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
-        await client.subscribe("water/howmuch")
+        await client.subscribe(f"boxthing/{serial_number}")
         async for message in messages:
-            data = json.loads(message)
+            data = json.loads(message.payload)
             print(f"Message from mqtt: {data}")
 
 async def mqtt_producer(client):
     while True:
         message = await mqtt_message_queue.get()
-        await client.publish("water/howmuch",json.dumps(message))
+        print(message)
+        await client.publish("boxthing",json.dumps(message))
         
-        
+
         
 async def mqtt_main():
     async with aiomqtt.Client(
@@ -28,13 +33,14 @@ async def mqtt_main():
     ) as client:
         await asyncio.gather(
             mqtt_consumer(client),
-            mqtt_producer(client)
+            mqtt_producer(client),
         )
         
 async def mqtt_test_coro():
     while True:
         await mqtt_message_queue.put({
             "type": "wt",
+            "deviceId": serial_number,
             "amount": "100",
         })
         await asyncio.sleep(5)

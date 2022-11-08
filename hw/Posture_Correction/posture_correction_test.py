@@ -120,7 +120,7 @@ async def check_pose():
                         posture_score = int(100-(now_dis - first_dis))
                     yield((send_posture_flag, "올바른 자세", posture_score))
                     #print(send_posture_flag, "올바른 자세", posture_score)
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.2)
                 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break

@@ -98,8 +98,9 @@ async def check_pose():
         try : 
             while webcam.isOpened():
                 image = take_picture()
-                now_dis, now_down, now_area = find_distance(image)
+
                 if posture_cnt == 5:
+                    now_dis, now_down, now_area = find_distance(image)
                     if now_dis - first_dis > 15 :
                         send_posture_flag = 2
                         posture_score = int(87-(now_dis-first_dis)/2)

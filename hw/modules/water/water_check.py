@@ -2,7 +2,9 @@ import asyncio
 import time
 import sys
 import RPi.GPIO as GPIO
-from hx711 import HX711
+from .hx711 import HX711
+from datetime import datetime, timedelta
+from dateutil import tz
 
 async def cleanAndExit():
     print("Cleaning...")
@@ -25,7 +27,7 @@ async def amount_water():
         try:
             val = hx.get_weight(5)
             
-            int_val = int(val) + 220
+            int_val = val + 220
             if -3 <= int_val - check_data_next <= 3:
                 if check_cnt < 5:
                     check_cnt += 1
@@ -33,7 +35,9 @@ async def amount_water():
                     check_cnt += 1
                     cha = check_data_before - check_data_next
                     if cha > 0:
-                        yield (check_data_next,cha)
+                        today = datetime.now(tz=tz.UTC)
+                        yield {"amount": cha, "timestamp": today.isoformat()}
+                        #yield (check_data_next,cha)
             else:
                 if check_cnt == 6 and check_data_next > 10:
                     check_data_before = check_data_next

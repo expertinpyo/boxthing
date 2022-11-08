@@ -16,7 +16,7 @@ async def mqtt_consumer(client):
             topic_list = message.topic.split("/")[2:]
 
             print(f"Message from mqtt topic: {topic_list}, data: {data}")
-            mqtt_message_queue.put((topic_list,data["data"]))
+            await mqtt_message_queue.put((topic_list,data["data"]))
             if topic_list[0] == "init":
                 pass
 
@@ -24,12 +24,11 @@ async def mqtt_producer(client):
     while True:
         topic, data = await mqtt_message_queue.get()
         message = {
-            "device_id": "100000005e3d327f",
             "data": "good",
         }
 
         await client.publish(
-            "boxthing/device/100000005e3d327f", json.dumps(message)
+            "boxthing/device/100000005e3d327f/water", json.dumps(message)
         )  
         
 async def mqtt_main():

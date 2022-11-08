@@ -2,6 +2,8 @@ import cv2, dlib, math
 import cvlib as cv
 import time
 import asyncio
+from datetime import datetime, timedelta
+from dateutil import tz
 def find_distance(img): # 얼굴 검출 및 거리 반환
     global first_area
     
@@ -106,23 +108,25 @@ async def check_pose():
                         send_posture_flag = 2
                         posture_score = int(87-(now_dis-first_dis)/2)
                         if posture_score < 60 : posture_score = 60
-                        yield((send_posture_flag, "거북목", posture_score))
+                        #yield((send_posture_flag, "거북목", posture_score))
                     elif now_down - first_down > 12 :
                         send_posture_flag = 3
                         posture_score = int(80-(now_down - first_down)/4)
                         if posture_score < 60 : posture_score = 60
-                        yield((send_posture_flag, "허리무리", posture_score))
+                        #yield((send_posture_flag, "허리무리", posture_score))
                     elif now_dis == 0 and now_down == 0 and now_area == 0: 
                         posture_score = -1
                         send_posture_flag = 4
-                        yield((send_posture_flag, "사람 없음", posture_score))
+                        #yield((send_posture_flag, "사람 없음", posture_score))
                     else :
                         send_posture_flag = 1
                         if now_dis - first_dis < 0 :
                             posture_score = int(100+(now_dis - first_dis))
                         else : 
                             posture_score = int(100-(now_dis - first_dis))
-                        yield((send_posture_flag, "올바른 자세", posture_score))
+                        #yield((send_posture_flag, "올바른 자세", posture_score))
+                    today = datetime.now(tz=tz.UTC)
+                    yield({"posture_flag": send_posture_flag, "posture_score": posture_score, "timestamp": today.isoformat()})
                     posture_cnt = 0
                 posture_cnt += 1
                 await asyncio.sleep(0.2)

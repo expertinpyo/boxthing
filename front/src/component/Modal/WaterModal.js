@@ -1,13 +1,23 @@
 /** @jsxImportSource @emotion/react */
 
-import { defaultBoxStyle } from "../../style/shared"
-import { WaterAnimation } from "../Health/Water"
+import { useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { waterModalState } from "../../store/modal";
+import { WaterAnimation } from "../Water/Water";
 
-import { motion } from "framer-motion"
+const WaterModal = () => {
+  const [state, setter] = useRecoilState(waterModalState);
 
-const WaterModal = ({ start, end }) => {
+  useEffect(() => {
+    if (state) {
+      setTimeout(() => {
+        setter((pre) => !pre);
+      }, 3000);
+    }
+  }, [state, setter]);
+
   return (
-    <motion.div
+    <div
       css={{
         position: "fixed",
         width: "100%",
@@ -18,17 +28,16 @@ const WaterModal = ({ start, end }) => {
         alignItems: "center",
         // transform: "translate(-50%, -50%)",
         background: "rgba(255, 255, 255, 0.375)",
-        zIndex: 1,
+        zIndex: 3,
+        transition: "visibility 0.3s linear,opacity 0.3s linear",
+        visibility: state ? "visible" : "hidden",
+        opacity: state ? 1 : 0,
       }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
     >
-      <WaterAnimation start={start} end={end} />
+      <WaterAnimation />
       <div css={{ fontWeight: "bold" }}>250ml 섭취하셨습니다!</div>
-    </motion.div>
-  )
-}
+    </div>
+  );
+};
 
-export default WaterModal
+export default WaterModal;

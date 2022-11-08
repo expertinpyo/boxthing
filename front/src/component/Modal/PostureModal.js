@@ -1,11 +1,22 @@
 /** @jsxImportSource @emotion/react */
 
-import { motion } from "framer-motion"
-import Angry from "../../asset/angry.gif"
+import { useEffect } from "react";
+import { useRecoilState } from "recoil";
+import Angry from "../../asset/angry.gif";
+import { postureModalState } from "../../store/modal";
 
 const PostureModal = () => {
+  const [state, setter] = useRecoilState(postureModalState);
+
+  useEffect(() => {
+    if (state) {
+      setTimeout(() => {
+        setter((pre) => !pre);
+      }, 3000);
+    }
+  }, [state, setter]);
   return (
-    <motion.div
+    <div
       css={{
         position: "fixed",
         width: "100%",
@@ -16,17 +27,16 @@ const PostureModal = () => {
         flexDirection: "column",
         // transform: "translate(-50%, -50%)",
         background: "rgba(255, 255, 255, 0.375)",
-        zIndex: 1,
+        zIndex: 3,
+        transition: "visibility 0.3s linear,opacity 0.3s linear",
+        visibility: state ? "visible" : "hidden",
+        opacity: state ? 1 : 0,
       }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
     >
       <img src={Angry} alt="" css={{ width: 200 }} />
       <div css={{ fontWeight: "bold" }}>자세를 똑바로 하세요!</div>
-    </motion.div>
-  )
-}
+    </div>
+  );
+};
 
-export default PostureModal
+export default PostureModal;

@@ -1,14 +1,15 @@
 /** @jsxImportSource @emotion/react */
+import moment from "moment";
 
 const PlanListItem = ({ item }) => {
-  const start = new Date(item.start.dateTime)
-  const end = new Date(item.end.dateTime)
+  const start = moment(item.start.dateTime);
+  const end = moment(item.end.dateTime);
 
   return (
     <div
       css={{
         width: "100%",
-        height: "15%",
+        height: "20%",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -30,6 +31,7 @@ const PlanListItem = ({ item }) => {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            fontSize: "1.2rem",
           }}
         >
           {item.summary}
@@ -37,7 +39,7 @@ const PlanListItem = ({ item }) => {
         <div
           css={{
             color: "var(--font-sub-color)",
-            fontSize: "0.75rem",
+            fontSize: "1rem",
             width: "100%",
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -47,19 +49,24 @@ const PlanListItem = ({ item }) => {
           {item.description}
         </div>
       </div>
-      <div css={{ width: "30%", display: "flex", justifyContent: "flex-end" }}>
-        {`${start.getHours().toString().padStart(2, "0")}:${start
-          .getMinutes()
+      <div
+        css={{
+          width: "30%",
+          display: "flex",
+          justifyContent: "flex-end",
+          fontSize: "1.1rem",
+        }}
+      >
+        {`${start.hours().toString().padStart(2, "0")}:${start
+          .minutes()
           .toString()
-          .padStart(2, "0")} - ${end
-          .getHours()
+          .padStart(2, "0")} - ${end.hours().toString().padStart(2, "0")}:${end
+          .minutes()
           .toString()
-          .padStart(2, "0")}:${end.getMinutes().toString().padStart(2, "0")} ${
-          end.getHours() >= 12 ? "PM" : "AM"
-        } `}
+          .padStart(2, "0")} ${end.hours() >= 12 ? "PM" : "AM"} `}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PlanListItem
+export default PlanListItem;

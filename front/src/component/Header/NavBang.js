@@ -2,7 +2,7 @@
 
 import { useRecoilValue } from "recoil"
 import { upcomingPlanState } from "../../store/plan"
-import Exclamation from "../../asset/nav_icon/warning.png"
+import Exclamation from "../../asset/nav_icon/warningex.png"
 const NavBang = () => {
   const upcoming = useRecoilValue(upcomingPlanState)
   return (
@@ -15,7 +15,6 @@ const NavBang = () => {
             aspectRatio: "1/1",
             top: -5,
             right: -5,
-            fontSize: 12,
             lineHeight: 0,
             display: "flex",
             justifyContent: "center",

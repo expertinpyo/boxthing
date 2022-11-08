@@ -1,12 +1,11 @@
 /** @jsxImportSource @emotion/react */
 
-import { useRecoilValue } from "recoil"
 import { AnimatePresence } from "framer-motion"
 import PlanBox from "../component/Box/PlanBox"
 import GitBox from "../component/Box/GitBox"
-import WorkBox from "../component/Box/WorkBox"
-import HealthBox from "../component/Box/HealthBox"
 import { Route, Routes, useLocation } from "react-router-dom"
+import PostureBox from "../component/Box/PostureBox"
+import WaterBox from "../component/Box/WaterBox"
 
 const Main = () => {
   const location = useLocation()
@@ -23,8 +22,8 @@ const Main = () => {
         <Routes location={location} key={location.pathname}>
           <Route path="/" exact element={<PlanBox />} />
           <Route path="/git" element={<GitBox />} />
-          <Route path="/work" element={<WorkBox />} />
-          <Route path="/health" element={<HealthBox />} />
+          <Route path="/posture" element={<PostureBox />} />
+          <Route path="/water" element={<WaterBox />} />
         </Routes>
       </AnimatePresence>
     </div>

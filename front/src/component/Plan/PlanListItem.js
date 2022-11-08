@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
+import moment from "moment";
 
 const PlanListItem = ({ item }) => {
-  const start = new Date(item.start.dateTime)
-  const end = new Date(item.end.dateTime)
+  const start = moment(item.start.dateTime);
+  const end = moment(item.end.dateTime);
 
   return (
     <div
@@ -56,18 +57,16 @@ const PlanListItem = ({ item }) => {
           fontSize: "1.1rem",
         }}
       >
-        {`${start.getHours().toString().padStart(2, "0")}:${start
-          .getMinutes()
+        {`${start.hours().toString().padStart(2, "0")}:${start
+          .minutes()
           .toString()
-          .padStart(2, "0")} - ${end
-          .getHours()
+          .padStart(2, "0")} - ${end.hours().toString().padStart(2, "0")}:${end
+          .minutes()
           .toString()
-          .padStart(2, "0")}:${end.getMinutes().toString().padStart(2, "0")} ${
-          end.getHours() >= 12 ? "PM" : "AM"
-        } `}
+          .padStart(2, "0")} ${end.hours() >= 12 ? "PM" : "AM"} `}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PlanListItem
+export default PlanListItem;

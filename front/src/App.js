@@ -27,6 +27,10 @@ import PlanModal from "./component/Modal/PlanModal";
 import NotiModal from "./component/Modal/NotiModal";
 
 import { Subscriber } from "./shared/WebSocket";
+import WelcomeModal from "./component/Modal/WelcomeModal";
+import PhotoModal from "./component/Modal/PhotoModal";
+
+import moment from "moment";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -45,7 +49,7 @@ function App() {
     handleResize();
     window.addEventListener("resize", handleResize);
     let timer = setInterval(() => {
-      setCurrentTime(new Date());
+      setCurrentTime(moment());
     }, 1000);
 
     // toast("캘린더가 업데이트 되었습니다!", {
@@ -92,6 +96,8 @@ function App() {
       <WaterModal />
       <PlanModal />
       <PostureModal />
+      <WelcomeModal />
+      <PhotoModal />
       <div className="video-container">
         <video
           autoPlay

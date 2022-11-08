@@ -11,6 +11,7 @@ import {
 } from "../store/modal";
 import { notiState } from "../store/noti";
 import { planState } from "../store/plan";
+import { postureState } from "../store/posture";
 import { linkState } from "../store/qrcode";
 import { socketState } from "../store/socket";
 import { statisticsState } from "../store/statistics";
@@ -28,6 +29,7 @@ const Subscriber = () => {
   const [noti, setNotiState] = useRecoilState(notiState);
   const setStatisticsState = useSetRecoilState(statisticsState);
   const [drinked, setDrinkedState] = useRecoilState(drinkedState);
+  const [posture, setPostureState] = useRecoilState(postureState);
 
   //setState about modal
   const setStretchModalState = useSetRecoilState(stretchModalState);
@@ -92,12 +94,12 @@ const Subscriber = () => {
             break;
           case "log/water/stat":
             setStatisticsState({ water: message.data });
-            //setStatisticsState(message.data.reverse());
             break;
           case "log/water/today":
             setDrinkedState(message.data);
             break;
           case "log/posture/today":
+            setPostureState(message.data);
             break;
           case "stretching":
             setStretchModalState(true);
@@ -108,6 +110,7 @@ const Subscriber = () => {
             break;
           case "posture":
             setPostureModalState(true);
+            setPostureState([...posture, message.data]);
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -129,6 +132,8 @@ const Subscriber = () => {
     setNotiModalState,
     drinked,
     setDrinkedState,
+    posture,
+    setPostureState,
   ]);
 };
 

@@ -7,20 +7,22 @@ import NotiListItem from "../Git/NotiListItem";
 import { motion } from "framer-motion";
 import { gitAuthenticationState } from "../../store/gitauth";
 import QrcodeBox from "../Welcome/QrcodeBox";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { socketState } from "../../store/socket";
 
 function GitBox() {
   const gitAuthenticated = useRecoilValue(gitAuthenticationState);
   const socket = useRecoilValue(socketState);
+  const [first, setFirst] = useState(true);
 
   const noti = useRecoilValue(notiState);
   // const unreadNoti = useRecoilValue(unreadNotiState);
 
   useEffect(() => {
-    if (socket && socket.readyState === 1 && !gitAuthenticated) {
+    if (socket && socket.readyState === 1 && !gitAuthenticated && first) {
       socket.send(JSON.stringify({ type: "github/qr", data: null }));
       console.log("send github/qr message to server!");
+      setFirst(false);
     }
 
     return () => {
@@ -29,7 +31,7 @@ function GitBox() {
         console.log("send github/read message to server!");
       }
     };
-  }, [socket, gitAuthenticated]);
+  }, [socket, gitAuthenticated, first, setFirst]);
 
   return (
     <motion.div

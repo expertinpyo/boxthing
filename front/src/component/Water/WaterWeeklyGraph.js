@@ -1,11 +1,24 @@
 /** @jsxImportSource @emotion/react */
 
 import ReactECharts from "echarts-for-react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { socketState } from "../../store/socket";
 import { statisticsState } from "../../store/statistics";
 
 const WaterWeeklyGraph = () => {
   const statistics = useRecoilValue(statisticsState);
+  const [first, setFirst] = useState(true);
+
+  const socket = useRecoilValue(socketState);
+  useEffect(() => {
+    if (socket && socket.readyState === 1 && first) {
+      socket.send(JSON.stringify({ type: "log/water/stat", data: null }));
+      console.log("send log/water/stat message to server!");
+      setFirst(false);
+    }
+  }, [socket, first, setFirst]);
+
   const option = {
     title: {
       text: "15일간 음수 히스토리",

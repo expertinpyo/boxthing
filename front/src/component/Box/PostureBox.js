@@ -1,15 +1,29 @@
 /** @jsxImportSource @emotion/react */
 
-import { defaultBoxStyle } from "../../style/shared"
+import { defaultBoxStyle } from "../../style/shared";
 
-import { motion } from "framer-motion"
-import PostureGraph from "../Posture/PostureGraph"
-import PostureLineGraph from "../Posture/PostureLineGraph"
-import ToggleButton from "../Water/ToggleButton"
-import { useState } from "react"
+import { motion } from "framer-motion";
+import PostureGraph from "../Posture/PostureGraph";
+import PostureLineGraph from "../Posture/PostureLineGraph";
+import ToggleButton from "../Water/ToggleButton";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { postureAvgState } from "../../store/posture";
+import { socketState } from "../../store/socket";
 
 function PostureBox({ key }) {
-  const [state, setState] = useState(false)
+  const [state, setState] = useState(false);
+  const [first, setFirst] = useState(true);
+  const avg = useRecoilValue(postureAvgState);
+
+  const socket = useRecoilValue(socketState);
+  useEffect(() => {
+    if (socket && socket.readyState === 1 && first) {
+      socket.send(JSON.stringify({ type: "log/posture/today", data: null }));
+      console.log("send log/posture/today message to server!");
+      setFirst(false);
+    }
+  }, [socket, first, setFirst]);
   return (
     <motion.div
       key={key}
@@ -32,7 +46,7 @@ function PostureBox({ key }) {
             leftText={"RUNTIME"}
             rightText={"TODAY"}
             onClick={() => {
-              setState((pre) => !pre)
+              setState((pre) => !pre);
             }}
           />
         </div>
@@ -65,14 +79,14 @@ function PostureBox({ key }) {
                 <span
                   css={{ marginRight: 5 }}
                 >{`오늘 하루 자세 평균 점수 : `}</span>
-                <span css={{ fontWeight: "bold", color: "green" }}>79</span>
+                <span css={{ fontWeight: "bold", color: "green" }}>{avg}</span>
               </div>
             </div>
           )}
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
 
-export default PostureBox
+export default PostureBox;

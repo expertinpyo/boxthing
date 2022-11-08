@@ -19,7 +19,7 @@ const StretchingModal = () => {
       setChoice(Math.floor(Math.random() * 10));
       setTimeout(() => {
         setter((pre) => !pre);
-      }, 3000);
+      }, 10000);
     }
   }, [state, setter]);
 

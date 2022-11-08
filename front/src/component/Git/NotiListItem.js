@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
-import "./NotiListItem.css"
+import "./NotiListItem.css";
+import moment from "moment";
 
 const noti_type_object = {
   assign: {
@@ -51,19 +52,19 @@ const noti_type_object = {
     color: "#E29500",
     background: "#FFE76B",
   },
-}
+};
 
 const calculateLeftTime = (updated_at) => {
-  const temp = new Date() - new Date(updated_at)
-  const years = temp / (1000 * 60 * 60 * 24 * 365)
-  if (years > 0) return `${Math.floor(years)} years ago`
-  const days = (temp % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24)
-  if (days > 0) return `${Math.floor(days)} days ago`
-  const hours = (temp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  if (hours > 0) return `${Math.floor(hours)} hours ago`
-  const minutes = (temp % (1000 * 60 * 60)) / (1000 * 60)
-  return `${Math.floor(minutes)} minutes ago`
-}
+  const temp = moment() - moment(updated_at);
+  const years = temp / (1000 * 60 * 60 * 24 * 365);
+  if (years > 0) return `${Math.floor(years)} years ago`;
+  const days = (temp % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24);
+  if (days > 0) return `${Math.floor(days)} days ago`;
+  const hours = (temp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+  if (hours > 0) return `${Math.floor(hours)} hours ago`;
+  const minutes = (temp % (1000 * 60 * 60)) / (1000 * 60);
+  return `${Math.floor(minutes)} minutes ago`;
+};
 
 const NotiListItem = ({ item }) => {
   return (
@@ -156,7 +157,7 @@ const NotiListItem = ({ item }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NotiListItem
+export default NotiListItem;

@@ -1,36 +1,37 @@
 import { atom, selector } from "recoil";
+import moment from "moment";
 
 const target = 1300;
 
 const drinkedState = atom({
   key: "drinkedState",
-  default: [
-    { amount: 100, created_at: "2022-11-07 14:17:20" },
-    { amount: 130, created_at: "2022-11-07 15:17:20" },
-    { amount: 200, created_at: "2022-11-07 16:17:20" },
-    { amount: 50, created_at: "2022-11-07 17:17:20" },
-    { amount: 120, created_at: "2022-11-07 18:17:20" },
-    { amount: 300, created_at: "2022-11-07 19:17:20" },
-    { amount: 100, created_at: "2022-11-07 10:20:20" },
-  ],
+  default: [],
+  // default: [
+  //   { amount: 100, timestamp: "2022-11-08 14:17:20" },
+  //   { amount: 130, timestamp: "2022-11-08 15:17:20" },
+  //   { amount: 200, timestamp: "2022-11-08 16:17:20" },
+  //   { amount: 50, timestamp: "2022-11-08 17:17:20" },
+  //   { amount: 120, timestamp: "2022-11-08 18:17:20" },
+  //   { amount: 300, timestamp: "2022-11-08 19:17:20" },
+  //   { amount: 100, timestamp: "2022-11-08 10:20:20" },
+  // ],
 });
 
 const drinkedHistoryState = selector({
   key: "drinkedHistoryState",
   get: ({ get }) => {
     const drinkedLog = get(drinkedState);
-    let today =
-      new Date() - (new Date() % (1000 * 60 * 60 * 24)) - 1000 * 60 * 60;
+    let today = moment() - (moment() % (1000 * 60 * 60 * 24)) - 1000 * 60 * 60;
     let result = [];
     let sum = 0;
     for (let i = 0; i < 12; i++) {
       for (let j = 0, end = drinkedLog.length; j < end; j++) {
         const temp = drinkedLog[j];
         if (
-          new Date(temp["created_at"]) >= today + 1000 * 60 * 60 * i &&
-          new Date(temp["created_at"]) < today + 1000 * 60 * 60 * (i + 1)
+          moment(temp.timestamp) - 0 >= today + 1000 * 60 * 60 * i &&
+          moment(temp.timestamp) - 0 < today + 1000 * 60 * 60 * (i + 1)
         ) {
-          sum += Number.parseInt(temp["amount"]);
+          sum += Number.parseInt(temp.amount);
         }
       }
       result = [
@@ -41,7 +42,6 @@ const drinkedHistoryState = selector({
         },
       ];
     }
-    console.log(result);
     return result;
   },
 });

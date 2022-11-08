@@ -25,10 +25,22 @@ const waterModalState = atom({
   default: false,
 });
 
+const welcomeModalState = atom({
+  key: "welcomeModalState",
+  default: false,
+});
+
+const photoModalState = atom({
+  key: "photoModalState",
+  default: false,
+});
+
 export {
   stretchModalState,
   planModalState,
   notiModalState,
   postureModalState,
   waterModalState,
+  welcomeModalState,
+  photoModalState,
 };

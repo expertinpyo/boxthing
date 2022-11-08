@@ -4,7 +4,7 @@ import { authenticationState } from "../store/auth";
 import { gitAuthenticationState } from "../store/gitauth";
 import {
   notiModalState,
-  planModalState,
+  // planModalState,
   postureModalState,
   stretchModalState,
   waterModalState,
@@ -33,7 +33,7 @@ const Subscriber = () => {
 
   //setState about modal
   const setStretchModalState = useSetRecoilState(stretchModalState);
-  const setPlanModalState = useSetRecoilState(planModalState);
+  // const setPlanModalState = useSetRecoilState(planModalState);
   const setNotiModalState = useSetRecoilState(notiModalState);
   const setWaterModalState = useSetRecoilState(waterModalState);
   const setPostureModalState = useSetRecoilState(postureModalState);
@@ -68,6 +68,16 @@ const Subscriber = () => {
           case "init":
             if (message.data.google["is_login"]) {
               setAuthenticationState(true);
+              if (socket && socket.readyState === 1) {
+                socket.send(
+                  JSON.stringify({ type: "log/water/today", data: null })
+                );
+                console.log("send log/water/stat message to server!");
+                socket.send(
+                  JSON.stringify({ type: "log/posture/today", data: null })
+                );
+                console.log("send lo g/posture/today message to server!");
+              }
             } else {
               setLinkState(message.data.google.link);
             }
@@ -76,6 +86,16 @@ const Subscriber = () => {
             break;
           case "login":
             setAuthenticationState(true);
+            if (socket && socket.readyState === 1) {
+              socket.send(
+                JSON.stringify({ type: "log/water/today", data: null })
+              );
+              console.log("send log/water/stat message to server!");
+              socket.send(
+                JSON.stringify({ type: "log/posture/today", data: null })
+              );
+              console.log("send lo g/posture/today message to server!");
+            }
             break;
           case "github/qr":
             setLinkState(message.data.link);
@@ -89,7 +109,8 @@ const Subscriber = () => {
             break;
           case "github/noti":
             setNotiState([...noti, ...message.data]);
-            setNotiModalState(true);
+            const someUnread = message.data.some((item) => item.unread);
+            if (someUnread) setNotiModalState(true);
             console.log("notiState updated!");
             break;
           case "log/water/stat":

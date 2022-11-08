@@ -1,6 +1,7 @@
 import asyncio
 import json
 import websockets.server as websockets
+from modules.water import amount_water
 import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
@@ -231,7 +232,11 @@ async def github_notifications_coroutine():
 
         await asyncio.sleep(1 * 60)
 
-
+async def water_coroutine():
+    async for water in amount_water():
+        await ws_message_queue.put(("water", water))
+        await mqtt_message_queue.put(("water", water))
+        
 async def main():
     load_dotenv()
 
@@ -246,6 +251,7 @@ async def main():
         mqtt_client(),
         google_calendar_coroutine(),
         github_notifications_coroutine(),
+        water_coroutine(),
     )
 
 

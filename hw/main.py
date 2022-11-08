@@ -5,7 +5,6 @@ import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
 from os import environ
-from datetime import datetime
 
 from modules.api import (
     google_calendar,
@@ -14,8 +13,8 @@ from modules.api import (
     github_set_read,
 )
 
-ws_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
-mqtt_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
+ws_message_queue = asyncio.Queue()
+mqtt_message_queue = asyncio.Queue()
 
 
 class State:
@@ -29,7 +28,7 @@ class State:
 
     google_access_token = ""
     github_access_token = ""
-    github_notification_last_updated_at: datetime | None = None
+    github_notification_last_updated_at = None
 
 
 state = State()
@@ -204,6 +203,7 @@ async def google_calendar_coroutine():
             await asyncio.sleep(5 * 60)
 
         except GoogleAccessTokenExpired:
+            print("google access token expired")
             state.google_refreshed.clear()
             await mqtt_message_queue.put(("access_token/google", None))
             await state.google_refreshed.wait()

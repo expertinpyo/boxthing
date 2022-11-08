@@ -5,9 +5,7 @@ GITHUB_API_BASE_URL = "https://api.github.com"
 PER_PAGE = 50
 
 
-async def github_notification(
-    token, last_updated_at: datetime | None = None
-) -> tuple[list, datetime | None]:
+async def github_notification(token, last_updated_at=None):
     url = f"{GITHUB_API_BASE_URL}/notifications"
     headers = {
         "Accept": "application/vnd.github+json",
@@ -47,15 +45,14 @@ async def github_notification(
     return notifications, updated_at
 
 
-async def github_set_read(token, last_updated_at: datetime | None = None):
+async def github_set_read(token, last_updated_at=None):
     url = f"{GITHUB_API_BASE_URL}/notifications"
     headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {token}",
     }
-    data = {
-        "read": "true"
-    }
+    data = {"read": "true"}
+
     if last_updated_at:
         data["last_read_at"] = last_updated_at.strftime("%Y-%m-%dT%H:%M:%SZ")
 

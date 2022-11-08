@@ -10,7 +10,7 @@ class GoogleAccessTokenExpired(Exception):
     pass
 
 
-async def fetch_calendar(calendar, headers, params) -> list:
+async def fetch_calendar(calendar, headers, params):
     calendar_id = calendar["id"]
     url = f"{GOOGLE_CALENDAR_BASE_URL}/calendars/{calendar_id}/events"
 
@@ -34,7 +34,7 @@ async def fetch_calendar(calendar, headers, params) -> list:
     return event_list
 
 
-async def google_calendar(token) -> list:
+async def google_calendar(token):
     # get google calendar list
     headers = {"Authorization": f"Bearer {token}"}
 

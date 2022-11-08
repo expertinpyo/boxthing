@@ -1,25 +1,22 @@
 /** @jsxImportSource @emotion/react */
-import { defaultBoxStyle } from "../../style/shared"
-import { useRecoilValue } from "recoil"
+import { defaultBoxStyle } from "../../style/shared";
+import { useRecoilValue } from "recoil";
 import {
-  planState,
   upcomingPlanState,
   inProgressPlanState,
-} from "../../store/plan"
-import PlanUpcoming from "../Plan/PlanUpcoming"
-import PlanInProgress from "../Plan/PlanInProgress"
-import PlanListItem from "../Plan/PlanListItem"
+  filterPastPlanState,
+} from "../../store/plan";
+import PlanUpcoming from "../Plan/PlanUpcoming";
+import PlanInProgress from "../Plan/PlanInProgress";
+import PlanListItem from "../Plan/PlanListItem";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 function PlanBox({ key }) {
-  const plan = useRecoilValue(planState)
-  const upcomingPlan = useRecoilValue(upcomingPlanState)
-  const inProgressPlan = useRecoilValue(inProgressPlanState)
+  const plan = useRecoilValue(filterPastPlanState);
+  const upcomingPlan = useRecoilValue(upcomingPlanState);
+  const inProgressPlan = useRecoilValue(inProgressPlanState);
 
-  // console.log("planList", plan)
-  // console.log("upcoming", upcomingPlan)
-  // console.log("inProgress", inProgressPlan)
   return (
     <motion.div
       key={key}
@@ -66,12 +63,12 @@ function PlanBox({ key }) {
         </div>
         <div css={{ width: "69%", height: "100%" }}>
           {plan.map((item) => {
-            return <PlanListItem key={item.id} item={item} />
+            return <PlanListItem key={item.id} item={item} />;
           })}
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
 
-export default PlanBox
+export default PlanBox;

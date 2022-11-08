@@ -25,21 +25,26 @@ const PlanUpcoming = ({ item }) => {
         width: "100%",
         height: "100%",
         padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
       }}
     >
       {item.length !== 0 ? (
-        <>
+        <div
+          css={{
+            width: "100%",
+            height: " 100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
           <div css={{ fontSize: 14, color: "var(--font-sub-color)" }}>
             임박한 일정
           </div>
           <div
             css={{
               width: "100%",
-              fontSize: 48,
+              fontSize: 44,
               fontWeight: "bold",
               color: upcomingPlanTimer[1] ? "red" : "black",
             }}
@@ -47,11 +52,31 @@ const PlanUpcoming = ({ item }) => {
             {upcomingPlanTimer[0]}
           </div>
 
-          <div>
-            <div css={{ fontSize: "1.5rem" }}>{item[0].summary}</div>
-            <div css={{ fontSize: "1rem" }}>{item[0].description}</div>
+          <div css={{ width: "100%" }}>
+            <div
+              css={{
+                fontSize: "1.5rem",
+                width: "100%",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {item[0].summary}
+            </div>
+            <div
+              css={{
+                fontSize: "1rem",
+                width: "100%",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {item[0].description}
+            </div>
           </div>
-        </>
+        </div>
       ) : (
         <div
           css={{

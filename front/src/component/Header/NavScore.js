@@ -9,12 +9,12 @@ const NavScore = () => {
     <div
       css={{
         position: "absolute",
-        width: "40%",
+        width: "60%",
         aspectRatio: "1/1",
-        bottom: 0,
-        right: -5,
+        bottom: -15,
+        right: -15,
         color: score === 0 ? "white" : score > 80 ? "green" : "red",
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: "bold",
         lineHeight: 0,
         display: "flex",

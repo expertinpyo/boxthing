@@ -1,7 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import moment from "moment";
+import { useRecoilValue } from "recoil";
+import { inProgressPlanState } from "../../store/plan";
+import "./PlanListItem.css";
 
-const PlanListItem = ({ item }) => {
+const PlanListItem = ({ item, type = "" }) => {
+  const inprogress = useRecoilValue(inProgressPlanState);
   const start = moment(item.start.dateTime);
   const end = moment(item.end.dateTime);
 
@@ -15,6 +19,11 @@ const PlanListItem = ({ item }) => {
         alignItems: "center",
         padding: 8,
       }}
+      className={
+        inprogress.some((progress) => progress.id === item.id)
+          ? "inprogressItem"
+          : ""
+      }
     >
       <div
         css={{

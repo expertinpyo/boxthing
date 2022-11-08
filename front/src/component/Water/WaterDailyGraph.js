@@ -1,23 +1,21 @@
 /** @jsxImportSource @emotion/react */
 
 import ReactECharts from "echarts-for-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import { socketState } from "../../store/socket";
 import { drinkedHistoryState } from "../../store/water";
 
 const WaterDailyGraph = () => {
   const drinkedHistory = useRecoilValue(drinkedHistoryState);
-  const [first, setFirst] = useState(true);
 
   const socket = useRecoilValue(socketState);
   useEffect(() => {
-    if (socket && socket.readyState === 1 && first) {
+    if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({ type: "log/water/today", data: null }));
       console.log("send log/water/today message to server!");
-      setFirst(false);
     }
-  }, [socket, first, setFirst]);
+  }, [socket]);
 
   const option = {
     title: {

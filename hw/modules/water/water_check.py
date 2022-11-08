@@ -34,7 +34,7 @@ async def amount_water():
                 if check_cnt == 5 and int_val > 10:
                     check_cnt += 1
                     cha = check_data_before - check_data_next
-                    if cha > 0:
+                    if cha > 10:
                         today = datetime.now(tz=tz.UTC)
                         yield {"amount": cha, "timestamp": today.isoformat()}
                         #yield (check_data_next,cha)

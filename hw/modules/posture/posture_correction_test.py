@@ -75,7 +75,7 @@ first_img = None
 first_dis = first_down = first_area = 0
 webcam = cv2.VideoCapture(0)
 async def check_pose():   
-    # 0 : 올바른 자세, 1 : 거북목, 2: 허리무리
+    # 1 : 올바른 자세, 2 : 거북목, 3: 허리무리 4: 사람 없음
     send_posture_flag = 0
     posture_score = 0
 
@@ -108,7 +108,7 @@ async def check_pose():
                     yield((send_posture_flag, "허리무리", posture_score))
                     #print(send_posture_flag, "허리무리", posture_score)
                 elif now_dis == 0 and now_down == 0 and now_area == 0: 
-                    posture_score = -1
+                    posture_score = 0
                     send_posture_flag = 4
                     yield((send_posture_flag, "사람 없음", posture_score))
                     #print(send_posture_flag, "사람 없음", posture_score)

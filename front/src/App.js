@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./App.css";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { timerState } from "./store/timer";
@@ -31,6 +31,8 @@ import WelcomeModal from "./component/Modal/WelcomeModal";
 import PhotoModal from "./component/Modal/PhotoModal";
 
 import moment from "moment";
+import CaptureModal from "./component/Modal/CaptureModal";
+import { captureModalState } from "./store/modal";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -39,6 +41,8 @@ function App() {
   const setWeather = useSetRecoilState(weatherState);
 
   const authenticated = useRecoilValue(authenticationState);
+
+  const captureModal = useRecoilValue(captureModalState);
 
   const handleResize = () => {
     const vh = window.innerHeight;
@@ -98,6 +102,9 @@ function App() {
       <PostureModal />
       <WelcomeModal />
       <PhotoModal />
+      <AnimatePresence mode="wait">
+        {captureModal ? <CaptureModal /> : false}
+      </AnimatePresence>
       <div className="video-container">
         <video
           autoPlay

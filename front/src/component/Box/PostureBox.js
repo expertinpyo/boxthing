@@ -13,17 +13,16 @@ import { socketState } from "../../store/socket";
 
 function PostureBox({ key }) {
   const [state, setState] = useState(false);
-  const [first, setFirst] = useState(true);
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
   useEffect(() => {
-    if (socket && socket.readyState === 1 && first) {
+    if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({ type: "log/posture/today", data: null }));
-      console.log("send log/posture/today message to server!");
-      setFirst(false);
+      console.log("send lo g/posture/today message to server!");
     }
-  }, [socket, first, setFirst]);
+  }, [socket]);
+
   return (
     <motion.div
       key={key}
@@ -85,6 +84,16 @@ function PostureBox({ key }) {
           )}
         </div>
       </div>
+      <button
+        onClick={() => {
+          if (socket && socket.readyState === 1) {
+            socket.send(JSON.stringify({ type: "posture/reset", data: null }));
+            console.log("send close capture modal message to server!");
+          }
+        }}
+      >
+        sendreset
+      </button>
     </motion.div>
   );
 }

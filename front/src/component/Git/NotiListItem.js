@@ -57,11 +57,11 @@ const noti_type_object = {
 const calculateLeftTime = (updated_at) => {
   const temp = moment() - moment(updated_at);
   const years = temp / (1000 * 60 * 60 * 24 * 365);
-  if (years > 0) return `${Math.floor(years)} years ago`;
+  if (years >= 1) return `${Math.floor(years)} years ago`;
   const days = (temp % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24);
-  if (days > 0) return `${Math.floor(days)} days ago`;
+  if (days >= 1) return `${Math.floor(days)} days ago`;
   const hours = (temp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-  if (hours > 0) return `${Math.floor(hours)} hours ago`;
+  if (hours >= 1) return `${Math.floor(hours)} hours ago`;
   const minutes = (temp % (1000 * 60 * 60)) / (1000 * 60);
   return `${Math.floor(minutes)} minutes ago`;
 };

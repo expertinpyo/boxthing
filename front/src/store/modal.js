@@ -35,6 +35,16 @@ const photoModalState = atom({
   default: false,
 });
 
+const captureModalState = atom({
+  key: "captureModalState",
+  default: false,
+});
+
+const captureFuncState = atom({
+  key: "captureFuncState",
+  default: false,
+});
+
 export {
   stretchModalState,
   planModalState,
@@ -43,4 +53,6 @@ export {
   waterModalState,
   welcomeModalState,
   photoModalState,
+  captureModalState,
+  captureFuncState,
 };

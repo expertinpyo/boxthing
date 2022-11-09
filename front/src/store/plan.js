@@ -26,11 +26,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-10-27T17:30:00+09:00",
+  //       dateTime: "2022-11-08T16:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-10-27T17:45:00+09:00",
+  //       dateTime: "2022-11-08T17:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "5curjtaj80idbjt1i46vtgimfq@google.com",
@@ -64,7 +64,7 @@ const planState = atom({
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-10-27T16:30:00+09:00",
+  //       dateTime: "2022-11-08T17:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "3q67nteuc6h3jn6o7jljokfdr9@google.com",
@@ -109,6 +109,19 @@ const planState = atom({
   //     eventType: "default",
   //   },
   // ],
+});
+
+const filterPastPlanState = selector({
+  key: "filterPastPlanState",
+  get: ({ get }) => {
+    const list = get(planState);
+    const currentTime = get(timerState);
+
+    return list.filter((item) => {
+      const temp = moment(item.end.dateTime) - currentTime;
+      return temp >= 0;
+    });
+  },
 });
 
 const upcomingPlanState = selector({
@@ -170,4 +183,5 @@ export {
   upcomingPlanState,
   inProgressPlanState,
   upcomingPlanTimerState,
+  filterPastPlanState,
 };

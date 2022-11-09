@@ -3,8 +3,9 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { authenticationState } from "../store/auth";
 import { gitAuthenticationState } from "../store/gitauth";
 import {
+  captureFuncState,
+  captureModalState,
   notiModalState,
-  // planModalState,
   postureModalState,
   stretchModalState,
   waterModalState,
@@ -33,10 +34,12 @@ const Subscriber = () => {
 
   //setState about modal
   const setStretchModalState = useSetRecoilState(stretchModalState);
-  // const setPlanModalState = useSetRecoilState(planModalState);
   const setNotiModalState = useSetRecoilState(notiModalState);
   const setWaterModalState = useSetRecoilState(waterModalState);
   const setPostureModalState = useSetRecoilState(postureModalState);
+  const setCaptureModalState = useSetRecoilState(captureModalState);
+
+  const setCaptureFunc = useSetRecoilState(captureFuncState);
 
   useEffect(() => {
     setSocket(new WebSocket("ws://localhost:8765"));
@@ -130,8 +133,25 @@ const Subscriber = () => {
             setDrinkedState([...drinked, message.data]);
             break;
           case "posture":
-            setPostureModalState(true);
             setPostureState([...posture, message.data]);
+            break;
+          case "posture/ready":
+            setCaptureModalState(true);
+            setCaptureFunc(true);
+            break;
+          case "posture/nope":
+            setCaptureFunc(true);
+            break;
+          case "posture/complete":
+            setCaptureModalState(false);
+            if (socket && socket.readyState === 1) {
+              socket.send(
+                JSON.stringify({ type: "posture/complete", data: null })
+              );
+              console.log("send close capture modal message to server!");
+            }
+            break;
+          case "route/calendar":
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -155,6 +175,8 @@ const Subscriber = () => {
     setDrinkedState,
     posture,
     setPostureState,
+    setCaptureFunc,
+    setCaptureModalState,
   ]);
 };
 

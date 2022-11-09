@@ -22,6 +22,7 @@ function PostureBox({ key }) {
       console.log("send lo g/posture/today message to server!");
     }
   }, [socket]);
+
   return (
     <motion.div
       key={key}
@@ -83,6 +84,16 @@ function PostureBox({ key }) {
           )}
         </div>
       </div>
+      <button
+        onClick={() => {
+          if (socket && socket.readyState === 1) {
+            socket.send(JSON.stringify({ type: "posture/reset", data: null }));
+            console.log("send close capture modal message to server!");
+          }
+        }}
+      >
+        sendreset
+      </button>
     </motion.div>
   );
 }

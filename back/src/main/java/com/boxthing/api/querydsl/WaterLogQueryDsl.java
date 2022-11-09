@@ -18,7 +18,7 @@ public class WaterLogQueryDsl {
 
   public List<WaterLog> findAllByUserAndDate(User user, int days) {
     ZonedDateTime end = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0);
-    ZonedDateTime start = end.minusDays(days + 1).withHour(0).withMinute(0).withSecond(0);
+    ZonedDateTime start = end.minusDays((long) days + 1).withHour(0).withMinute(0).withSecond(0);
 
     return jpaQueryFactory
         .select(waterLog)

@@ -2,6 +2,8 @@ import asyncio
 import json
 import websockets.server as websockets
 from modules.water import amount_water
+from modules.voice_cmd import give_events
+from modules.posture import Cam
 import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
@@ -37,7 +39,7 @@ class State:
 
 
 state = State()
-
+cam = Cam()
 
 async def ws_consumer(websocket):
     async for message in websocket:
@@ -59,6 +61,19 @@ async def ws_consumer(websocket):
         if type_list[0] == "log":
             # Pass any log request to mqtt
             await mqtt_message_queue.put(("/".join(type_list), data))
+
+        if type_list[0] == "posture":
+            if type_list[1] == "reset":
+                await cam.stop()
+                await ws_message_queue.put(("posture/ready", None))
+            elif type_list[1] == "capture":
+                result = cam.check(data)
+                if result:
+                    await ws_message_queue.put(("posture/complete", None))
+                else:
+                    await ws_message_queue.put(("posture/nope", None)) 
+            elif type_list[1] == "complete":
+                await cam.start()
 
 
 async def ws_producer(websocket):
@@ -307,8 +322,49 @@ async def github_notifications_coroutine():
 
 async def water_coroutine():
     async for water in amount_water():
+        print(water)
         await ws_message_queue.put(("water", water))
         await mqtt_message_queue.put(("water", water))
+
+async def motion_coro():
+    async for image in cam.capture():
+        print(image)
+        await ws_message_queue.put(("posture", image))
+        await mqtt_message_queue.put(("posture", image))
+
+
+async def voice_command_coroutine():
+
+    while True:
+        #await state.ws_connected.wait()
+        voice_cmd = give_events()
+        if voice_cmd:
+            print(voice_cmd)
+            if voice_cmd == "캘린더":
+                print("calendar")
+                # await ws_message_queue.put(("route/calendar", None))
+            elif voice_cmd == "깃허브":
+                print("Git")
+                # await ws_message_queue.put(("route/git", None))
+            elif voice_cmd == "자세":
+                print("posture")
+                # await ws_message_queue.put(("route/posture", None))
+            elif voice_cmd == "음수량":
+                print("water-check")
+                # await ws_message_queue.put(("route/water", None))
+            elif voice_cmd == "일주일" or voice_cmd == "오늘":
+                print("show_graph")
+                # await ws_message_queue.put(("toggle/posture", None))
+            elif voice_cmd == "스트레칭":
+                print("show_Stretching")
+                # await ws_message_queue.put(("toggle/water", None))
+            elif voice_cmd == "사진":
+                print("take picture")
+                # await ws_message_queue.put(("posture/re", None))
+            else:
+                print("unknown command")
+
+        await asyncio.sleep(1)
 
 
 async def main():
@@ -327,6 +383,8 @@ async def main():
         google_calendar_coroutine(),
         github_notifications_coroutine(),
         water_coroutine(),
+        voice_command_coroutine(),
+        motion_coro()
     )
 
 

@@ -1,17 +1,23 @@
 import asyncio
 import json
 import websockets.server as websockets
+from modules.water import amount_water
+from modules.voice_cmd import give_events
+from modules.posture import Cam
 import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
 from os import environ
-from datetime import datetime
 
-from modules.api import google_calendar, github_notification
+from modules.api import (
+    google_calendar,
+    GoogleAccessTokenExpired,
+    github_notification,
+    github_set_read,
+)
 
-
-ws_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
-mqtt_message_queue: asyncio.Queue[tuple[str, dict | list | None]] = asyncio.Queue()
+ws_message_queue = asyncio.Queue()
+mqtt_message_queue = asyncio.Queue()
 
 
 class State:
@@ -21,14 +27,15 @@ class State:
     init_done = asyncio.Event()
     google_logged_in = asyncio.Event()
     github_logged_in = asyncio.Event()
+    google_refreshed = asyncio.Event()
 
     google_access_token = ""
     github_access_token = ""
-    github_notification_last_updated_at: datetime | None = None
+    github_notification_last_updated_at = None
 
 
 state = State()
-
+cam = Cam()
 
 async def ws_consumer(websocket):
     async for message in websocket:
@@ -43,12 +50,27 @@ async def ws_consumer(websocket):
                 await mqtt_message_queue.put(("github/qr", None))
 
             if type_list[1] == "read":
-                # TODO: set notifications as read
-                pass
+                await github_set_read(
+                    state.github_access_token, state.github_notification_last_updated_at
+                )
 
         if type_list[0] == "log":
             # Pass any log request to mqtt
             await mqtt_message_queue.put(("/".join(type_list), data))
+
+        if type_list[0] == "posture":
+            if type_list[1] == "reset":
+                await cam.stop()
+                await ws_message_queue.put(("posture/ready", None))
+            elif type_list[1] == "capture":
+                result = cam.check(data)
+                if result:
+                    await ws_message_queue.put(("posture/complete", None))
+                else:
+                    await ws_message_queue.put(("posture/nope", None)) 
+            elif type_list[1] == "complete":
+                await cam.start()
+
 
 async def ws_producer(websocket):
     while True:
@@ -126,28 +148,27 @@ async def mqtt_consumer(client):
                     state.init_done.set()
 
                 if topic_list[1] == "github":
-                    ws_data = {
-                        "link": data["link"]
-                    }
+                    ws_data = {"link": data["link"]}
 
                     await ws_message_queue.put(("github/qr", ws_data))
 
             if topic_list[0] == "login":
                 if topic_list[1] == "google":
                     state.google_access_token = data["access_token"]
-                    state.google_logged_in.set()
 
                     await ws_message_queue.put(("login", None))
+                    state.google_logged_in.set()
 
                 if topic_list[1] == "github":
                     state.github_access_token = data["access_token"]
-                    state.github_logged_in.set()
 
                     await ws_message_queue.put(("github/login", None))
+                    state.github_logged_in.set()
 
             if topic_list[0] == "access_token":
                 if topic_list[1] == "google":
                     state.google_access_token = data["access_token"]
+                    state.google_refreshed.set()
 
                 if topic_list[1] == "github":
                     state.github_access_token = data["access_token"]
@@ -155,7 +176,6 @@ async def mqtt_consumer(client):
             if topic_list[0] == "log":
                 # Pass any log response to ws
                 await ws_message_queue.put(("/".join(topic_list), data))
-
 
 
 async def mqtt_producer(client):
@@ -189,13 +209,20 @@ async def google_calendar_coroutine():
     while True:
         await state.ws_connected.wait()
 
-        events = google_calendar(state.google_access_token)
-        # TODO: Need access token expiration check
+        try:
+            events = await google_calendar(state.google_access_token)
+            print(f"google calendar events: {events}")
 
-        if events:
-            await ws_message_queue.put(("calendar", events))
+            if events:
+                await ws_message_queue.put(("calendar", events))
 
-        await asyncio.sleep(5 * 60)
+            await asyncio.sleep(5 * 60)
+
+        except GoogleAccessTokenExpired:
+            print("google access token expired")
+            state.google_refreshed.clear()
+            await mqtt_message_queue.put(("access_token/google", None))
+            await state.google_refreshed.wait()
 
 
 async def github_notifications_coroutine():
@@ -204,9 +231,14 @@ async def github_notifications_coroutine():
     while True:
         await state.ws_connected.wait()
 
-        notifications, last_updated_at = github_notification(
+        notifications, last_updated_at = await github_notification(
             state.github_access_token, state.github_notification_last_updated_at
         )
+
+        print(
+            f"github notifications: {notifications}, last_updated_at: {last_updated_at}"
+        )
+
         if last_updated_at is not None:
             state.github_notification_last_updated_at = last_updated_at
 
@@ -214,6 +246,53 @@ async def github_notifications_coroutine():
             await ws_message_queue.put(("github/noti", notifications))
 
         await asyncio.sleep(1 * 60)
+
+
+async def water_coroutine():
+    async for water in amount_water():
+        print(water)
+        await ws_message_queue.put(("water", water))
+        await mqtt_message_queue.put(("water", water))
+
+async def motion_coro():
+    async for image in cam.capture():
+        print(image)
+        await ws_message_queue.put(("posture", image))
+        await mqtt_message_queue.put(("posture", image))
+
+
+async def voice_command_coroutine():
+
+    while True:
+        #await state.ws_connected.wait()
+        voice_cmd = give_events()
+        if voice_cmd:
+            print(voice_cmd)
+            if voice_cmd == "캘린더":
+                print("calendar")
+                # await ws_message_queue.put(("route/calendar", None))
+            elif voice_cmd == "깃허브":
+                print("Git")
+                # await ws_message_queue.put(("route/git", None))
+            elif voice_cmd == "자세":
+                print("posture")
+                # await ws_message_queue.put(("route/posture", None))
+            elif voice_cmd == "음수량":
+                print("water-check")
+                # await ws_message_queue.put(("route/water", None))
+            elif voice_cmd == "일주일" or voice_cmd == "오늘":
+                print("show_graph")
+                # await ws_message_queue.put(("toggle/posture", None))
+            elif voice_cmd == "스트레칭":
+                print("show_Stretching")
+                # await ws_message_queue.put(("toggle/water", None))
+            elif voice_cmd == "사진":
+                print("take picture")
+                # await ws_message_queue.put(("posture/re", None))
+            else:
+                print("unknown command")
+
+        await asyncio.sleep(1)
 
 
 async def main():
@@ -230,6 +309,9 @@ async def main():
         mqtt_client(),
         google_calendar_coroutine(),
         github_notifications_coroutine(),
+        water_coroutine(),
+        voice_command_coroutine(),
+        motion_coro()
     )
 
 
@@ -238,4 +320,5 @@ if __name__ == "__main__":
     if os.name == "nt":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

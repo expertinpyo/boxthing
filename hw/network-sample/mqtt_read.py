@@ -8,22 +8,28 @@ mqtt_message_queue = asyncio.Queue()
 
 async def mqtt_consumer(client):
     async with client.unfiltered_messages() as messages:
-        await client.subscribe("boxthing")
+        await client.subscribe(
+            "boxthing/server/water"
+        )
         async for message in messages:
             data = json.loads(message.payload)
-            print(f"Message from mqtt: {data}")
-            
-            await mqtt_message_queue.put((data["deviceId"], {
-                "type": "wt",
-                "check": 1,
-            }))
+            topic_list = message.topic.split("/")[2:]
+
+            print(f"Message from mqtt topic: {topic_list}, data: {data}")
+            await mqtt_message_queue.put((topic_list,data["data"]))
+            if topic_list[0] == "init":
+                pass
 
 async def mqtt_producer(client):
     while True:
-        device_id, message = await mqtt_message_queue.get()
-        await client.publish(f"boxthing/{device_id}",json.dumps(message))
-        
-        
+        topic, data = await mqtt_message_queue.get()
+        message = {
+            "data": "good",
+        }
+
+        await client.publish(
+            "boxthing/device/100000005e3d327f/water", json.dumps(message)
+        )  
         
 async def mqtt_main():
     async with aiomqtt.Client(

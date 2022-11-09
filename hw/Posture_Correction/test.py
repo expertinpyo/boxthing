@@ -1,9 +1,14 @@
 import posture_correction_test
 import asyncio
+async def posture_coro():
+    async for p in posture_correction_test.check_pose():
+        print(p)
+        
 async def main():
-    async for w in posture_correction_test.check_pose():
-        print(w)
-        
-        
+    await asyncio.gather(
+        posture_coro(),
+    )
+    
+    
 asyncio.run(main())
 

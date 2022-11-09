@@ -6,6 +6,7 @@ import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
 from os import environ
+import logging
 
 from modules.api import (
     google_calendar,
@@ -13,6 +14,9 @@ from modules.api import (
     github_notification,
     github_set_read,
 )
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 ws_message_queue = asyncio.Queue()
 mqtt_message_queue = asyncio.Queue()
@@ -38,14 +42,14 @@ state = State()
 async def ws_consumer(websocket):
     async for message in websocket:
         message_dict = json.loads(message)
-        type_list = message_dict["type"].split("/")
-        data = message_dict["data"]
+        type_list = message_dict["type"].split("/") if "type" in message_dict else [""]
+        data = message_dict["data"] if "data" in message_dict else None
 
-        print(f"Message from websocket type: {type_list}, data: {data}")
+        logger.info(f"message from websocket type={type_list}")
 
         if type_list[0] == "github":
             if type_list[1] == "qr":
-                await mqtt_message_queue.put(("github/qr", None))
+                await mqtt_message_queue.put(("qr/github", None))
 
             if type_list[1] == "read":
                 await github_set_read(
@@ -65,24 +69,50 @@ async def ws_producer(websocket):
             "data": data,
         }
 
+        logger.info(f"send ws message type={type_}")
+
         await websocket.send(json.dumps(message))
 
 
 async def ws_handler(websocket):
     await state.init_done.wait()
 
+    logger.info("ws connected")
+
     if state.ws_connected.is_set():
+        logger.warning("ws connection already exists")
         await websocket.close()
         return
 
     state.ws_connected.set()
 
-    await asyncio.gather(
-        ws_consumer(websocket),
-        ws_producer(websocket),
+    done, pending = await asyncio.wait(
+        [ws_consumer(websocket), ws_producer(websocket)],
+        return_when=asyncio.FIRST_COMPLETED,
     )
 
+    logger.info("ws disconnected")
+
+    for task in pending:
+        task.cancel()
+
+    # reset states
+    state.init_done.clear()
     state.ws_connected.clear()
+    state.google_logged_in.clear()
+    state.github_logged_in.clear()
+
+    while not ws_message_queue.empty():
+        await ws_message_queue.get()
+    while not mqtt_message_queue.empty():
+        await mqtt_message_queue.get()
+
+    state.google_access_token = ""
+    state.github_access_token = ""
+    state.github_notification_last_updated_at = None
+
+    await mqtt_message_queue.put(("init", None))
+
 
 
 async def mqtt_consumer(client):
@@ -92,12 +122,22 @@ async def mqtt_consumer(client):
         )
         async for message in messages:
             message_dict = json.loads(message.payload)
-            data = message_dict["data"]
+            data = message_dict["data"] if "data" in message_dict else None
             topic_list = message.topic.split("/")[3:]
 
-            print(f"Message from mqtt topic: {topic_list}, data: {data}")
+            logger.info(f"message from mqtt topic={topic_list}")
 
             if topic_list[0] == "init":
+                if (
+                    data is None
+                    or "google_access_token" not in data
+                    or "github_access_token" not in data
+                ):
+                    logger.error(
+                        f"MQTT: invalid data: topic={message.topic}, data={data}"
+                    )
+                    continue
+
                 state.google_access_token = data["google_access_token"]
                 state.github_access_token = data["github_access_token"]
 
@@ -122,6 +162,12 @@ async def mqtt_consumer(client):
 
             if topic_list[0] == "qr":
                 if topic_list[1] == "google":
+                    if data is None or "link" not in data:
+                        logger.error(
+                            f"invalid mqtt message: topic={topic_list}, data={data}"
+                        )
+                        continue
+
                     ws_data = {
                         "google": {"is_login": False, "link": data["link"]},
                         "github": {
@@ -133,18 +179,34 @@ async def mqtt_consumer(client):
                     state.init_done.set()
 
                 if topic_list[1] == "github":
+                    if data is None or "link" not in data:
+                        logger.error(
+                            f"invalid mqtt message: topic={topic_list}, data={data}"
+                        )
+                        continue
+
                     ws_data = {"link": data["link"]}
 
                     await ws_message_queue.put(("github/qr", ws_data))
 
             if topic_list[0] == "login":
                 if topic_list[1] == "google":
+                    if data is None or "access_token" not in data:
+                        logger.error(
+                            f"invalid mqtt message: topic={topic_list}, data={data}"
+                        )
+                        continue
                     state.google_access_token = data["access_token"]
 
                     await ws_message_queue.put(("login", None))
                     state.google_logged_in.set()
 
                 if topic_list[1] == "github":
+                    if data is None or "access_token" not in data:
+                        logger.error(
+                            f"invalid mqtt message: topic={topic_list}, data={data}"
+                        )
+                        continue
                     state.github_access_token = data["access_token"]
 
                     await ws_message_queue.put(("github/login", None))
@@ -152,10 +214,20 @@ async def mqtt_consumer(client):
 
             if topic_list[0] == "access_token":
                 if topic_list[1] == "google":
+                    if data is None or "access_token" not in data:
+                        logger.error(
+                            f"invalid mqtt message: topic={topic_list}, data={data}"
+                        )
+                        continue
                     state.google_access_token = data["access_token"]
                     state.google_refreshed.set()
 
                 if topic_list[1] == "github":
+                    if data is None or "access_token" not in data:
+                        logger.error(
+                            f"invalid mqtt message: topic={topic_list}, data={data}"
+                        )
+                        continue
                     state.github_access_token = data["access_token"]
 
             if topic_list[0] == "log":
@@ -171,6 +243,8 @@ async def mqtt_producer(client):
             "data": data,
         }
 
+        logger.info(f"send mqtt message topic={topic}")
+
         await client.publish(
             f"{environ['MQTT_BASE_TOPIC']}/server/{topic}", json.dumps(message)
         )
@@ -182,10 +256,14 @@ async def mqtt_client():
         port=int(environ["MQTT_PORT"]),
         tls_params=aiomqtt.TLSParameters(),
     ) as client:
+        logger.info("mqtt connected")
+
         await asyncio.gather(
             mqtt_consumer(client),
             mqtt_producer(client),
         )
+
+        logger.info("mqtt disconnected")
 
 
 async def google_calendar_coroutine():
@@ -196,7 +274,6 @@ async def google_calendar_coroutine():
 
         try:
             events = await google_calendar(state.google_access_token)
-            print(f"google calendar events: {events}")
 
             if events:
                 await ws_message_queue.put(("calendar", events))
@@ -204,7 +281,6 @@ async def google_calendar_coroutine():
             await asyncio.sleep(5 * 60)
 
         except GoogleAccessTokenExpired:
-            print("google access token expired")
             state.google_refreshed.clear()
             await mqtt_message_queue.put(("access_token/google", None))
             await state.google_refreshed.wait()
@@ -220,10 +296,6 @@ async def github_notifications_coroutine():
             state.github_access_token, state.github_notification_last_updated_at
         )
 
-        print(
-            f"github notifications: {notifications}, last_updated_at: {last_updated_at}"
-        )
-
         if last_updated_at is not None:
             state.github_notification_last_updated_at = last_updated_at
 
@@ -232,13 +304,16 @@ async def github_notifications_coroutine():
 
         await asyncio.sleep(1 * 60)
 
+
 async def water_coroutine():
     async for water in amount_water():
         await ws_message_queue.put(("water", water))
         await mqtt_message_queue.put(("water", water))
-        
+
+
 async def main():
     load_dotenv()
+    logging.basicConfig(level=logging.INFO)
 
     ws_server = await websockets.serve(
         ws_handler, "localhost", int(environ["WEBSOCKET_PORT"])

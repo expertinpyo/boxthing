@@ -1,8 +1,12 @@
 import aiohttp
 from datetime import datetime
+import logging
 
 GITHUB_API_BASE_URL = "https://api.github.com"
 PER_PAGE = 50
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 async def github_notification(token, last_updated_at=None):
@@ -42,6 +46,10 @@ async def github_notification(token, last_updated_at=None):
 
                 params["page"] += 1
 
+    logger.info(
+        f"get {len(notifications)} github notifications since {last_updated_at}"
+    )
+
     return notifications, updated_at
 
 
@@ -51,12 +59,11 @@ async def github_set_read(token, last_updated_at=None):
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {token}",
     }
-    data = {"read": "true"}
+    data = {"read": True}
 
     if last_updated_at:
         data["last_read_at"] = last_updated_at.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     async with aiohttp.ClientSession() as session:
-        async with session.put(url=url, headers=headers, data=data) as response:
-            message = await response.json()
-            print(message)
+        async with session.put(url=url, headers=headers, json=data) as response:
+            logger.info(f"set github notifications as read since {last_updated_at} with status={response.status}")

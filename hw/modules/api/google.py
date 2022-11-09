@@ -2,8 +2,12 @@ import asyncio
 import aiohttp
 from datetime import datetime, timedelta
 from dateutil import tz
+import logging
 
 GOOGLE_CALENDAR_BASE_URL = "https://www.googleapis.com/calendar/v3"
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class GoogleAccessTokenExpired(Exception):
@@ -46,6 +50,7 @@ async def google_calendar(token):
         while True:
             async with session.get(url=url, headers=headers, params=params) as response:
                 if response.status == 401:
+                    logger.info("google access token expired")
                     raise GoogleAccessTokenExpired
 
                 data = await response.json()
@@ -84,5 +89,7 @@ async def google_calendar(token):
             flattened_list.append(event)
 
     sorted_list = sorted(flattened_list, key=lambda x: x["start"]["dateTime"])
+
+    logger.info(f"get {len(sorted_list)} events from google calendar")
 
     return sorted_list

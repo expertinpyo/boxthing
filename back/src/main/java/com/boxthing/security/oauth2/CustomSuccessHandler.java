@@ -1,7 +1,5 @@
 package com.boxthing.security.oauth2;
 
-import static com.boxthing.mqtt.handler.MqttInboundHandler.responseMessage;
-
 import com.boxthing.api.domain.Device;
 import com.boxthing.api.domain.User;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
@@ -10,7 +8,7 @@ import com.boxthing.api.mapper.DeviceMapper;
 import com.boxthing.api.mapper.UserMapper;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.UserRepository;
-import com.boxthing.mqtt.MessageParser;
+import com.boxthing.mqtt.MessageCreator;
 import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -39,7 +37,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private final DeviceRepository deviceRepository;
   private final DeviceMapper deviceMapper;
 
-  private final MessageParser messageParser;
+  private final MessageCreator messageCreator;
 
   @Override
   public void onAuthenticationSuccess(
@@ -56,17 +54,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String state = request.getParameter("state");
     String topic = "login";
     Device device = deviceRepository.findByState(state);
-    String msg;
+    String deviceId = device.getSerialNumber();
+
     if (device == null) {
       return;
     }
+
     // google 인증 성공
     if (registrationId.equals("google")) {
       OAuth2RefreshToken maybeRefreshToken = client.getRefreshToken();
       if (maybeRefreshToken == null) {
         // no refresh token
-        msg = responseMessage.LOGIN_FAILED.getMessage();
-        messageParser.msgFail(msg, device.getSerialNumber(), topic, null);
+        messageCreator.loginFailed(deviceId, topic + "/google", null);
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -99,10 +98,9 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
               .build();
       deviceMapper.updateWithNull(dto, device);
       deviceRepository.save(device);
-      msg = responseMessage.SUCCEED.getMessage();
       MqttAccessTokenResDto accessTokenResDto =
           MqttAccessTokenResDto.builder().accessToken(accessToken).build();
-      messageParser.msgSucceed(msg, device.getSerialNumber(), topic + "/google", accessTokenResDto);
+      messageCreator.succeed(deviceId, topic + "/google", accessTokenResDto);
     }
 
     // github 인증 성공
@@ -110,19 +108,17 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       log.info("github");
       User user = device.getUser();
       if (user.getGoogleRefreshJws().equals("")) {
-        msg = responseMessage.NO_GOOGLE_TOKEN.getMessage();
-        messageParser.msgFail(msg, device.getSerialNumber(), topic + "/github", null);
+        messageCreator.noGoogleToken(deviceId, topic + "/github", null);
         return;
       }
 
       UserGoogleRequestDto dto = UserGoogleRequestDto.builder().githubJws(accessToken).build();
       userMapper.updateUserFromDto(dto, user);
       userRepository.save(user);
-      msg = responseMessage.SUCCEED.getMessage();
+
       MqttAccessTokenResDto accessTokenResDto =
           MqttAccessTokenResDto.builder().accessToken(accessToken).build();
-      messageParser.msgSucceed(msg, device.getSerialNumber(), topic + "/github", accessTokenResDto);
-
+      messageCreator.succeed(deviceId, topic + "/github", accessTokenResDto);
       DeviceRequestDto deviceDto =
           DeviceRequestDto.builder()
               .state(null)

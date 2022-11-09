@@ -1,6 +1,5 @@
 package com.boxthing.mqtt.handler;
 
-import static com.boxthing.mqtt.handler.MqttInboundHandler.responseMessage;
 import static com.boxthing.util.UtilMethods.jsonConverter;
 
 import com.boxthing.api.domain.Device;
@@ -11,7 +10,7 @@ import com.boxthing.api.mapper.PostureLogMapper;
 import com.boxthing.api.querydsl.PostureLogQueryDsl;
 import com.boxthing.api.repository.DeviceRepository;
 import com.boxthing.api.repository.PostureLogRepository;
-import com.boxthing.mqtt.MessageParser;
+import com.boxthing.mqtt.MessageCreator;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttPostureReqData;
 import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
 import com.google.gson.reflect.TypeToken;
@@ -32,10 +31,11 @@ public class PostureLogHandler {
 
   private final PostureLogRepository postureLogRepository;
   private final DeviceRepository deviceRepository;
-  private final MessageParser messageParser;
   private final PostureLogMapper postureLogMapper;
 
   private final PostureLogQueryDsl postureLogQueryDsl;
+
+  private final MessageCreator messageCreator;
 
   @Bean
   @ServiceActivator(inputChannel = "mqtt-posture")
@@ -48,17 +48,14 @@ public class PostureLogHandler {
       ZonedDateTime time = ZonedDateTime.parse(requestDto.getData().getTimestamp());
       String deviceId = requestDto.getDeviceId();
       MqttPostureReqData data = requestDto.getData();
-      String msg;
       String topic = "posture";
 
       if (data == null) {
-        msg = responseMessage.NO_INPUT_DATA.getMessage();
-        messageParser.msgFail(msg, deviceId, topic, null);
+        messageCreator.noInputData(deviceId, topic, null);
         return;
       }
       if (data.getPostureScore() == null) {
-        msg = responseMessage.INVALID_INPUT_VALUE.getMessage();
-        messageParser.msgFail(msg, deviceId, topic, null);
+        messageCreator.invalidInputData(deviceId, topic, null);
         return;
       }
 
@@ -75,9 +72,7 @@ public class PostureLogHandler {
               .user(user)
               .build();
       postureLogRepository.save(postureLogMapper.toEntity(postureDto));
-      msg = responseMessage.CREATED.getMessage();
-
-      messageParser.msgSucceed(msg, deviceId, topic, null);
+      messageCreator.created(deviceId, topic, null);
     };
   }
 
@@ -90,25 +85,21 @@ public class PostureLogHandler {
 
       Device device = deviceRepository.findBySerialNumber(deviceId);
 
-      String msg;
       String topic = "log/posture/today";
 
       if (device == null) {
-        msg = responseMessage.NO_SERIAL_NUMBER.getMessage();
-        messageParser.msgFail(msg, deviceId, topic, null);
+        messageCreator.noSerialNumber(deviceId, topic, null);
         return;
       }
       User user = device.getUser();
 
       if (user == null) {
-        msg = responseMessage.NO_USER_CONNECT.getMessage();
-        messageParser.msgFail(msg, deviceId, topic, null);
+        messageCreator.noUserConnect(deviceId, topic, null);
         return;
       }
 
       List<PostureLog> list = postureLogQueryDsl.findallByUserAndToday(user);
-      msg = responseMessage.SUCCEED.getMessage();
-      messageParser.msgSucceed(msg, deviceId, topic, postureLogMapper.toList(list));
+      messageCreator.succeed(deviceId, topic, postureLogMapper.toList(list));
     };
   }
 }

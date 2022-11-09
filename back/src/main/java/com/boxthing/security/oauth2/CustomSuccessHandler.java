@@ -1,5 +1,15 @@
 package com.boxthing.security.oauth2;
 
+import com.boxthing.api.domain.Device;
+import com.boxthing.api.domain.User;
+import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
+import com.boxthing.api.dto.UserDto.*;
+import com.boxthing.api.mapper.DeviceMapper;
+import com.boxthing.api.mapper.UserMapper;
+import com.boxthing.api.repository.DeviceRepository;
+import com.boxthing.api.repository.UserRepository;
+import com.boxthing.mqtt.MessageCreator;
+import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +31,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
   private final OAuth2AuthorizedClientService clientService;
 
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
+
+  private final DeviceRepository deviceRepository;
+  private final DeviceMapper deviceMapper;
+
+  private final MessageCreator messageCreator;
+
   @Override
   public void onAuthenticationSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -34,25 +52,82 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String registrationId = oauthToken.getAuthorizedClientRegistrationId();
     String accessToken = client.getAccessToken().getTokenValue();
     String state = request.getParameter("state");
+    String topic = "login";
+    Device device = deviceRepository.findByState(state);
+    String deviceId = device.getSerialNumber();
 
-    log.info("regId: {}, accessToken: {}, state: {}\n", registrationId, accessToken, state);
+    if (device == null) {
+      return;
+    }
 
     // google 인증 성공
     if (registrationId.equals("google")) {
       OAuth2RefreshToken maybeRefreshToken = client.getRefreshToken();
       if (maybeRefreshToken == null) {
         // no refresh token
-        // TODO: login failure page
+        messageCreator.loginFailed(deviceId, topic + "/google", null);
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
+      String email = oauthToken.getPrincipal().getAttribute("email");
 
-      log.info("google OK, refreshToken: {}\n", refreshToken);
+      User user = userRepository.findByEmail(email);
+
+      if (user != null) {
+
+        UserGoogleRequestDto dto =
+            UserGoogleRequestDto.builder().googleRefreshJws(refreshToken).build();
+        userMapper.updateUserFromDto(dto, user);
+        log.info("user updated : {} {}", user.toString(), state);
+        userRepository.save(user);
+
+      } else {
+        UserGoogleRequestDto dto =
+            UserGoogleRequestDto.builder().email(email).googleRefreshJws(refreshToken).build();
+        user = userRepository.save(userMapper.toEntity(dto));
+        log.info("New user created : {} {}", user.toString(), state);
+      }
+      // 이렇게 DB에 user 정보 저장 후 access token return 하는 방식으로 하면 될 듯
+      // access token 반환 + state값 확인, right?
+      DeviceRequestDto dto =
+          DeviceRequestDto.builder()
+              .state(null)
+              .serialNumber(device.getSerialNumber())
+              .id(device.getId())
+              .user(user)
+              .build();
+      deviceMapper.updateWithNull(dto, device);
+      deviceRepository.save(device);
+      MqttAccessTokenResDto accessTokenResDto =
+          MqttAccessTokenResDto.builder().accessToken(accessToken).build();
+      messageCreator.succeed(deviceId, topic + "/google", accessTokenResDto);
     }
 
     // github 인증 성공
     if (registrationId.equals("github")) {
-      log.info("github OK\n");
+      log.info("github");
+      User user = device.getUser();
+      if (user.getGoogleRefreshJws().equals("")) {
+        messageCreator.noGoogleToken(deviceId, topic + "/github", null);
+        return;
+      }
+
+      UserGoogleRequestDto dto = UserGoogleRequestDto.builder().githubJws(accessToken).build();
+      userMapper.updateUserFromDto(dto, user);
+      userRepository.save(user);
+
+      MqttAccessTokenResDto accessTokenResDto =
+          MqttAccessTokenResDto.builder().accessToken(accessToken).build();
+      messageCreator.succeed(deviceId, topic + "/github", accessTokenResDto);
+      DeviceRequestDto deviceDto =
+          DeviceRequestDto.builder()
+              .state(null)
+              .serialNumber(device.getSerialNumber())
+              .id(device.getId())
+              .user(user)
+              .build();
+      deviceMapper.updateWithNull(deviceDto, device);
+      deviceRepository.save(device);
     }
   }
 }

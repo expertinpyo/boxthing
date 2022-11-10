@@ -67,7 +67,7 @@ async def ws_consumer(websocket):
                 await cam.stop()
                 await ws_message_queue.put(("posture/ready", None))
             elif type_list[1] == "capture":
-                result = await cam.checking(data)
+                result = cam.checking(data)
                 if result:
                     await ws_message_queue.put(("posture/complete", None))
                 else:

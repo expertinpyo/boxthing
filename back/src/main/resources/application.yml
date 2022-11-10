@@ -37,3 +37,7 @@ spring:
 mqtt:
   BASE_TOPIC: "${BASE_TOPIC}"
   BROKER_URL: "${BROKER_URL}"
+
+urlmaker:
+  scheme: "${LOGIN_SCHEME}"
+  host: "${LOGIN_HOST}"

@@ -11,6 +11,8 @@ import { useRecoilValue } from "recoil";
 import { postureAvgState } from "../../store/posture";
 import { socketState } from "../../store/socket";
 
+import Refresh from "../../asset/refresh.png";
+
 function PostureBox({ key }) {
   const [state, setState] = useState(false);
   const avg = useRecoilValue(postureAvgState);
@@ -51,6 +53,31 @@ function PostureBox({ key }) {
         </div>
         <div
           css={{
+            position: "absolute",
+            top: -8,
+            right: 176,
+            ...defaultBoxStyle,
+            background: "#fff",
+            height: 50,
+            aspectRatio: "1/1",
+            borderRadius: 9999,
+            lineHeight: 0,
+            zIndex: 10,
+          }}
+          onClick={() => {
+            console.log("send reset message to server!");
+            if (socket && socket.readyState === 1) {
+              socket.send(
+                JSON.stringify({ type: "posture/reset", data: null })
+              );
+              console.log("send close capture modal message to server!");
+            }
+          }}
+        >
+          <img src={Refresh} alt={""} css={{ width: "100%" }} />
+        </div>
+        <div
+          css={{
             width: "100%",
             height: "100%",
           }}
@@ -68,7 +95,7 @@ function PostureBox({ key }) {
                   height: 40,
                   zIndex: 3,
                   top: 0,
-                  right: 176,
+                  right: 242,
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
@@ -84,16 +111,6 @@ function PostureBox({ key }) {
           )}
         </div>
       </div>
-      <button
-        onClick={() => {
-          if (socket && socket.readyState === 1) {
-            socket.send(JSON.stringify({ type: "posture/reset", data: null }));
-            console.log("send close capture modal message to server!");
-          }
-        }}
-      >
-        sendreset
-      </button>
     </motion.div>
   );
 }

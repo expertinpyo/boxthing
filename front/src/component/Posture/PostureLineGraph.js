@@ -72,7 +72,7 @@ const PostureLineGraph = () => {
         return idx * 10;
       },
       data: posture.map((item) => {
-        return item["posture_score"];
+        return item["posture_score"] === 0 ? null : item["posture_score"];
       }),
       markLine: {
         silent: true,

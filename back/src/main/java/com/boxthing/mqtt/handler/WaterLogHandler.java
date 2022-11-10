@@ -17,6 +17,7 @@ import com.boxthing.mqtt.dto.MqttReqDto.MqttWaterReqData;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -111,7 +112,8 @@ public class WaterLogHandler {
       log.info("before : {}", days);
       List<WaterLog> list = waterLogQueryDsl.findAllByUserAndDate(user, days);
       if (list.isEmpty()) {
-        messageCreator.emptyResult(deviceId, topic, null);
+        List emptyList = new ArrayList<>();
+        messageCreator.emptyResult(deviceId, topic, emptyList);
         return;
       }
       messageCreator.succeed(deviceId, topic, waterLogMapper.toDateList(list, days));
@@ -136,7 +138,12 @@ public class WaterLogHandler {
       }
 
       List<WaterLog> list = waterLogQueryDsl.findallByUserAndToday(user);
-      messageCreator.succeed(deviceId, topic, waterLogMapper.toList(list));
+      if (list.isEmpty()) {
+        List emptyList = new ArrayList<>();
+        messageCreator.succeed(deviceId, topic, emptyList);
+      } else {
+        messageCreator.succeed(deviceId, topic, waterLogMapper.toList(list));
+      }
     };
   }
 }

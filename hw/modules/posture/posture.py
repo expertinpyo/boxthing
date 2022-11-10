@@ -36,8 +36,9 @@ class Cam:
         self.running.clear()
         #webcam 정리작업
         async with self.lock_webcam:
-            await self.webcam.release()
-        return True
+            if self.webcam:
+                await self.webcam.release()
+            self.webcam = None
             
     
     #포즈 인식
@@ -77,7 +78,8 @@ class Cam:
 
     #초기 사진 유효 체크
     async def checking(self, image_string):
-        self.first_image = self.base64_to_img(image_string)
+        if image_string:
+            self.first_image = self.base64_to_img(image_string)
         self.first_dis, self.first_down, self.first_area = self.find_distance(self.first_image)
         #반환값
         if self.first_dis or self.first_down or self.first_area :

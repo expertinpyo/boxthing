@@ -23,8 +23,9 @@ const currentPostureScoreState = selector({
   key: "currentPostureScoreState",
   get: ({ get }) => {
     const list = get(postureState);
+
     let score = 0;
-    if (list.length !== 0) score = list[0]["posture_score"];
+    if (list.length !== 0) score = list[list.length - 1]["posture_score"];
 
     return score;
   },
@@ -34,9 +35,9 @@ const runtimePostureState = selector({
   key: "runtimePostureState",
   get: ({ get }) => {
     const list = get(postureState);
-    let length = list.length;
-    if (length > 20) length = 20;
-    return list.slice(0, length);
+    let idx = list.length - 20;
+    if (idx < 0) return list;
+    else return list.slice(idx);
   },
 });
 

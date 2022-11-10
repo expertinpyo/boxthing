@@ -24,7 +24,7 @@ const CaptureModal = () => {
   const [count, setCount] = useState(6);
 
   const sendCaptureImg = useCallback(() => {
-    if (state && webcamRef.current.stream) {
+    if (state && webcamRef.current) {
       if (count > 0) {
         setTimeout(() => {
           setCount(count - 1);

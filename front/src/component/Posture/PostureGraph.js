@@ -3,25 +3,8 @@
 // import React, { useState, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 // import cloneDeep from "lodash.clonedeep";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { runtimePostureState } from "../../store/posture";
 import moment from "moment";
-import { useEffect } from "react";
-import { postureModalState } from "../../store/modal";
-const PostureGraph = () => {
-  const runtime = useRecoilValue(runtimePostureState);
-  const [state, setter] = useRecoilState(postureModalState);
-
-  useEffect(() => {
-    if (!state) {
-      const temp = runtime.splice(runtime.length - 5).every((item) => {
-        const result = item["send_posture_flag"];
-        return result && (result === 2 || result === 3);
-      });
-      if (temp) setter(true);
-    }
-  }, [runtime, state, setter]);
-
+const PostureGraph = ({ data }) => {
   const DEFAULT_OPTION = {
     title: {
       text: "실시간 자세 분석 그래프",
@@ -67,7 +50,7 @@ const PostureGraph = () => {
       {
         type: "category",
         boundaryGap: true,
-        data: runtime.map((item) => {
+        data: data.map((item) => {
           return moment(item.timestamp).format("mm-ss");
         }),
       },
@@ -98,7 +81,7 @@ const PostureGraph = () => {
         animationDelayUpdate: function (idx) {
           return idx * 10;
         },
-        data: runtime.map((item) => {
+        data: data.map((item) => {
           return item["posture_score"] === 0 ? null : item["posture_score"];
         }),
       },

@@ -38,7 +38,7 @@ const PostureLineGraph = () => {
       {
         pieces: [
           {
-            gt: 0,
+            gt: 60,
             lte: 80,
             color: "red",
           },

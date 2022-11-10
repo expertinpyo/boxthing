@@ -34,6 +34,8 @@ import moment from "moment";
 import CaptureModal from "./component/Modal/CaptureModal";
 import { captureModalState } from "./store/modal";
 
+import { useNavigate } from "react-router-dom";
+
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
 
@@ -43,6 +45,8 @@ function App() {
   const authenticated = useRecoilValue(authenticationState);
 
   const captureModal = useRecoilValue(captureModalState);
+
+  const navi = useNavigate();
 
   const handleResize = () => {
     const vh = window.innerHeight;

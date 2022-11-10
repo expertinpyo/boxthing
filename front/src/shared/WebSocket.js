@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { authenticationState } from "../store/auth";
 import { gitAuthenticationState } from "../store/gitauth";
@@ -40,6 +41,8 @@ const Subscriber = () => {
   const setCaptureModalState = useSetRecoilState(captureModalState);
 
   const setCaptureFunc = useSetRecoilState(captureFuncState);
+
+  const navi = useNavigate();
 
   useEffect(() => {
     setSocket(new WebSocket("ws://localhost:8765"));
@@ -125,7 +128,7 @@ const Subscriber = () => {
           case "log/posture/today":
             setPostureState(message.data);
             break;
-          case "stretching":
+          case "stretch":
             setStretchModalState(true);
             break;
           case "water":
@@ -152,6 +155,20 @@ const Subscriber = () => {
             }
             break;
           case "route/calendar":
+            navi("/");
+            break;
+          case "route/git":
+            navi("/git");
+            break;
+          case "route/posture":
+            navi("/posture");
+            break;
+          case "route/water":
+            navi("/water");
+            break;
+          case "toggle/posture":
+            break;
+          case "toggle/water":
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -177,6 +194,7 @@ const Subscriber = () => {
     setPostureState,
     setCaptureFunc,
     setCaptureModalState,
+    navi,
   ]);
 };
 

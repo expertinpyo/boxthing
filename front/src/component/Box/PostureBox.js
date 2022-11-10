@@ -7,14 +7,18 @@ import PostureGraph from "../Posture/PostureGraph";
 import PostureLineGraph from "../Posture/PostureLineGraph";
 import ToggleButton from "../Water/ToggleButton";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { postureAvgState } from "../../store/posture";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { postureAvgState, runtimePostureState } from "../../store/posture";
 import { socketState } from "../../store/socket";
 
 import Refresh from "../../asset/refresh.png";
+import { postureModalState } from "../../store/modal";
+import { ptoggleState } from "../../store/nav";
 
 function PostureBox({ key }) {
-  const [state, setState] = useState(false);
+  const [state, setState] = useRecoilValue(ptoggleState);
+  const runtime = useRecoilValue(runtimePostureState);
+  const [pmodalState, setter] = useRecoilState(postureModalState);
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
@@ -24,6 +28,20 @@ function PostureBox({ key }) {
       console.log("send lo g/posture/today message to server!");
     }
   }, [socket]);
+
+  useEffect(() => {
+    if (!pmodalState && runtime.length >= 5) {
+      const copy = [...runtime];
+      const temp = copy.splice(runtime.length - 5).every((item) => {
+        const result = item["posture_flag"];
+        return (
+          result &&
+          (Number.parseInt(result) === 2 || Number.parseInt(result) === 3)
+        );
+      });
+      if (temp) setter(true);
+    }
+  }, [runtime, pmodalState, setter]);
 
   return (
     <motion.div
@@ -83,7 +101,7 @@ function PostureBox({ key }) {
           }}
         >
           {state ? (
-            <PostureGraph />
+            <PostureGraph data={runtime} />
           ) : (
             <div css={{ width: "100%", height: "100%" }}>
               <PostureLineGraph />

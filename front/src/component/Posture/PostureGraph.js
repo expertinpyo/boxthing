@@ -3,11 +3,25 @@
 // import React, { useState, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 // import cloneDeep from "lodash.clonedeep";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { runtimePostureState } from "../../store/posture";
 import moment from "moment";
+import { useEffect } from "react";
+import { postureModalState } from "../../store/modal";
 const PostureGraph = () => {
   const runtime = useRecoilValue(runtimePostureState);
+  const [state, setter] = useRecoilState(postureModalState);
+
+  useEffect(() => {
+    if (!state) {
+      const temp = runtime.splice(runtime.length - 5).every((item) => {
+        const result = item["send_posture_flag"];
+        return result && (result === 2 || result === 3);
+      });
+      if (temp) setter(true);
+    }
+  }, [runtime, state, setter]);
+
   const DEFAULT_OPTION = {
     title: {
       text: "실시간 자세 분석 그래프",
@@ -54,7 +68,7 @@ const PostureGraph = () => {
         type: "category",
         boundaryGap: true,
         data: runtime.map((item) => {
-          return moment(item.timestamp).format("HH-mm-ss");
+          return moment(item.timestamp).format("mm-ss");
         }),
       },
     ],
@@ -85,35 +99,11 @@ const PostureGraph = () => {
           return idx * 10;
         },
         data: runtime.map((item) => {
-          return item["posture_score"];
+          return item["posture_score"] === 0 ? null : item["posture_score"];
         }),
       },
     ],
   };
-
-  // function fetchNewData() {
-  //   const axisData = new Date()
-  //     .toLocaleTimeString()
-  //     .replace(/^\D*/, "")
-  //     .slice(-5);
-  //   const newOption = cloneDeep(option); // immutable
-  //   const data0 = newOption.series[0].data;
-  //   data0.shift();
-  //   data0.push(Math.round(Math.random() * 100));
-
-  //   newOption.xAxis[0].data.shift();
-  //   newOption.xAxis[0].data.push(axisData);
-
-  //   setOption(newOption);
-  // }
-
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     fetchNewData();
-  //   }, 1000);
-
-  //   return () => clearInterval(timer);
-  // });
 
   return <ReactECharts option={DEFAULT_OPTION} style={{ height: "100%" }} />;
 };

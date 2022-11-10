@@ -19,12 +19,12 @@ const CaptureModal = () => {
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
-    console.log(imageSrc);
+    return imageSrc;
   }, [webcamRef]);
   const [count, setCount] = useState(6);
 
   const sendCaptureImg = useCallback(() => {
-    if (state && webcamRef.current) {
+    if (state && webcamRef.current.stream) {
       if (count > 0) {
         setTimeout(() => {
           setCount(count - 1);
@@ -34,8 +34,6 @@ const CaptureModal = () => {
           socket.send(
             JSON.stringify({ type: "posture/capture", data: capture() })
           );
-          console.log("send base64 image to server!");
-          console.log(capture());
           setCaptureFunc(false);
           setCount(6);
         }
@@ -57,12 +55,8 @@ const CaptureModal = () => {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        // transform: "translate(-50%, -50%)",
         background: "rgba(255, 255, 255, 0.375)",
         zIndex: 3,
-        // transition: "visibility 0.3s linear,opacity 0.3s linear",
-        // visibility: state ? "visible" : "hidden",
-        // opacity: state ? 1 : 0,
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}

@@ -4,6 +4,7 @@ import com.boxthing.api.domain.Device;
 import com.boxthing.api.dto.DeviceDto.DeviceRequestDto;
 import com.boxthing.api.mapper.DeviceMapper;
 import com.boxthing.api.repository.DeviceRepository;
+import com.boxthing.config.QRProperties;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ public class QRCreator {
   private final DeviceRepository deviceRepository;
   private final DeviceMapper deviceMapper;
 
+  private final QRProperties qrProperties;
   // 이 클래스로부터 로직 진행됨
   public String hashedUri(String serialNumber, String site) throws NoSuchAlgorithmException {
     StringBuffer state = new StringBuffer();
@@ -52,8 +54,8 @@ public class QRCreator {
 
     UriComponents uri =
         UriComponentsBuilder.newInstance()
-            .scheme("http")
-            .host("localhost:8080")
+            .scheme(qrProperties.getScheme())
+            .host(qrProperties.getHost())
             .path(path)
             .queryParam("state", state.toString())
             .build();

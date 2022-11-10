@@ -18,10 +18,11 @@ async def amount_water():
     check_data_before = 0
     check_cnt = 0
     hx = HX711(13, 8)
+    await hx.setting()
     hx.set_reading_format("MSB", "MSB")
     hx.set_reference_unit(referenceUnit)
-    hx.reset()
-    hx.tare()
+    await hx.reset()
+    await hx.tare()
     print("Tare done! Add weight now...")
     while True:
         try:
@@ -44,8 +45,8 @@ async def amount_water():
                 check_cnt = 0
                 check_data_next = int_val
 
-            hx.power_down()
-            hx.power_up()
+            await hx.power_down()
+            await hx.power_up()
             await asyncio.sleep(0.001)
 
         except (KeyboardInterrupt, SystemExit):

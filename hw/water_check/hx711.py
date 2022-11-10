@@ -3,12 +3,13 @@
 import RPi.GPIO as GPIO
 import time
 import threading
+import asyncio
 GPIO.setwarnings(False)
 
 
 class HX711:
 
-    def __init__(self, dout, pd_sck, gain=128):
+    def __init__(self, dout, pd_sck):
         self.PD_SCK = pd_sck
 
         self.DOUT = dout
@@ -20,7 +21,6 @@ class HX711:
         GPIO.setup(self.PD_SCK, GPIO.OUT)
         GPIO.setup(self.DOUT, GPIO.IN)
         self.GAIN = 0
-
         # The value returned by the hx711 that corresponds to your reference
         # unit AFTER dividing by the SCALE.
         self.REFERENCE_UNIT = 1
@@ -31,19 +31,22 @@ class HX711:
         self.DEBUG_PRINTING = False
         self.byte_format = 'MSB'
         self.bit_format = 'MSB'
-        self.set_gain(gain)
+        
+        
+    async def setting(self, gain=128):
+        await self.set_gain(gain)
         # Think about whether this is necessary.
-        time.sleep(1)
+        await asyncio.sleep(1)
         
     def convertFromTwosComplement24bit(self, inputValue):
         return -(inputValue & 0x800000) + (inputValue & 0x7fffff)
 
     
-    def is_ready(self):
+    async def is_ready(self):
         return GPIO.input(self.DOUT) == 0
 
     
-    def set_gain(self, gain):
+    async def set_gain(self, gain):
         if gain is 128:
             self.GAIN = 1
         elif gain is 64:
@@ -54,7 +57,7 @@ class HX711:
         GPIO.output(self.PD_SCK, False)
 
         # Read out a set of raw bytes and throw it away.
-        self.readRawBytes()
+        await self.readRawBytes()
 
         
     def get_gain(self):
@@ -98,14 +101,15 @@ class HX711:
        return byteValue 
         
 
-    def readRawBytes(self):
+    async def readRawBytes(self):
         # Wait for and get the Read Lock, incase another thread is already
         # driving the HX711 serial interface.
         self.readLock.acquire()
-
+        ready_flag = 0
         # Wait until HX711 is ready for us to read a sample.
-        while not self.is_ready():
-           pass
+        while not ready_flag:
+           ready_flag = await self.is_ready()
+           
 
         # Read three bytes of data from the HX711.
         firstByte  = self.readNextByte()
@@ -130,9 +134,9 @@ class HX711:
            return [firstByte, secondByte, thirdByte]
 
 
-    def read_long(self):
+    async def read_long(self):
         # Get a sample from the HX711 in the form of raw bytes.
-        dataBytes = self.readRawBytes()
+        dataBytes = await self.readRawBytes()
 
 
         if self.DEBUG_PRINTING:
@@ -156,26 +160,26 @@ class HX711:
         return int(signedIntValue)
 
     
-    def read_average(self, times=3):
+    async def read_average(self, times=3):
         # Make sure we've been asked to take a rational amount of samples.
         if times <= 0:
             raise ValueError("HX711()::read_average(): times must >= 1!!")
 
         # If we're only average across one value, just read it and return it.
         if times == 1:
-            return self.read_long()
+            return await self.read_long()
 
         # If we're averaging across a low amount of values, just take the
         # median.
         if times < 5:
-            return self.read_median(times)
+            return await self.read_median(times)
 
         # If we're taking a lot of samples, we'll collect them in a list, remove
         # the outliers, then take the mean of the remaining set.
         valueList = []
 
         for x in range(times):
-            valueList += [self.read_long()]
+            valueList += [await self.read_long()]
 
         valueList.sort()
 
@@ -191,18 +195,18 @@ class HX711:
 
     # A median-based read method, might help when getting random value spikes
     # for unknown or CPU-related reasons
-    def read_median(self, times=3):
+    async def read_median(self, times=3):
        if times <= 0:
           raise ValueError("HX711::read_median(): times must be greater than zero!")
       
        # If times == 1, just return a single reading.
        if times == 1:
-          return self.read_long()
+          return await self.read_long()
 
        valueList = []
 
        for x in range(times):
-          valueList += [self.read_long()]
+          valueList += [await self.read_long()]
 
        valueList.sort()
 
@@ -217,49 +221,49 @@ class HX711:
 
 
     # Compatibility function, uses channel A version
-    def get_value(self, times=3):
-        return self.get_value_A(times)
+    async def get_value(self, times=3):
+        return await self.get_value_A(times)
 
 
-    def get_value_A(self, times=3):
-        return self.read_median(times)
+    async def get_value_A(self, times=3):
+        return await self.read_median(times)
 
 
-    def get_value_B(self, times=3):
+    async def get_value_B(self, times=3):
         # for channel B, we need to set_gain(32)
         g = self.get_gain()
         self.set_gain(32)
-        value = self.read_median(times) - self.get_offset_B()
+        value = await self.read_median(times) - self.get_offset_B()
         self.set_gain(g)
         return value
 
     # Compatibility function, uses channel A version
-    def get_weight(self, times=3):
-        return self.get_weight_A(times)
+    async def get_weight(self, times=3):
+        return await self.get_weight_A(times)
 
 
-    def get_weight_A(self, times=3):
-        value = self.get_value_A(times)
+    async def get_weight_A(self, times=3):
+        value = await self.get_value_A(times)
         value = value / self.REFERENCE_UNIT
         return -1 * value
 
-    def get_weight_B(self, times=3):
-        value = self.get_value_B(times)
+    async def get_weight_B(self, times=3):
+        value = await self.get_value_B(times)
         value = value / self.REFERENCE_UNIT_B
         return value
 
     
     # Sets tare for channel A for compatibility purposes
-    def tare(self, times=15):
-        return self.tare_A(times)
+    async def tare(self, times=15):
+        return await self.tare_A(times)
     
     
-    def tare_A(self, times=15):
+    async def tare_A(self, times=15):
         # Backup REFERENCE_UNIT value
         backupReferenceUnit = self.get_reference_unit_A()
         self.set_reference_unit_A(1)
         
-        value = self.read_average(times)
+        value = await self.read_average(times)
 
         if self.DEBUG_PRINTING:
             print("Tare A value:", value)
@@ -272,13 +276,13 @@ class HX711:
         return value
 
 
-    def tare_B(self, times=15):
+    async def tare_B(self, times=15):
         # Backup REFERENCE_UNIT value
         backupReferenceUnit = self.get_reference_unit_B()
         self.set_reference_unit_B(1)
 
         # for channel B, we need to set_gain(32)
-        backupGain = self.get_gain()
+        backupGain = await self.get_gain()
         self.set_gain(32)
 
         value = self.read_average(times)
@@ -369,7 +373,7 @@ class HX711:
         return self.REFERENCE_UNIT_B
         
         
-    def power_down(self):
+    async def power_down(self):
         # Wait for and get the Read Lock, incase another thread is already
         # driving the HX711 serial interface.
         self.readLock.acquire()
@@ -380,14 +384,14 @@ class HX711:
         GPIO.output(self.PD_SCK, False)
         GPIO.output(self.PD_SCK, True)
 
-        time.sleep(0.0001)
+        await asyncio.sleep(0.0001)
 
         # Release the Read Lock, now that we've finished driving the HX711
         # serial interface.
         self.readLock.release()           
 
 
-    def power_up(self):
+    async def power_up(self):
         # Wait for and get the Read Lock, incase another thread is already
         # driving the HX711 serial interface.
         self.readLock.acquire()
@@ -396,7 +400,7 @@ class HX711:
         GPIO.output(self.PD_SCK, False)
 
         # Wait 100 us for the HX711 to power back up.
-        time.sleep(0.0001)
+        await asyncio.sleep(0.0001)
 
         # Release the Read Lock, now that we've finished driving the HX711
         # serial interface.
@@ -410,9 +414,9 @@ class HX711:
             self.readRawBytes()
 
 
-    def reset(self):
-        self.power_down()
-        self.power_up()
+    async def reset(self):
+        await self.power_down()
+        await self.power_up()
 
 
 # EOF - hx711.py

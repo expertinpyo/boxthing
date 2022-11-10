@@ -17,7 +17,7 @@ class Cam:
     webcam = None
     first_dis = first_down = first_area = 0
     predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat")
-    detector = dlib.get_frontal_face_detector()
+    #detector = dlib.get_frontal_face_detector()
     send_posture_flag = 0
 
     
@@ -37,8 +37,9 @@ class Cam:
         #webcam 정리작업
         async with self.lock_webcam:
             if self.webcam:
-                await self.webcam.release()
+             await self.webcam.release()
             self.webcam = None
+        #return True
             
     
     #포즈 인식
@@ -53,6 +54,8 @@ class Cam:
             # 작업 시작
             if posture_cnt == 5:
                 now_dis, now_down, now_area = self.find_distance(image)
+                print("현재 : ",  now_dis, now_down, now_area)
+                print("처음 : ", self.first_dis, self.first_down, self.first_area )
                 if now_dis - self.first_dis > 15 :
                     self.send_posture_flag = 2
                     posture_score = int(87-(now_dis-self.first_dis)/2)
@@ -62,7 +65,7 @@ class Cam:
                     posture_score = int(80-(now_down - self.first_down)/4)
                     if posture_score < 60 : posture_score = 60
                 elif now_dis == 0 and now_down == 0 and now_area == 0: 
-                    posture_score = -1
+                    posture_score = 0
                     self.send_posture_flag = 4
                 else :
                     self.send_posture_flag = 1
@@ -78,8 +81,7 @@ class Cam:
 
     #초기 사진 유효 체크
     async def checking(self, image_string):
-        if image_string:
-            self.first_image = self.base64_to_img(image_string)
+        self.first_image = self.base64_to_img(image_string)
         self.first_dis, self.first_down, self.first_area = self.find_distance(self.first_image)
         #반환값
         if self.first_dis or self.first_down or self.first_area :
@@ -105,7 +107,7 @@ class Cam:
         # 검출된 얼굴 없으시 0 반환
         if len(faces) == 0:
             return 0, 0, 0
-        
+
         # 가장 가까운 얼굴영역 검출
         for face in faces:
             area = (face[2]-face[0]) * (face[3]-face[1])

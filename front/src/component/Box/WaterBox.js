@@ -1,16 +1,16 @@
 /** @jsxImportSource @emotion/react */
-import { defaultBoxStyle } from "../../style/shared"
+import { defaultBoxStyle } from "../../style/shared";
 
-import { motion } from "framer-motion"
-import { Water } from "../Water/Water"
-import WaterInfo from "../Water/WaterInfo"
-import { useState } from "react"
-import WaterDailyGraph from "../Water/WaterDailyGraph"
-import WaterWeeklyGraph from "../Water/WaterWeeklyGraph"
-import ToggleButton from "../Water/ToggleButton"
+import { motion } from "framer-motion";
+import { Water } from "../Water/Water";
+import WaterDailyGraph from "../Water/WaterDailyGraph";
+import WaterWeeklyGraph from "../Water/WaterWeeklyGraph";
+import ToggleButton from "../Water/ToggleButton";
+import { useRecoilValue } from "recoil";
+import { wtoggleState } from "../../store/nav";
 
 function WaterBox({ key }) {
-  const [state, setState] = useState(true)
+  const [state, setState] = useRecoilValue(wtoggleState);
   return (
     <motion.div
       key={key}
@@ -59,7 +59,7 @@ function WaterBox({ key }) {
             leftText={"WEEK"}
             rightText={"TODAY"}
             onClick={() => {
-              setState((pre) => !pre)
+              setState((pre) => !pre);
             }}
           />
         </div>
@@ -76,7 +76,7 @@ function WaterBox({ key }) {
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
 
-export default WaterBox
+export default WaterBox;

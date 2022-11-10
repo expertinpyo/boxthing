@@ -13,9 +13,10 @@ import { socketState } from "../../store/socket";
 
 import Refresh from "../../asset/refresh.png";
 import { postureModalState } from "../../store/modal";
+import { ptoggleState } from "../../store/nav";
 
 function PostureBox({ key }) {
-  const [state, setState] = useState(false);
+  const [state, setState] = useRecoilValue(ptoggleState);
   const runtime = useRecoilValue(runtimePostureState);
   const [pmodalState, setter] = useRecoilState(postureModalState);
   const avg = useRecoilValue(postureAvgState);

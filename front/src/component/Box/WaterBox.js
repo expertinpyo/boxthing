@@ -6,11 +6,11 @@ import { Water } from "../Water/Water";
 import WaterDailyGraph from "../Water/WaterDailyGraph";
 import WaterWeeklyGraph from "../Water/WaterWeeklyGraph";
 import ToggleButton from "../Water/ToggleButton";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { wtoggleState } from "../../store/nav";
 
 function WaterBox({ key }) {
-  const [state, setState] = useRecoilValue(wtoggleState);
+  const [state, setState] = useRecoilState(wtoggleState);
   return (
     <motion.div
       key={key}
@@ -27,22 +27,6 @@ function WaterBox({ key }) {
       exit={{ transform: "translateY(100%)" }}
       transition={{ duration: 0.5, ease: "circOut" }}
     >
-      {/* <div
-        css={{
-          ...defaultBoxStyle,
-          width: "35%",
-          height: "100%",
-          padding: 16,
-          borderRadius: 16,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Water />
-        <WaterInfo />
-      </div> */}
       <div
         css={{
           width: "100%",

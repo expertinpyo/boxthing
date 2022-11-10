@@ -92,7 +92,7 @@ class Cam:
         imgdata = base64.b64decode(encoded_data)
         dataBytesIO = io.BytesIO(imgdata)
         image = Image.open(dataBytesIO)
-        return cv2.cvtColor(np.array(image, cv2.COLOR_BGR2RGB))
+        return cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
     
     def find_distance(self,img):
         result_list = []

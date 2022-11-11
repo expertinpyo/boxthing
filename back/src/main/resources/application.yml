@@ -26,7 +26,6 @@ spring:
             scope:
               - profile
               - email
-              - https://www.googleapis.com/auth/calendar.calendarlist.readonly
               - https://www.googleapis.com/auth/calendar.readonly
           github:
             client-id: "${OAUTH2_GITHUB_CLIENT_ID}"

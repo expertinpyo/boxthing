@@ -82,6 +82,10 @@ const Subscriber = () => {
                   JSON.stringify({ type: "log/posture/today", data: null })
                 );
                 console.log("send lo g/posture/today message to server!");
+                socket.send(
+                  JSON.stringify({ type: "posture/reset", data: null })
+                );
+                console.log("send close capture modal message to server!");
               }
             } else {
               setLinkState(message.data.google.link);
@@ -100,6 +104,10 @@ const Subscriber = () => {
                 JSON.stringify({ type: "log/posture/today", data: null })
               );
               console.log("send lo g/posture/today message to server!");
+              socket.send(
+                JSON.stringify({ type: "posture/reset", data: null })
+              );
+              console.log("send close capture modal message to server!");
             }
             break;
           case "github/qr":

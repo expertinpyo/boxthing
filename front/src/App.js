@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import "./App.css";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { timerState } from "./store/timer";
 import Layout from "./layout/Layout";
 
@@ -32,9 +32,10 @@ import PhotoModal from "./component/Modal/PhotoModal";
 
 import moment from "moment";
 import CaptureModal from "./component/Modal/CaptureModal";
-import { captureModalState } from "./store/modal";
+import { captureModalState, postureModalState } from "./store/modal";
 
 import { useNavigate } from "react-router-dom";
+import { runtimePostureState } from "./store/posture";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -45,7 +46,8 @@ function App() {
   const authenticated = useRecoilValue(authenticationState);
 
   const captureModal = useRecoilValue(captureModalState);
-
+  const [pmodalState, setter] = useRecoilState(postureModalState);
+  const runtime = useRecoilValue(runtimePostureState);
   const navi = useNavigate();
 
   const handleResize = () => {
@@ -88,7 +90,21 @@ function App() {
         console.log("Unable to retrieve your location");
       }
     );
-  });
+  }, []);
+
+  useEffect(() => {
+    if (!pmodalState && runtime.length >= 5) {
+      const copy = [...runtime];
+      const temp = copy.splice(runtime.length - 5).every((item) => {
+        const result = item["posture_flag"];
+        return (
+          result &&
+          (Number.parseInt(result) === 2 || Number.parseInt(result) === 3)
+        );
+      });
+      if (temp) setter(true);
+    }
+  }, [runtime, pmodalState, setter]);
 
   return (
     <div className="App">

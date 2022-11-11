@@ -94,13 +94,13 @@ public class WaterLogHandler {
       Device device = deviceRepository.findBySerialNumber(deviceId);
 
       if (device == null) {
-        messageCreator.noSerialNumber(deviceId, topic, null);
+        messageCreator.noSerialNumber(deviceId, topic, new ArrayList<>());
         return;
       }
       User user = device.getUser();
 
       if (user == null) {
-        messageCreator.noUserConnect(deviceId, topic, null);
+        messageCreator.noUserConnect(deviceId, topic, new ArrayList<>());
         return;
       }
 
@@ -112,8 +112,7 @@ public class WaterLogHandler {
       log.info("before : {}", days);
       List<WaterLog> list = waterLogQueryDsl.findAllByUserAndDate(user, days);
       if (list.isEmpty()) {
-        List emptyList = new ArrayList<>();
-        messageCreator.emptyResult(deviceId, topic, emptyList);
+        messageCreator.emptyResult(deviceId, topic, new ArrayList<>());
         return;
       }
       messageCreator.succeed(deviceId, topic, waterLogMapper.toDateList(list, days));
@@ -127,13 +126,17 @@ public class WaterLogHandler {
       MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
       String deviceId = requestDto.getDeviceId();
 
+      String topic = "log/water/today";
       Device device = deviceRepository.findBySerialNumber(deviceId);
+
+      if (device == null) {
+        messageCreator.noSerialNumber(deviceId, topic, new ArrayList<>());
+        return;
+      }
       User user = device.getUser();
 
-      String topic = "log/water/today";
-
       if (user == null) {
-        messageCreator.noUserConnect(deviceId, topic, null);
+        messageCreator.noUserConnect(deviceId, topic, new ArrayList<>());
         return;
       }
 

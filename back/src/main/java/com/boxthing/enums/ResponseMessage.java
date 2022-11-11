@@ -19,6 +19,8 @@ public enum ResponseMessage {
 
   NO_INPUT_DATA("입력 데이터 없음"),
   INVALID_INPUT_VALUE("유효하지 않은 입력 데이텨"),
+
+  ALREAEDY_REGISTERED("사용 중인 기기가 있는 유저"),
   ;
 
   private String message;

@@ -11,6 +11,7 @@ import com.boxthing.api.repository.UserRepository;
 import com.boxthing.mqtt.MessageCreator;
 import com.boxthing.mqtt.dto.MqttResDto.MqttAccessTokenResDto;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +75,16 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       User user = userRepository.findByEmail(email);
 
       if (user != null) {
+
+        List<Device> deviceList = deviceRepository.findAllByUser(user);
+        if (deviceList.size() >= 2) {
+          messageCreator.alreadyRegistered(deviceId, topic + "/google", null);
+          return;
+        }
+        if (deviceList.size() == 1 && !deviceList.get(0).equals(device)) {
+          messageCreator.alreadyRegistered(deviceId, topic + "/google", null);
+          return;
+        }
 
         UserGoogleRequestDto dto =
             UserGoogleRequestDto.builder().googleRefreshJws(refreshToken).build();

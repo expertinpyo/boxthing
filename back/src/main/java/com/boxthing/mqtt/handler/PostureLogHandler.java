@@ -63,7 +63,16 @@ public class PostureLogHandler {
       Integer postureScore = data.getPostureScore();
 
       Device device = deviceRepository.findBySerialNumber(deviceId);
+      if (device == null) {
+        messageCreator.noSerialNumber(deviceId, topic, null);
+        return;
+      }
+
       User user = device.getUser();
+      if (user == null) {
+        messageCreator.noUserConnect(deviceId, topic, null);
+        return;
+      }
 
       PostureLogRequestDto postureDto =
           PostureLogRequestDto.builder()

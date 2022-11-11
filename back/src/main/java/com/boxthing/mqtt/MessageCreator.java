@@ -69,4 +69,9 @@ public class MessageCreator {
     msg = responseMessage.LOGIN_FAILED.getMessage();
     messageParser.msgFail(msg, deviceId, topic, data);
   }
+
+  public void alreadyRegistered(String deviceId, String topic, Object data) {
+    msg = responseMessage.ALREAEDY_REGISTERED.getMessage();
+    messageParser.msgFail(msg, deviceId, topic, data);
+  }
 }

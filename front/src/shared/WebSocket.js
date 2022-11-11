@@ -21,7 +21,6 @@ import { drinkedState } from "../store/water";
 
 const Subscriber = () => {
   const [socket, setSocket] = useRecoilState(socketState);
-  console.log(socket);
 
   //setState about data
   const setAuthenticationState = useSetRecoilState(authenticationState);
@@ -108,6 +107,7 @@ const Subscriber = () => {
             break;
           case "github/login":
             setGitAuthenticationState(true);
+            setCaptureModalState(true);
             break;
           case "calendar":
             setPlanState(message.data);

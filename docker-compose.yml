@@ -11,6 +11,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    depends_on:
+      - backend
     env_file:
       - .env
 
@@ -34,6 +36,8 @@ services:
     build: ./back
     ports:
       - "8080:8080"
+    expose:
+      - 8080
     command: java -jar ./app.jar
     depends_on:
       db:

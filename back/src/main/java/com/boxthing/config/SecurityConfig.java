@@ -4,12 +4,15 @@ import com.boxthing.security.oauth2.CustomAuthorizationRequestResolver;
 import com.boxthing.security.oauth2.CustomSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 
 // import lombok.RequiredArgsConstructor;
 
@@ -53,14 +56,14 @@ public class SecurityConfig {
     return http.build();
   }
 
-  // @Bean
-  // FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
-  //   final FilterRegistrationBean<ForwardedHeaderFilter> filterRegistrationBean =
-  //       new FilterRegistrationBean<ForwardedHeaderFilter>();
+  @Bean
+  FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+    final FilterRegistrationBean<ForwardedHeaderFilter> filterRegistrationBean =
+        new FilterRegistrationBean<ForwardedHeaderFilter>();
 
-  //   filterRegistrationBean.setFilter(new ForwardedHeaderFilter());
-  //   filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    filterRegistrationBean.setFilter(new ForwardedHeaderFilter());
+    filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
 
-  //   return filterRegistrationBean;
-  // }
+    return filterRegistrationBean;
+  }
 }

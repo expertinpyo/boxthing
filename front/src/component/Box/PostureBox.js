@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import PostureGraph from "../Posture/PostureGraph";
 import PostureLineGraph from "../Posture/PostureLineGraph";
 import ToggleButton from "../Water/ToggleButton";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { postureAvgState, runtimePostureState } from "../../store/posture";
 import { socketState } from "../../store/socket";
@@ -16,7 +16,7 @@ import { postureModalState } from "../../store/modal";
 import { ptoggleState } from "../../store/nav";
 
 function PostureBox({ key }) {
-  const [state, setState] = useRecoilValue(ptoggleState);
+  const [state, setState] = useRecoilState(ptoggleState);
   const runtime = useRecoilValue(runtimePostureState);
   const [pmodalState, setter] = useRecoilState(postureModalState);
   const avg = useRecoilValue(postureAvgState);

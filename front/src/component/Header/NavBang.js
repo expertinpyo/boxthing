@@ -1,21 +1,28 @@
 /** @jsxImportSource @emotion/react */
 
-import { useRecoilValue } from "recoil"
-import { upcomingPlanState } from "../../store/plan"
-import Exclamation from "../../asset/nav_icon/warning.png"
+import { useRecoilValue } from "recoil";
+import { upcomingPlanState } from "../../store/plan";
+import Exclamation from "../../asset/nav_icon/warningex.png";
+import { motion } from "framer-motion";
+
 const NavBang = () => {
-  const upcoming = useRecoilValue(upcomingPlanState)
+  const upcoming = useRecoilValue(upcomingPlanState);
   return (
     <>
       {upcoming.length !== 0 ? (
-        <div
+        <motion.div
+          animate={{ scale: [1, 1.2, 1, 1.1, 1] }}
+          transition={{
+            repeat: Infinity,
+            duration: 2,
+            times: [0, 0.2, 0.3, 0.4, 1],
+          }}
           css={{
             position: "absolute",
-            width: "40%",
+            width: "60%",
             aspectRatio: "1/1",
-            top: -5,
-            right: -5,
-            fontSize: 12,
+            top: -10,
+            right: -10,
             lineHeight: 0,
             display: "flex",
             justifyContent: "center",
@@ -23,12 +30,12 @@ const NavBang = () => {
           }}
         >
           <img src={Exclamation} alt="" css={{ width: "100%" }} />
-        </div>
+        </motion.div>
       ) : (
         false
       )}
     </>
-  )
-}
+  );
+};
 
-export default NavBang
+export default NavBang;

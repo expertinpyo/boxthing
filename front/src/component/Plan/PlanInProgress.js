@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import Work from "../../asset/plan/Work.gif"
-import Break2 from "../../asset/plan/Break2.gif"
+import Work from "../../asset/plan/Work.gif";
+import Break2 from "../../asset/plan/Break2.gif";
 
 const PlanInProgress = ({ item }) => {
   return (
@@ -9,14 +9,19 @@ const PlanInProgress = ({ item }) => {
         width: "100%",
         height: "100%",
         padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
       }}
     >
       {item.length !== 0 ? (
-        <>
+        <div
+          css={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
           <div css={{ fontSize: 12, color: "var(--font-sub-color)" }}>
             진행 중인 일정
           </div>
@@ -35,11 +40,31 @@ const PlanInProgress = ({ item }) => {
             />
           </div>
 
-          <div>
-            <div css={{ fontSize: 20 }}>{item[0].summary}</div>
-            <div css={{ fontSize: 12 }}>{item[0].description}</div>
+          <div css={{ width: "100%" }}>
+            <div
+              css={{
+                fontSize: 20,
+                width: "100%",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {item[0].summary}
+            </div>
+            <div
+              css={{
+                fontSize: 12,
+                width: "100%",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {item[0].description}
+            </div>
           </div>
-        </>
+        </div>
       ) : (
         <div
           css={{
@@ -58,7 +83,7 @@ const PlanInProgress = ({ item }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PlanInProgress
+export default PlanInProgress;

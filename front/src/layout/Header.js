@@ -3,18 +3,17 @@
 import Timer from "../component/Header/Timer"
 import calendar from "../asset/nav_icon/google-calendar.png"
 import github from "../asset/nav_icon/github.png"
-import working from "../asset/nav_icon/working-woman.png"
-import examine from "../asset/nav_icon/examination.png"
+import pain from "../asset/nav_icon/pain.png"
+import drinkWater from "../asset/nav_icon/drink-water.png"
 
 import NavListItem from "../component/Header/NavListItem"
-
-import { motion } from "framer-motion"
+import WaterNavItem from "../component/Header/WaterNavItem"
 
 const array = [
   { type: "calendar", img: calendar, path: "/" },
   { type: "git", img: github, path: "/git" },
-  { type: "work", img: working, path: "/work" },
-  { type: "health", img: examine, path: "/health" },
+  { type: "posture", img: pain, path: "/posture" },
+  // { type: "water", img: drinkWater, path: "/water" },
 ]
 
 const Header = () => {
@@ -37,7 +36,7 @@ const Header = () => {
       </div>
       <div
         css={{
-          width: "40%",
+          width: "50%",
           height: "100%",
           display: "flex",
           justifyContent: "space-evenly",
@@ -47,6 +46,7 @@ const Header = () => {
         {array.map((item) => {
           return <NavListItem key={item.path} img={item.img} path={item.path} />
         })}
+        <WaterNavItem />
       </div>
     </div>
   )

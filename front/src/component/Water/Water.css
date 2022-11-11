@@ -1,0 +1,70 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  outline: none;
+}
+
+.box {
+  height: 200px;
+  width: 200px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 100%;
+  /* border: 1px solid black; */
+  overflow: hidden;
+}
+.box .percent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  justify-content: center;
+  color: #020438;
+  font-size: 80px;
+}
+.box .water {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  transform: translate(0, 100%);
+  background: #4d6de3;
+  transition: all 0.3s;
+}
+.box .water_wave {
+  width: 200%;
+  position: absolute;
+  bottom: 100%;
+}
+.box .water_wave_back {
+  right: 0;
+  fill: #c7eeff;
+  animation: wave-back 1.4s infinite linear;
+}
+.box .water_wave_front {
+  left: 0;
+  fill: #4d6de3;
+  margin-bottom: -1px;
+  animation: wave-front 0.7s infinite linear;
+}
+@keyframes wave-front {
+  100% {
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes wave-back {
+  100% {
+    transform: translate(50%, 0);
+  }
+}

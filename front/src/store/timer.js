@@ -1,8 +1,9 @@
-import { atom } from "recoil"
+import { atom } from "recoil";
+import moment from "moment";
 
 const timerState = atom({
   key: "timeState",
-  default: new Date(),
-})
+  default: moment(),
+});
 
-export { timerState }
+export { timerState };

@@ -34,8 +34,10 @@ import moment from "moment";
 import CaptureModal from "./component/Modal/CaptureModal";
 import { captureModalState, postureModalState } from "./store/modal";
 
-import { useNavigate } from "react-router-dom";
 import { runtimePostureState } from "./store/posture";
+import CaptureBadModal from "./component/Modal/CaptureBadModal";
+import CaptureStartModal from "./component/Modal/CaptureStartModal";
+import CaptureGoodModal from "./component/Modal/CaptureGoodModal";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -48,7 +50,6 @@ function App() {
   const captureModal = useRecoilValue(captureModalState);
   const [pmodalState, setter] = useRecoilState(postureModalState);
   const runtime = useRecoilValue(runtimePostureState);
-  const navi = useNavigate();
 
   const handleResize = () => {
     const vh = window.innerHeight;
@@ -122,6 +123,9 @@ function App() {
       <PostureModal />
       <WelcomeModal />
       <PhotoModal />
+      <CaptureBadModal />
+      <CaptureStartModal />
+      <CaptureGoodModal />
       <AnimatePresence mode="wait">
         {captureModal ? <CaptureModal /> : false}
       </AnimatePresence>

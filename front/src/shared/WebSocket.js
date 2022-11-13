@@ -4,8 +4,11 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { authenticationState } from "../store/auth";
 import { gitAuthenticationState } from "../store/gitauth";
 import {
+  captureBadModalState,
   captureFuncState,
+  captureGoodModalState,
   captureModalState,
+  captureStartModalState,
   notiModalState,
   postureModalState,
   stretchModalState,
@@ -40,6 +43,10 @@ const Subscriber = () => {
   const setCaptureModalState = useSetRecoilState(captureModalState);
 
   const setCaptureFunc = useSetRecoilState(captureFuncState);
+
+  const setCaptureGoodModal = useSetRecoilState(captureGoodModalState);
+  const setCaptureBadModal = useSetRecoilState(captureBadModalState);
+  const setCaptureStartModal = useSetRecoilState(captureStartModalState);
 
   const navi = useNavigate();
 
@@ -147,13 +154,16 @@ const Subscriber = () => {
             setPostureState([...posture, message.data]);
             break;
           case "posture/ready":
+            setCaptureStartModal(true);
             setCaptureModalState(true);
             setCaptureFunc(true);
             break;
           case "posture/nope":
+            setCaptureBadModal(true);
             setCaptureFunc(true);
             break;
           case "posture/complete":
+            setCaptureGoodModal(true);
             setCaptureModalState(false);
             if (socket && socket.readyState === 1) {
               socket.send(
@@ -203,6 +213,9 @@ const Subscriber = () => {
     setCaptureFunc,
     setCaptureModalState,
     navi,
+    setCaptureBadModal,
+    setCaptureGoodModal,
+    setCaptureStartModal,
   ]);
 };
 

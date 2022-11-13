@@ -45,6 +45,21 @@ const captureFuncState = atom({
   default: false,
 });
 
+const captureGoodModalState = atom({
+  key: "captureGoodModalState",
+  default: false,
+});
+
+const captureBadModalState = atom({
+  key: "captureBadModalState",
+  default: false,
+});
+
+const captureStartModalState = atom({
+  key: "captureStartModalState",
+  default: false,
+});
+
 export {
   stretchModalState,
   planModalState,
@@ -55,4 +70,7 @@ export {
   photoModalState,
   captureModalState,
   captureFuncState,
+  captureGoodModalState,
+  captureBadModalState,
+  captureStartModalState,
 };

@@ -6,16 +6,22 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { captureFuncState, captureModalState } from "../../store/modal";
 import { socketState } from "../../store/socket";
 import { motion } from "framer-motion";
+import One from "../../asset/number-one.png";
+import Two from "../../asset/number-2.png";
+import Three from "../../asset/number-3.png";
+
+const numberStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+};
 
 const CaptureModal = () => {
   const state = useRecoilValue(captureModalState);
   const [captureFunc, setCaptureFunc] = useRecoilState(captureFuncState);
-  console.log(captureFunc);
-  //   const state = true;
-  //   const setter = useSetRecoilState(captureModalState);
   const socket = useRecoilValue(socketState);
   const webcamRef = useRef(null);
-  console.log(webcamRef);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -73,21 +79,22 @@ const CaptureModal = () => {
           videoConstraints={{ facingMode: "user" }}
           style={{ borderRadius: 16 }}
         />
-        {count > 0 && count < 6 ? (
-          <div
-            css={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              color: "white",
-              fontSize: "80px",
-            }}
-          >
-            {count}
-          </div>
-        ) : null}
       </div>
+      {count === 1 && (
+        <div css={numberStyle}>
+          <img src={One} alt="" css={{ width: 200 }} />
+        </div>
+      )}
+      {count === 2 && (
+        <div css={numberStyle}>
+          <img src={Two} alt="" css={{ width: 200 }} />
+        </div>
+      )}
+      {count === 3 && (
+        <div css={numberStyle}>
+          <img src={Three} alt="" css={{ width: 200 }} />
+        </div>
+      )}
     </motion.div>
   );
 };

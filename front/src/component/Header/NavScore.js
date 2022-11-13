@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useRecoilValue } from "recoil";
-import PostIt from "../../asset/nav_icon/post-it.png";
+import Bubble from "../../asset/nav_icon/speech-bubble.png";
 import { currentPostureScoreState } from "../../store/posture";
 
 const NavScore = () => {
@@ -9,11 +9,11 @@ const NavScore = () => {
     <div
       css={{
         position: "absolute",
-        width: "60%",
+        width: "70%",
         aspectRatio: "1/1",
         bottom: -15,
         right: -15,
-        color: score === 0 ? "white" : score > 80 ? "green" : "red",
+        color: score === 0 ? "black" : score > 80 ? "green" : "red",
         fontSize: 20,
         fontWeight: "bold",
         lineHeight: 0,
@@ -22,8 +22,12 @@ const NavScore = () => {
         alignItems: "center",
       }}
     >
-      <img src={PostIt} alt="" css={{ width: "100%", position: "relative" }} />
-      <div css={{ position: "absolute", zIndex: "1" }}>{score}</div>
+      <img
+        src={Bubble}
+        alt=""
+        css={{ width: "100%", position: "relative", transform: "scaleY(-1)" }}
+      />
+      <div css={{ position: "absolute", zIndex: "1", bottom: 19 }}>{score}</div>
     </div>
   );
 };

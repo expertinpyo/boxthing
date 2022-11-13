@@ -1,7 +1,7 @@
 import asyncio
 import json
 import websockets.server as websockets
-#from modules.water import amount_water
+from modules.water import return_water
 from modules.posture import Cam
 from modules.voice_cmd import give_events
 import asyncio_mqtt as aiomqtt
@@ -321,10 +321,12 @@ async def github_notifications_coroutine():
 
 
 async def water_coroutine():
-    async for water in amount_water():
-        print(water)
-        await ws_message_queue.put(("water", water))
-        await mqtt_message_queue.put(("water", water))
+    while True:
+        water = return_water()
+        if water:
+            await ws_message_queue.put(("water", water))
+            await mqtt_message_queue.put(("water", water))
+        await asyncio.sleep(0.1)
 
 async def motion_coro():
     async for image in cam.capture():
@@ -382,7 +384,7 @@ async def main():
         mqtt_client(),
         google_calendar_coroutine(),
         github_notifications_coroutine(),
-        #water_coroutine(),
+        water_coroutine(),
         voice_command_coroutine(),
         motion_coro()
     )

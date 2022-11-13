@@ -37,9 +37,9 @@ const WaterModal = () => {
       }}
     >
       <WaterAnimation />
-      <div css={{ fontWeight: "bold" }}>{`${Number.parseInt(
+      <div css={{ fontWeight: "bold" }}>{`${Number.parseFloat(
         amount[amount.length - 1]
-      )}ml를 섭취하셨습니다!`}</div>
+      ).toFixed(0)}ml를 섭취하셨습니다!`}</div>
     </div>
   );
 };

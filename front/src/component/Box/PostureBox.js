@@ -56,15 +56,20 @@ function PostureBox({ key }) {
         <div
           css={{
             position: "absolute",
-            top: -8,
+            top: 0,
             right: 176,
             ...defaultBoxStyle,
             background: "#fff",
-            height: 50,
-            aspectRatio: "1/1",
-            borderRadius: 9999,
+            height: 40,
+            paddingLeft: 16,
+            paddingRight: 16,
+            borderRadius: 16,
             lineHeight: 0,
             zIndex: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 14,
           }}
           onClick={() => {
             console.log("send reset message to server!");
@@ -76,7 +81,7 @@ function PostureBox({ key }) {
             }
           }}
         >
-          <img src={Refresh} alt={""} css={{ width: "100%" }} />
+          기준 사진 재촬영
         </div>
         <div
           css={{
@@ -97,11 +102,12 @@ function PostureBox({ key }) {
                   height: 40,
                   zIndex: 3,
                   top: 0,
-                  right: 242,
+                  right: "50%",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: 14,
+                  fontSize: 16,
+                  transform: "translateX(50%);",
                 }}
               >
                 <span

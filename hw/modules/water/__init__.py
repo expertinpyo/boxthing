@@ -1,5 +1,4 @@
-from .water_check import amount_water
-
+from .water_check import return_water
 __all__ = [
-    "amount_water",
+    "return_water",
 ]

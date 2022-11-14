@@ -37,7 +37,7 @@ class Cam:
         #webcam 정리작업
         async with self.lock_webcam:
             if self.webcam:
-             await self.webcam.release()
+             self.webcam.release()
             self.webcam = None
         #return True
             
@@ -81,7 +81,7 @@ class Cam:
                 #print(send_posture_flag, "올바른 자세", posture_score
             #print(posture_flag_list)
             #print(now_dis,now_down)
-            if posture_cnt == 6:
+            if posture_cnt == 3:
                 self.send_posture_flag = posture_flag_list.index(max(posture_flag_list))
                 posture_score = int(posture_score_list[self.send_posture_flag]/max(posture_flag_list))
                 today = datetime.now(tz=tz.UTC)

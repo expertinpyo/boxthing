@@ -354,9 +354,18 @@ async def voice_command_coroutine():
             elif voice_cmd == "음수량":
                 #print("water-check")
                 await ws_message_queue.put(("route/water", None))
-            elif voice_cmd == "일주일" or voice_cmd == "오늘":
+            elif voice_cmd == "현재":
                 print("show_graph")
-                # await ws_message_queue.put(("toggle/posture", None))
+                await ws_message_queue.put(("toggle/posture/today", None))
+            elif voice_cmd == "진행":
+                print("show_graph")
+                await ws_message_queue.put(("toggle/posture/runtime", None))
+            elif voice_cmd == "오늘":
+                print("show_graph")
+                await ws_message_queue.put(("toggle/water/today", None))
+            elif voice_cmd == "일주일":
+                print("show_graph")
+                await ws_message_queue.put(("toggle/water/week", None))
             elif voice_cmd == "스트레칭":
                 #print("show_Stretching")
                 await ws_message_queue.put(("stretch", None))

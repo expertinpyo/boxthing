@@ -1,8 +1,9 @@
 package com.boxthing.config;
 
-import com.boxthing.dto.MqttDto.MqttRequestDto;
-import com.boxthing.mqtt.MqttInboundHandler;
+import com.boxthing.mqtt.dto.MqttReqDto.MqttRequestDto;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import lombok.RequiredArgsConstructor;
@@ -31,17 +32,18 @@ import org.springframework.messaging.handler.annotation.Header;
 @RequiredArgsConstructor
 @Slf4j
 public class MqttConfig {
-  private final MqttInboundHandler inboundHandler;
-  private static final String BROKER_URL = "ssl://k7a408.p.ssafy.io:8883";
-  private static final String BASE_TOPIC = "boxthing";
+
+  private final MqttProperties mqttProperties;
   private static final String OUTBOUND_CHANNEL = "outboundChannel";
-  private final Gson gson = new Gson();
+  private final Gson gson =
+      new GsonBuilder()
+          .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+          .create();
 
   @Bean
   public MqttPahoClientFactory mqttPahoClientFactory() {
     MqttConnectOptions options = new MqttConnectOptions();
-    options.setServerURIs(new String[] {BROKER_URL});
-
+    options.setServerURIs(new String[] {mqttProperties.getBrokerUrl()});
     DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
     factory.setConnectionOptions(options);
 
@@ -53,22 +55,24 @@ public class MqttConfig {
     return IntegrationFlows.from(mqttInboundChannelAdapter())
         .transform(mqttRequestTransformer())
         .filter(mqttRequestFilter())
-        .<MqttRequestDto, String>route(
-            MqttRequestDto::getType,
-            mapping ->
-                mapping
-                    .subFlowMapping("qr", sf -> sf.handle(inboundHandler.qrHandler()))
-                    .subFlowMapping("log", sf -> sf.handle(inboundHandler.logHandler()))
-                    .defaultOutputChannel("errorChannel")
-                    .resolutionRequired(false))
+        .enrichHeaders(
+            h ->
+                h.headerExpression(
+                    "trimmedTopic",
+                    "'mqtt-'+headers['"
+                        + MqttHeaders.RECEIVED_TOPIC
+                        + "'].substring("
+                        + (mqttProperties.getBaseTopic() + "/server/").length()
+                        + ")"))
+        .route("headers['trimmedTopic']")
         .get();
   }
 
-  private GenericTransformer<String, MqttRequestDto> mqttRequestTransformer() {
-    return new GenericTransformer<String, MqttRequestDto>() {
+  private GenericTransformer<String, MqttRequestDto<Object>> mqttRequestTransformer() {
+    return new GenericTransformer<String, MqttRequestDto<Object>>() {
       @Override
-      public MqttRequestDto transform(String payload) {
-        Type type = new TypeToken<MqttRequestDto>() {}.getType();
+      public MqttRequestDto<Object> transform(String payload) {
+        Type type = new TypeToken<MqttRequestDto<Object>>() {}.getType();
         return gson.fromJson(payload, type);
       }
     };
@@ -79,10 +83,10 @@ public class MqttConfig {
       @Override
       public boolean accept(Message<?> message) {
         MqttRequestDto requestDto = (MqttRequestDto) message.getPayload();
+        log.info("serialNumber : {}", requestDto.getDeviceId());
         if (requestDto.getDeviceId() == null) {
           return false;
         }
-
         // TODO: deviceId가 우리 db에 있는지 검증
 
         return true;
@@ -91,9 +95,10 @@ public class MqttConfig {
   }
 
   public MqttPahoMessageDrivenChannelAdapter mqttInboundChannelAdapter() {
+    String topic = mqttProperties.getBaseTopic() + "/server/#";
     MqttPahoMessageDrivenChannelAdapter adapter =
         new MqttPahoMessageDrivenChannelAdapter(
-            MqttAsyncClient.generateClientId(), mqttPahoClientFactory(), BASE_TOPIC);
+            MqttAsyncClient.generateClientId(), mqttPahoClientFactory(), topic);
     adapter.setCompletionTimeout(5000);
     adapter.setConverter(new DefaultPahoMessageConverter());
     adapter.setQos(1);

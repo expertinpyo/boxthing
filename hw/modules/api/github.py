@@ -1,5 +1,5 @@
 import aiohttp
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 GITHUB_API_BASE_URL = "https://api.github.com"
@@ -62,7 +62,8 @@ async def github_set_read(token, last_updated_at=None):
     data = {"read": True}
 
     if last_updated_at:
-        data["last_read_at"] = last_updated_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+        last_updated_at_plus_1sec = last_updated_at + timedelta(seconds=1)
+        data["last_read_at"] = last_updated_at_plus_1sec.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     async with aiohttp.ClientSession() as session:
         async with session.put(url=url, headers=headers, json=data) as response:

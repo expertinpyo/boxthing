@@ -60,6 +60,16 @@ const captureStartModalState = atom({
   default: false,
 });
 
+const neckPainModalState = atom({
+  key: "neckPainModalState",
+  default: false,
+});
+
+const spinePainModalState = atom({
+  key: "spinePainModalState",
+  default: false,
+});
+
 export {
   stretchModalState,
   planModalState,
@@ -73,4 +83,6 @@ export {
   captureGoodModalState,
   captureBadModalState,
   captureStartModalState,
+  neckPainModalState,
+  spinePainModalState,
 };

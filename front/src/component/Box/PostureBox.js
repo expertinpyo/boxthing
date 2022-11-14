@@ -8,15 +8,13 @@ import PostureLineGraph from "../Posture/PostureLineGraph";
 import ToggleButton from "../Water/ToggleButton";
 import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { postureAvgState, runtimePostureState } from "../../store/posture";
+import { cutRuntimeState, postureAvgState } from "../../store/posture";
 import { socketState } from "../../store/socket";
-
-import Refresh from "../../asset/refresh.png";
 import { ptoggleState } from "../../store/nav";
 
 function PostureBox({ key }) {
   const [state, setState] = useRecoilState(ptoggleState);
-  const runtime = useRecoilValue(runtimePostureState);
+  const runtime = useRecoilValue(cutRuntimeState);
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
@@ -51,6 +49,7 @@ function PostureBox({ key }) {
             onClick={() => {
               setState((pre) => !pre);
             }}
+            state={state}
           />
         </div>
         <div

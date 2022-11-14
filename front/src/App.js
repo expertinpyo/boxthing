@@ -35,11 +35,10 @@ import CaptureModal from "./component/Modal/CaptureModal";
 import {
   captureModalState,
   neckPainModalState,
-  postureModalState,
   spinePainModalState,
 } from "./store/modal";
 
-import { runtimePostureState } from "./store/posture";
+import { postureState } from "./store/posture";
 import CaptureBadModal from "./component/Modal/CaptureBadModal";
 import CaptureStartModal from "./component/Modal/CaptureStartModal";
 import CaptureGoodModal from "./component/Modal/CaptureGoodModal";
@@ -59,7 +58,7 @@ function App() {
   const captureModal = useRecoilValue(captureModalState);
   const [neckModal, setNeckModal] = useRecoilState(neckPainModalState);
   const [spineModal, setSpineModal] = useRecoilState(spinePainModalState);
-  const runtime = useRecoilValue(runtimePostureState);
+  const runtime = useRecoilValue(postureState);
 
   const handleResize = () => {
     const vh = window.innerHeight;

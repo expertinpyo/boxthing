@@ -32,7 +32,9 @@ const NeckPainModal = () => {
       }}
     >
       <img src={Turtle} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold", fontSize: 20 }}>목이 무거워해요 ㅠㅠ</div>
+      <div css={{ fontWeight: "bold", fontSize: 20 }}>
+        거북목이 될 수 있어요!
+      </div>
     </div>
   );
 };

@@ -31,26 +31,26 @@ const currentPostureScoreState = selector({
   },
 });
 
-const runtimeState = atom({
-  key: "runtimeState",
-  default: [],
-});
+// const runtimeState = atom({
+//   key: "runtimeState",
+//   default: [],
+// });
 
-const cutRuntimeState = selector({
-  key: "cutRuntimeState",
-  get: ({ get }) => {
-    const list = get(runtimeState);
-    list.shift();
-    return list;
-  },
-});
+// const cutRuntimeState = selector({
+//   key: "cutRuntimeState",
+//   get: ({ get }) => {
+//     const list = get(runtimeState);
+//     if (list.length > 20) return list.slice(list.length - 20);
+//     return list;
+//   },
+// });
 
 export {
   postureState,
   currentPostureScoreState,
   postureAvgState,
-  runtimeState,
-  cutRuntimeState,
+  // runtimeState,
+  // cutRuntimeState,
 };
 // [{"send_posture_flag": 1(정상) or 2(거북목) or 3(허리무리) or 4(자리비움), "posture_score": 60 ~ 100 or -1}, {}, {}]
 // 80점 이상이 보통 정상일 것

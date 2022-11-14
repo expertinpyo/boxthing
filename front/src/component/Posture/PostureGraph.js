@@ -4,7 +4,24 @@
 import ReactECharts from "echarts-for-react";
 // import cloneDeep from "lodash.clonedeep";
 import moment from "moment";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { ptoggleState } from "../../store/nav";
 const PostureGraph = ({ data }) => {
+  const [runtime, setRuntime] = useState([]);
+
+  useEffect(() => {
+    return () => {
+      setRuntime([]);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (data.length !== 0) {
+      setRuntime((old) => [...old, data[data.length - 1]]);
+    }
+  }, [data, setRuntime]);
+
   const DEFAULT_OPTION = {
     title: {
       text: "실시간 자세 분석 그래프",
@@ -69,12 +86,14 @@ const PostureGraph = ({ data }) => {
       animationDelayUpdate: function (idx) {
         return idx * 10;
       },
-      data: data.map((item) => {
-        return [
-          moment(item.timestamp) - 0,
-          item["posture_score"] === 0 ? null : item["posture_score"],
-        ];
-      }),
+      data:
+        runtime.length !== 0 &&
+        runtime.map((item) => {
+          return [
+            moment(item.timestamp) - 0,
+            item["posture_score"] === 0 ? null : item["posture_score"],
+          ];
+        }),
     },
   };
 

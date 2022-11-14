@@ -19,7 +19,7 @@ import {
 import { ptoggleState, wtoggleState } from "../store/nav";
 import { notiState } from "../store/noti";
 import { planState } from "../store/plan";
-import { postureState, runtimeState } from "../store/posture";
+import { postureState } from "../store/posture";
 import { linkState } from "../store/qrcode";
 import { socketState } from "../store/socket";
 import { statisticsState } from "../store/statistics";
@@ -56,8 +56,6 @@ const Subscriber = () => {
 
   const setMicModal = useSetRecoilState(micModalState);
   const setNoOrderModal = useSetRecoilState(noOrderModalState);
-
-  const [runtime, setRuntime] = useRecoilState(runtimeState);
 
   const navi = useNavigate();
 
@@ -152,9 +150,6 @@ const Subscriber = () => {
             break;
           case "log/posture/today":
             setPostureState(message.data);
-            let idx = message.data.length - 20;
-            if (idx < 0) setRuntime(message.data);
-            else setRuntime(message.data.slice(idx));
             break;
           case "stretch":
             setStretchModalState(true);
@@ -165,7 +160,6 @@ const Subscriber = () => {
             break;
           case "posture":
             setPostureState([...posture, message.data]);
-            setRuntime([...runtime, message.data]);
             break;
           case "posture/ready":
             setCaptureStartModal(true);
@@ -252,8 +246,6 @@ const Subscriber = () => {
     setWaterToggle,
     setMicModal,
     setNoOrderModal,
-    runtime,
-    setRuntime,
   ]);
 };
 

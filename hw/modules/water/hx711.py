@@ -209,7 +209,7 @@ class HX711:
           valueList += [self.read_long()]
 
        valueList.sort()
-       print(valueList)
+       #print(valueList)
        # If times is odd we can just take the centre value.
        if (times & 0x1) == 0x1:
           return valueList[len(valueList) // 2]

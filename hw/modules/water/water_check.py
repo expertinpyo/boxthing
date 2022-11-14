@@ -41,7 +41,7 @@ def amount_water():
             val = hx.get_weight(11)
             
             int_val = val + 220
-            print(int_val)
+            #print(int_val)
             if -3 <= int_val - check_data_next <= 3:
                 if check_cnt < 5:
                     check_cnt += 1

@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 const gitAuthenticationState = atom({
   key: "gitAuthenticationState",
-  default: false,
+  default: true,
 });
 
 export { gitAuthenticationState };

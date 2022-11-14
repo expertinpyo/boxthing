@@ -13,12 +13,16 @@ const PlanListItem = ({ item, type = "" }) => {
     <div
       css={{
         width: "100%",
-        height: "20%",
+        height: "15%",
         display: "flex",
         justifyContent: "space-between",
+        background: "rgba(255,255,255,0.375)",
         alignItems: "center",
-        padding: 8,
-        border: `${item.calendar.backgroundColor} 2px solid`,
+        paddingRight: 16,
+        paddingLeft: 16,
+        marginBottom: 8,
+        borderRadius: 8,
+        border: `${item.calendar.backgroundColor} 3px solid`,
       }}
       className={
         inprogress.some((progress) => progress.id === item.id)

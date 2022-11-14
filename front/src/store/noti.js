@@ -110,7 +110,7 @@ const notiState = atom({
   //       hooks_url: "http://api.github.com/repos/octocat/Hello-World/hooks",
   //     },
   //     subject: {
-  //       title: "Greetings",
+  //       title: "Hello",
   //       url: "https://api.github.com/repos/octokit/octokit.rb/issues/123",
   //       latest_comment_url:
   //         "https://api.github.com/repos/octokit/octokit.rb/issues/comments/123",

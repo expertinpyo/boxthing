@@ -55,11 +55,13 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String state = request.getParameter("state");
     String topic = "login";
     Device device = deviceRepository.findByState(state);
-    String deviceId = device.getSerialNumber();
 
     if (device == null) {
+      response.sendRedirect("/error");
       return;
     }
+
+    String deviceId = device.getSerialNumber();
 
     // google 인증 성공
     if (registrationId.equals("google")) {
@@ -67,6 +69,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       if (maybeRefreshToken == null) {
         // no refresh token
         messageCreator.loginFailed(deviceId, topic + "/google", null);
+        response.sendRedirect("/error");
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -79,10 +82,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         List<Device> deviceList = deviceRepository.findAllByUser(user);
         if (deviceList.size() >= 2) {
           messageCreator.alreadyRegistered(deviceId, topic + "/google", null);
+          response.sendRedirect("/error");
           return;
         }
         if (deviceList.size() == 1 && !deviceList.get(0).equals(device)) {
           messageCreator.alreadyRegistered(deviceId, topic + "/google", null);
+          response.sendRedirect("/error");
           return;
         }
 
@@ -120,6 +125,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       User user = device.getUser();
       if (user.getGoogleRefreshJws().equals("")) {
         messageCreator.noGoogleToken(deviceId, topic + "/github", null);
+        response.sendRedirect("/error");
         return;
       }
 
@@ -140,5 +146,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       deviceMapper.updateWithNull(deviceDto, device);
       deviceRepository.save(device);
     }
+
+    response.sendRedirect("/success/" + registrationId);
   }
 }

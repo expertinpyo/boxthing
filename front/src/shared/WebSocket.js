@@ -137,7 +137,7 @@ const Subscriber = () => {
             console.log("planState updated!");
             break;
           case "github/noti":
-            setNotiState((old) => [...old, ...message.data]);
+            setNotiState((old) => [...message.data, ...old]);
             break;
           case "log/water/stat":
             setStatisticsState({ water: message.data });

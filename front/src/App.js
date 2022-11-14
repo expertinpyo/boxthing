@@ -136,14 +136,14 @@ function App() {
 
   useEffect(() => {
     if (upcomingPlan.length !== upcomingCount) {
-      setPlanModal(true);
+      if (upcomingPlan.length > 0) setPlanModal(true);
       setUpcomingCount(upcomingPlan.length);
     }
   }, [upcomingPlan, setPlanModal, upcomingCount, setUpcomingCount]);
 
   useEffect(() => {
     if (unreadNoti.length !== unreadNotiCount) {
-      setGitModal(true);
+      if (unreadNoti.length > 0) setGitModal(true);
       setUnreadNotiCount(unreadNoti.length);
     }
   }, [unreadNoti, setGitModal, unreadNotiCount, setUnreadNotiCount]);

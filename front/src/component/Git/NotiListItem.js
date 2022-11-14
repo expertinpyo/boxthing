@@ -67,6 +67,7 @@ const calculateLeftTime = (updated_at) => {
 };
 
 const NotiListItem = ({ item }) => {
+  console.log(item.unread);
   return (
     <div
       css={{
@@ -77,7 +78,8 @@ const NotiListItem = ({ item }) => {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: 8,
+        paddingRight: 16,
+        paddingLeft: 16,
         marginBottom: 8,
         borderRadius: 8,
         // ...defaultBoxStyle,

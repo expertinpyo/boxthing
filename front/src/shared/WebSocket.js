@@ -137,10 +137,7 @@ const Subscriber = () => {
             console.log("planState updated!");
             break;
           case "github/noti":
-            setNotiState([...noti, ...message.data]);
-            const someUnread = message.data.some((item) => item.unread);
-            if (someUnread) setNotiModalState(true);
-            console.log("notiState updated!");
+            setNotiState((old) => [...old, ...message.data]);
             break;
           case "log/water/stat":
             setStatisticsState({ water: message.data });
@@ -156,10 +153,10 @@ const Subscriber = () => {
             break;
           case "water":
             setWaterModalState(true);
-            setDrinkedState([...drinked, message.data]);
+            setDrinkedState((old) => [...old, message.data]);
             break;
           case "posture":
-            setPostureState([...posture, message.data]);
+            setPostureState((old) => [...old, message.data]);
             break;
           case "posture/ready":
             setCaptureStartModal(true);
@@ -223,7 +220,6 @@ const Subscriber = () => {
     socket,
     setPlanState,
     setNotiState,
-    noti,
     setAuthenticationState,
     setGitAuthenticationState,
     setLinkState,
@@ -232,9 +228,7 @@ const Subscriber = () => {
     setPostureModalState,
     setStretchModalState,
     setNotiModalState,
-    drinked,
     setDrinkedState,
-    posture,
     setPostureState,
     setCaptureFunc,
     setCaptureModalState,

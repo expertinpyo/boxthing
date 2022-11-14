@@ -31,7 +31,7 @@ const PlanListItem = ({ item, type = "" }) => {
           flexDirection: "column",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          width: "60%",
+          width: "55%",
         }}
       >
         <div
@@ -60,19 +60,41 @@ const PlanListItem = ({ item, type = "" }) => {
       </div>
       <div
         css={{
-          width: "30%",
+          width: "35%",
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
+          alignItems: "center",
           fontSize: "1.1rem",
         }}
       >
-        {`${start.hours().toString().padStart(2, "0")}:${start
-          .minutes()
-          .toString()
-          .padStart(2, "0")} - ${end.hours().toString().padStart(2, "0")}:${end
-          .minutes()
-          .toString()
-          .padStart(2, "0")} ${end.hours() >= 12 ? "PM" : "AM"} `}
+        <div
+          css={{
+            // position: "absolute",
+            // flex: "none",
+            // left: 10,
+            // top: -20,
+            // zIndex: 1,
+            fontSize: "1rem",
+            background: "white",
+            color: "black",
+            border: `${item.calendar.backgroundColor} 2px solid`,
+            padding: "4px 8px",
+            borderRadius: 8,
+          }}
+        >
+          {item.calendar.summary}
+        </div>
+        <div>
+          {`${start.hours().toString().padStart(2, "0")}:${start
+            .minutes()
+            .toString()
+            .padStart(2, "0")} - ${end
+            .hours()
+            .toString()
+            .padStart(2, "0")}:${end.minutes().toString().padStart(2, "0")} ${
+            end.hours() >= 12 ? "PM" : "AM"
+          } `}
+        </div>
       </div>
     </div>
   );

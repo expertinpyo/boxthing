@@ -35,6 +35,8 @@ import CaptureModal from "./component/Modal/CaptureModal";
 import {
   captureModalState,
   neckPainModalState,
+  notiModalState,
+  planModalState,
   spinePainModalState,
 } from "./store/modal";
 
@@ -46,6 +48,8 @@ import NeckPainModal from "./component/Modal/NeckPainModal";
 import SpinePainModal from "./component/Modal/SpinePainModal";
 import MicModal from "./component/Modal/MicModal";
 import NoOrderModal from "./component/Modal/NoOrderModal";
+import { upcomingPlanState } from "./store/plan";
+import { unreadNotiState } from "./store/noti";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -59,6 +63,10 @@ function App() {
   const [neckModal, setNeckModal] = useRecoilState(neckPainModalState);
   const [spineModal, setSpineModal] = useRecoilState(spinePainModalState);
   const runtime = useRecoilValue(postureState);
+  const upcomingPlan = useRecoilValue(upcomingPlanState);
+  const setPlanModal = useSetRecoilState(planModalState);
+  const unreadNoti = useRecoilValue(unreadNotiState);
+  const setGitModal = useSetRecoilState(notiModalState);
 
   const handleResize = () => {
     const vh = window.innerHeight;
@@ -122,6 +130,14 @@ function App() {
       if (spine) setSpineModal(true);
     }
   }, [runtime, neckModal, setNeckModal, spineModal, setSpineModal]);
+
+  useEffect(() => {
+    if (upcomingPlan.length > 0) setPlanModal(true);
+  }, [upcomingPlan, setPlanModal]);
+
+  useEffect(() => {
+    if (unreadNoti.length > 0) setGitModal(true);
+  }, [unreadNoti, setGitModal]);
 
   return (
     <div className="App">

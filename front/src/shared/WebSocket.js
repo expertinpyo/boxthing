@@ -4,13 +4,17 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { authenticationState } from "../store/auth";
 import { gitAuthenticationState } from "../store/gitauth";
 import {
+  captureBadModalState,
   captureFuncState,
+  captureGoodModalState,
   captureModalState,
+  captureStartModalState,
   notiModalState,
   postureModalState,
   stretchModalState,
   waterModalState,
 } from "../store/modal";
+import { ptoggleState, wtoggleState } from "../store/nav";
 import { notiState } from "../store/noti";
 import { planState } from "../store/plan";
 import { postureState } from "../store/posture";
@@ -21,7 +25,6 @@ import { drinkedState } from "../store/water";
 
 const Subscriber = () => {
   const [socket, setSocket] = useRecoilState(socketState);
-  console.log(socket);
 
   //setState about data
   const setAuthenticationState = useSetRecoilState(authenticationState);
@@ -41,6 +44,13 @@ const Subscriber = () => {
   const setCaptureModalState = useSetRecoilState(captureModalState);
 
   const setCaptureFunc = useSetRecoilState(captureFuncState);
+
+  const setCaptureGoodModal = useSetRecoilState(captureGoodModalState);
+  const setCaptureBadModal = useSetRecoilState(captureBadModalState);
+  const setCaptureStartModal = useSetRecoilState(captureStartModalState);
+
+  const setPostureToggle = useSetRecoilState(ptoggleState);
+  const setWaterToggle = useSetRecoilState(wtoggleState);
 
   const navi = useNavigate();
 
@@ -83,6 +93,10 @@ const Subscriber = () => {
                   JSON.stringify({ type: "log/posture/today", data: null })
                 );
                 console.log("send lo g/posture/today message to server!");
+                socket.send(
+                  JSON.stringify({ type: "posture/reset", data: null })
+                );
+                console.log("send close capture modal message to server!");
               }
             } else {
               setLinkState(message.data.google.link);
@@ -101,6 +115,10 @@ const Subscriber = () => {
                 JSON.stringify({ type: "log/posture/today", data: null })
               );
               console.log("send lo g/posture/today message to server!");
+              socket.send(
+                JSON.stringify({ type: "posture/reset", data: null })
+              );
+              console.log("send close capture modal message to server!");
             }
             break;
           case "github/qr":
@@ -108,6 +126,7 @@ const Subscriber = () => {
             break;
           case "github/login":
             setGitAuthenticationState(true);
+            setCaptureModalState(true);
             break;
           case "calendar":
             setPlanState(message.data);
@@ -139,13 +158,16 @@ const Subscriber = () => {
             setPostureState([...posture, message.data]);
             break;
           case "posture/ready":
+            setCaptureStartModal(true);
             setCaptureModalState(true);
             setCaptureFunc(true);
             break;
           case "posture/nope":
+            setCaptureBadModal(true);
             setCaptureFunc(true);
             break;
           case "posture/complete":
+            setCaptureGoodModal(true);
             setCaptureModalState(false);
             if (socket && socket.readyState === 1) {
               socket.send(
@@ -166,9 +188,17 @@ const Subscriber = () => {
           case "route/water":
             navi("/water");
             break;
-          case "toggle/posture":
+          case "toggle/posture/today":
+            setPostureToggle(true);
             break;
-          case "toggle/water":
+          case "toggle/posture/runtime":
+            setPostureToggle(false);
+            break;
+          case "toggle/water/today":
+            setPostureToggle(true);
+            break;
+          case "toggle/water/week":
+            setPostureToggle(false);
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -195,6 +225,11 @@ const Subscriber = () => {
     setCaptureFunc,
     setCaptureModalState,
     navi,
+    setCaptureBadModal,
+    setCaptureGoodModal,
+    setCaptureStartModal,
+    setPostureToggle,
+    setWaterToggle,
   ]);
 };
 

@@ -12,13 +12,11 @@ import { postureAvgState, runtimePostureState } from "../../store/posture";
 import { socketState } from "../../store/socket";
 
 import Refresh from "../../asset/refresh.png";
-import { postureModalState } from "../../store/modal";
 import { ptoggleState } from "../../store/nav";
 
 function PostureBox({ key }) {
   const [state, setState] = useRecoilState(ptoggleState);
   const runtime = useRecoilValue(runtimePostureState);
-  const [pmodalState, setter] = useRecoilState(postureModalState);
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
@@ -28,20 +26,6 @@ function PostureBox({ key }) {
       console.log("send lo g/posture/today message to server!");
     }
   }, [socket]);
-
-  useEffect(() => {
-    if (!pmodalState && runtime.length >= 5) {
-      const copy = [...runtime];
-      const temp = copy.splice(runtime.length - 5).every((item) => {
-        const result = item["posture_flag"];
-        return (
-          result &&
-          (Number.parseInt(result) === 2 || Number.parseInt(result) === 3)
-        );
-      });
-      if (temp) setter(true);
-    }
-  }, [runtime, pmodalState, setter]);
 
   return (
     <motion.div
@@ -72,15 +56,20 @@ function PostureBox({ key }) {
         <div
           css={{
             position: "absolute",
-            top: -8,
+            top: 0,
             right: 176,
             ...defaultBoxStyle,
             background: "#fff",
-            height: 50,
-            aspectRatio: "1/1",
-            borderRadius: 9999,
+            height: 40,
+            paddingLeft: 16,
+            paddingRight: 16,
+            borderRadius: 16,
             lineHeight: 0,
             zIndex: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: 14,
           }}
           onClick={() => {
             console.log("send reset message to server!");
@@ -92,7 +81,7 @@ function PostureBox({ key }) {
             }
           }}
         >
-          <img src={Refresh} alt={""} css={{ width: "100%" }} />
+          기준 사진 재촬영
         </div>
         <div
           css={{
@@ -113,11 +102,12 @@ function PostureBox({ key }) {
                   height: 40,
                   zIndex: 3,
                   top: 0,
-                  right: 242,
+                  right: "50%",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: 14,
+                  fontSize: 16,
+                  transform: "translateX(50%);",
                 }}
               >
                 <span

@@ -1,12 +1,14 @@
 /** @jsxImportSource @emotion/react */
 
 import { useEffect } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { waterModalState } from "../../store/modal";
+import { drinkedState } from "../../store/water";
 import { WaterAnimation } from "../Water/Water";
 
 const WaterModal = () => {
   const [state, setter] = useRecoilState(waterModalState);
+  const amount = useRecoilValue(drinkedState);
 
   useEffect(() => {
     if (state) {
@@ -35,7 +37,9 @@ const WaterModal = () => {
       }}
     >
       <WaterAnimation />
-      <div css={{ fontWeight: "bold" }}>250ml 섭취하셨습니다!</div>
+      <div css={{ fontWeight: "bold" }}>{`${Number.parseFloat(
+        amount[amount.length - 1]
+      ).toFixed(0)}ml를 섭취하셨습니다!`}</div>
     </div>
   );
 };

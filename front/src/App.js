@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import "./App.css";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { timerState } from "./store/timer";
 import Layout from "./layout/Layout";
 
@@ -32,9 +32,19 @@ import PhotoModal from "./component/Modal/PhotoModal";
 
 import moment from "moment";
 import CaptureModal from "./component/Modal/CaptureModal";
-import { captureModalState } from "./store/modal";
+import {
+  captureModalState,
+  neckPainModalState,
+  postureModalState,
+  spinePainModalState,
+} from "./store/modal";
 
-import { useNavigate } from "react-router-dom";
+import { runtimePostureState } from "./store/posture";
+import CaptureBadModal from "./component/Modal/CaptureBadModal";
+import CaptureStartModal from "./component/Modal/CaptureStartModal";
+import CaptureGoodModal from "./component/Modal/CaptureGoodModal";
+import NeckPainModal from "./component/Modal/NeckPainModal";
+import SpinePainModal from "./component/Modal/SpinePainModal";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -45,8 +55,9 @@ function App() {
   const authenticated = useRecoilValue(authenticationState);
 
   const captureModal = useRecoilValue(captureModalState);
-
-  const navi = useNavigate();
+  const [neckModal, setNeckModal] = useRecoilState(neckPainModalState);
+  const [spineModal, setSpineModal] = useRecoilState(spinePainModalState);
+  const runtime = useRecoilValue(runtimePostureState);
 
   const handleResize = () => {
     const vh = window.innerHeight;
@@ -88,7 +99,28 @@ function App() {
         console.log("Unable to retrieve your location");
       }
     );
-  });
+  }, []);
+
+  useEffect(() => {
+    const copy = [...runtime];
+    const cut = copy.splice(runtime.length - 5);
+    if (!neckModal && runtime.length >= 5) {
+      const neck = cut.every((item) => {
+        const result = item["posture_flag"];
+        return result && Number.parseInt(result) === 2;
+      });
+
+      if (neck) setNeckModal(true);
+    }
+    if (!spineModal && runtime.length >= 5) {
+      const spine = cut.every((item) => {
+        const result = item["posture_flag"];
+        return result && Number.parseInt(result) === 3;
+      });
+
+      if (spine) setSpineModal(true);
+    }
+  }, [runtime, neckModal, setNeckModal, spineModal, setSpineModal]);
 
   return (
     <div className="App">
@@ -106,6 +138,11 @@ function App() {
       <PostureModal />
       <WelcomeModal />
       <PhotoModal />
+      <CaptureBadModal />
+      <CaptureStartModal />
+      <CaptureGoodModal />
+      <NeckPainModal />
+      <SpinePainModal />
       <AnimatePresence mode="wait">
         {captureModal ? <CaptureModal /> : false}
       </AnimatePresence>

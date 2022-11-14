@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -24,6 +26,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,11 +58,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     String state = request.getParameter("state");
     String topic = "login";
     Device device = deviceRepository.findByState(state);
-    String deviceId = device.getSerialNumber();
 
     if (device == null) {
       return;
     }
+
+    String deviceId = device.getSerialNumber();
 
     // google 인증 성공
     if (registrationId.equals("google")) {
@@ -140,5 +144,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       deviceMapper.updateWithNull(deviceDto, device);
       deviceRepository.save(device);
     }
+
+    String uri =
+        UriComponentsBuilder.fromHttpRequest((HttpRequest) request)
+            .path("/success/" + registrationId)
+            .build()
+            .toUriString();
+
+
+    getRedirectStrategy().sendRedirect(request, response, uri);
   }
 }

@@ -1,6 +1,7 @@
-from .voice import give_events
+from .voice import give_events, recognize_boxthing
 
 
 __all__ = [
-    "give_events"
+    "give_events",
+    "recognize_boxthing"
 ]

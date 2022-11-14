@@ -8,13 +8,6 @@ import { micModalState } from "../../store/modal";
 const MicModal = () => {
   const [state, setter] = useRecoilState(micModalState);
 
-  useEffect(() => {
-    if (state) {
-      setTimeout(() => {
-        setter((pre) => !pre);
-      }, 2000);
-    }
-  }, [state, setter]);
   return (
     <div
       css={{

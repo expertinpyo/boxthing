@@ -8,13 +8,13 @@ import { noOrderModalState } from "../../store/modal";
 const NoOrderModal = () => {
   const [state, setter] = useRecoilState(noOrderModalState);
 
-  //   useEffect(() => {
-  //     if (state) {
-  //       setTimeout(() => {
-  //         setter((pre) => !pre);
-  //       }, 6000);
-  //     }
-  //   }, [state, setter]);
+  useEffect(() => {
+    if (state) {
+      setTimeout(() => {
+        setter((pre) => !pre);
+      }, 2000);
+    }
+  }, [state, setter]);
   return (
     <div
       css={{

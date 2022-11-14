@@ -42,6 +42,10 @@ const WaterWeeklyGraph = () => {
       splitLine: {
         show: false,
       },
+      type: "value",
+      scale: true,
+      max: 1500,
+      min: 0,
     },
     series: [
       {

@@ -50,8 +50,8 @@ function PostureBox({ key }) {
       <div css={{ position: "relative", width: "100%", height: "100%" }}>
         <div css={{ position: "absolute", top: 0, right: 0, zIndex: 10 }}>
           <ToggleButton
-            leftText={"RUNTIME"}
-            rightText={"TODAY"}
+            leftText={"TODAY"}
+            rightText={"RUNTIME"}
             onClick={() => {
               setState((pre) => !pre);
             }}

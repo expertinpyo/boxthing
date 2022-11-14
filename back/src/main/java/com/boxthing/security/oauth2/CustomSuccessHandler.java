@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -25,7 +24,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -59,6 +57,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     Device device = deviceRepository.findByState(state);
 
     if (device == null) {
+      response.sendRedirect("/error");
       return;
     }
 
@@ -70,6 +69,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       if (maybeRefreshToken == null) {
         // no refresh token
         messageCreator.loginFailed(deviceId, topic + "/google", null);
+        response.sendRedirect("/error");
         return;
       }
       String refreshToken = maybeRefreshToken.getTokenValue();
@@ -82,10 +82,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         List<Device> deviceList = deviceRepository.findAllByUser(user);
         if (deviceList.size() >= 2) {
           messageCreator.alreadyRegistered(deviceId, topic + "/google", null);
+          response.sendRedirect("/error");
           return;
         }
         if (deviceList.size() == 1 && !deviceList.get(0).equals(device)) {
           messageCreator.alreadyRegistered(deviceId, topic + "/google", null);
+          response.sendRedirect("/error");
           return;
         }
 
@@ -123,6 +125,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       User user = device.getUser();
       if (user.getGoogleRefreshJws().equals("")) {
         messageCreator.noGoogleToken(deviceId, topic + "/github", null);
+        response.sendRedirect("/error");
         return;
       }
 
@@ -144,12 +147,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       deviceRepository.save(device);
     }
 
-    String uri =
-        UriComponentsBuilder.fromHttpRequest((HttpRequest) request)
-            .path("/success/" + registrationId)
-            .build()
-            .toUriString();
-
-    getRedirectStrategy().sendRedirect(request, response, uri);
+    response.sendRedirect("/success/" + registrationId);
   }
 }

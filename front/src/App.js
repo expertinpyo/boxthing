@@ -32,12 +32,19 @@ import PhotoModal from "./component/Modal/PhotoModal";
 
 import moment from "moment";
 import CaptureModal from "./component/Modal/CaptureModal";
-import { captureModalState, postureModalState } from "./store/modal";
+import {
+  captureModalState,
+  neckPainModalState,
+  postureModalState,
+  spinePainModalState,
+} from "./store/modal";
 
 import { runtimePostureState } from "./store/posture";
 import CaptureBadModal from "./component/Modal/CaptureBadModal";
 import CaptureStartModal from "./component/Modal/CaptureStartModal";
 import CaptureGoodModal from "./component/Modal/CaptureGoodModal";
+import NeckPainModal from "./component/Modal/NeckPainModal";
+import SpinePainModal from "./component/Modal/SpinePainModal";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -48,7 +55,8 @@ function App() {
   const authenticated = useRecoilValue(authenticationState);
 
   const captureModal = useRecoilValue(captureModalState);
-  const [pmodalState, setter] = useRecoilState(postureModalState);
+  const [neckModal, setNeckModal] = useRecoilState(neckPainModalState);
+  const [spineModal, setSpineModal] = useRecoilState(spinePainModalState);
   const runtime = useRecoilValue(runtimePostureState);
 
   const handleResize = () => {
@@ -94,18 +102,25 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!pmodalState && runtime.length >= 5) {
-      const copy = [...runtime];
-      const temp = copy.splice(runtime.length - 5).every((item) => {
+    const copy = [...runtime];
+    const cut = copy.splice(runtime.length - 5);
+    if (!neckModal && runtime.length >= 5) {
+      const neck = cut.every((item) => {
         const result = item["posture_flag"];
-        return (
-          result &&
-          (Number.parseInt(result) === 2 || Number.parseInt(result) === 3)
-        );
+        return result && Number.parseInt(result) === 2;
       });
-      if (temp) setter(true);
+
+      if (neck) setNeckModal(true);
     }
-  }, [runtime, pmodalState, setter]);
+    if (!spineModal && runtime.length >= 5) {
+      const spine = cut.every((item) => {
+        const result = item["posture_flag"];
+        return result && Number.parseInt(result) === 3;
+      });
+
+      if (spine) setSpineModal(true);
+    }
+  }, [runtime, neckModal, setNeckModal, spineModal, setSpineModal]);
 
   return (
     <div className="App">
@@ -126,6 +141,8 @@ function App() {
       <CaptureBadModal />
       <CaptureStartModal />
       <CaptureGoodModal />
+      <NeckPainModal />
+      <SpinePainModal />
       <AnimatePresence mode="wait">
         {captureModal ? <CaptureModal /> : false}
       </AnimatePresence>

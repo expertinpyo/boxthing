@@ -14,6 +14,7 @@ import {
   stretchModalState,
   waterModalState,
 } from "../store/modal";
+import { ptoggleState, wtoggleState } from "../store/nav";
 import { notiState } from "../store/noti";
 import { planState } from "../store/plan";
 import { postureState } from "../store/posture";
@@ -47,6 +48,9 @@ const Subscriber = () => {
   const setCaptureGoodModal = useSetRecoilState(captureGoodModalState);
   const setCaptureBadModal = useSetRecoilState(captureBadModalState);
   const setCaptureStartModal = useSetRecoilState(captureStartModalState);
+
+  const setPostureToggle = useSetRecoilState(ptoggleState);
+  const setWaterToggle = useSetRecoilState(wtoggleState);
 
   const navi = useNavigate();
 
@@ -184,9 +188,17 @@ const Subscriber = () => {
           case "route/water":
             navi("/water");
             break;
-          case "toggle/posture":
+          case "toggle/posture/today":
+            setPostureToggle(true);
             break;
-          case "toggle/water":
+          case "toggle/posture/runtime":
+            setPostureToggle(false);
+            break;
+          case "toggle/water/today":
+            setPostureToggle(true);
+            break;
+          case "toggle/water/week":
+            setPostureToggle(false);
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -216,6 +228,8 @@ const Subscriber = () => {
     setCaptureBadModal,
     setCaptureGoodModal,
     setCaptureStartModal,
+    setPostureToggle,
+    setWaterToggle,
   ]);
 };
 

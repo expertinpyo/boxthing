@@ -72,7 +72,7 @@ const spinePainModalState = atom({
 
 const micModalState = atom({
   key: "micModalState",
-  default: true,
+  default: false,
 });
 
 const noOrderModalState = atom({

@@ -70,6 +70,16 @@ const spinePainModalState = atom({
   default: false,
 });
 
+const micModalState = atom({
+  key: "micModalState",
+  default: false,
+});
+
+const noOrderModalState = atom({
+  key: "noOrderModalState",
+  default: false,
+});
+
 export {
   stretchModalState,
   planModalState,
@@ -85,4 +95,6 @@ export {
   captureStartModalState,
   neckPainModalState,
   spinePainModalState,
+  micModalState,
+  noOrderModalState,
 };

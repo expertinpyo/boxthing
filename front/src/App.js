@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { timerState } from "./store/timer";
@@ -68,6 +68,9 @@ function App() {
   const unreadNoti = useRecoilValue(unreadNotiState);
   const setGitModal = useSetRecoilState(notiModalState);
 
+  const [upcomingCount, setUpcomingCount] = useState(0);
+  const [unreadNotiCount, setUnreadNotiCount] = useState(0);
+
   const handleResize = () => {
     const vh = window.innerHeight;
     document.documentElement.style.setProperty("--vh", `${vh}px`);
@@ -132,12 +135,18 @@ function App() {
   }, [runtime, neckModal, setNeckModal, spineModal, setSpineModal]);
 
   useEffect(() => {
-    if (upcomingPlan.length > 0) setPlanModal(true);
-  }, [upcomingPlan, setPlanModal]);
+    if (upcomingPlan.length !== upcomingCount) {
+      setPlanModal(true);
+      setUpcomingCount(upcomingPlan.length);
+    }
+  }, [upcomingPlan, setPlanModal, upcomingCount, setUpcomingCount]);
 
   useEffect(() => {
-    if (unreadNoti.length > 0) setGitModal(true);
-  }, [unreadNoti, setGitModal]);
+    if (unreadNoti.length !== unreadNotiCount) {
+      setGitModal(true);
+      setUnreadNotiCount(unreadNoti.length);
+    }
+  }, [unreadNoti, setGitModal, unreadNotiCount, setUnreadNotiCount]);
 
   return (
     <div className="App">

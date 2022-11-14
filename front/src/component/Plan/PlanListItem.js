@@ -18,6 +18,7 @@ const PlanListItem = ({ item, type = "" }) => {
         justifyContent: "space-between",
         alignItems: "center",
         padding: 8,
+        border: `${item.calendar.backgroundColor} 2px solid`,
       }}
       className={
         inprogress.some((progress) => progress.id === item.id)
@@ -31,7 +32,7 @@ const PlanListItem = ({ item, type = "" }) => {
           flexDirection: "column",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          width: "55%",
+          width: "60%",
         }}
       >
         <div
@@ -60,30 +61,13 @@ const PlanListItem = ({ item, type = "" }) => {
       </div>
       <div
         css={{
-          width: "35%",
+          width: "30%",
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
           fontSize: "1.1rem",
         }}
       >
-        <div
-          css={{
-            // position: "absolute",
-            // flex: "none",
-            // left: 10,
-            // top: -20,
-            // zIndex: 1,
-            fontSize: "1rem",
-            background: "white",
-            color: "black",
-            border: `${item.calendar.backgroundColor} 2px solid`,
-            padding: "4px 8px",
-            borderRadius: 8,
-          }}
-        >
-          {item.calendar.summary}
-        </div>
         <div>
           {`${start.hours().toString().padStart(2, "0")}:${start
             .minutes()

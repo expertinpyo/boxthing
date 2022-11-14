@@ -7,7 +7,7 @@ const ptoggleState = atom({
 
 const wtoggleState = atom({
   key: "wtoggleState",
-  default: false,
+  default: true,
 });
 
 export { ptoggleState, wtoggleState };

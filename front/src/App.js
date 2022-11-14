@@ -45,6 +45,8 @@ import CaptureStartModal from "./component/Modal/CaptureStartModal";
 import CaptureGoodModal from "./component/Modal/CaptureGoodModal";
 import NeckPainModal from "./component/Modal/NeckPainModal";
 import SpinePainModal from "./component/Modal/SpinePainModal";
+import MicModal from "./component/Modal/MicModal";
+import NoOrderModal from "./component/Modal/NoOrderModal";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -143,6 +145,8 @@ function App() {
       <CaptureGoodModal />
       <NeckPainModal />
       <SpinePainModal />
+      <MicModal />
+      <NoOrderModal />
       <AnimatePresence mode="wait">
         {captureModal ? <CaptureModal /> : false}
       </AnimatePresence>

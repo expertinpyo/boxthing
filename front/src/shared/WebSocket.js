@@ -9,6 +9,7 @@ import {
   captureGoodModalState,
   captureModalState,
   captureStartModalState,
+  micModalState,
   notiModalState,
   postureModalState,
   stretchModalState,
@@ -51,6 +52,8 @@ const Subscriber = () => {
 
   const setPostureToggle = useSetRecoilState(ptoggleState);
   const setWaterToggle = useSetRecoilState(wtoggleState);
+
+  const setMicModal = useSetRecoilState(micModalState);
 
   const navi = useNavigate();
 
@@ -200,6 +203,15 @@ const Subscriber = () => {
           case "toggle/water/week":
             setPostureToggle(false);
             break;
+          case "send/cmd":
+            setMicModal(true);
+            break;
+          case "success/cmd":
+            setMicModal(false);
+            break;
+          case "fail/cmd":
+            setMicModal(false);
+            break;
           default:
             console.log("I can't distinguish the type of message...");
         }
@@ -230,6 +242,7 @@ const Subscriber = () => {
     setCaptureStartModal,
     setPostureToggle,
     setWaterToggle,
+    setMicModal,
   ]);
 };
 

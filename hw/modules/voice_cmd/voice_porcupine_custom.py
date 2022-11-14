@@ -27,6 +27,7 @@ from pvrecorder import PvRecorder
 hot_word_flag = 0
 stop_wake_flag = 0
 record_flag = 0
+recognize = 0
 load_dotenv()
 
 
@@ -104,13 +105,14 @@ class PorcupineCustom(Thread):
                 print('}')
 
                 while True:
-                    global stop_wake_flag
+                    global stop_wake_flag, recognize
                     if stop_wake_flag:
                         continue
                     pcm = recorder.read()
                     result = porcupine.process(pcm)
                     # set hot word flag
                     if result >= 0:
+                        recognize = 1
                         print('[%s] Detected %s' %
                               (str(datetime.now()), keywords[result]))
                         print("Start Recording")

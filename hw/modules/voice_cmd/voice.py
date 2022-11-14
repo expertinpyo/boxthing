@@ -26,6 +26,10 @@ class DetectHotword(Thread):
                 voice_porcupine_custom.stop_wake_flag = 0
                 time.sleep(7)
 
+def recognize_boxthing():
+    if voice_porcupine_custom.recognize:
+        voice_porcupine_custom.recognize = 0
+        return True
 
 def give_events():
     global give_evnets_flag

@@ -107,7 +107,7 @@ public class PostureLogHandler {
         return;
       }
 
-      List<PostureLog> list = postureLogQueryDsl.findallByUserAndToday(user);
+      List<PostureLog> list = postureLogQueryDsl.findAllByUserAndToday(user);
       messageCreator.succeed(deviceId, topic, postureLogMapper.toList(list));
     };
   }

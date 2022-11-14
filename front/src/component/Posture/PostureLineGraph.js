@@ -7,8 +7,7 @@ import { postureState } from "../../store/posture";
 // import { sample_data } from "./sampleData";
 import moment from "moment";
 
-const PostureLineGraph = () => {
-  const posture = useRecoilValue(postureState);
+const PostureLineGraph = ({ data }) => {
   const DEFAULT_OPTION = {
     title: {
       text: "자세 데이터 통계 분석",
@@ -67,12 +66,14 @@ const PostureLineGraph = () => {
       // animationDelayUpdate: function (idx) {
       //   return idx * 10;
       // },
-      data: posture.map((item) => {
-        return [
-          moment(item.timestamp) - 0,
-          item["posture_score"] === 0 ? null : item["posture_score"],
-        ];
-      }),
+      data:
+        data.length !== 0 &&
+        data.map((item) => {
+          return [
+            moment(item.timestamp) - 0,
+            item["posture_score"] === 0 ? null : item["posture_score"],
+          ];
+        }),
       markLine: {
         silent: true,
         lineStyle: {

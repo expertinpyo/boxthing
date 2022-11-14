@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import "./ToggleButton.css";
 
-const ToggleButton = ({ onClick, leftText, rightText }) => {
-  const [toggleState, setToggleState] = useState(true);
+const ToggleButton = ({ onClick, leftText, rightText, state }) => {
   const toggleContainer = useRef(null);
 
   return (
@@ -10,7 +9,6 @@ const ToggleButton = ({ onClick, leftText, rightText }) => {
       id="container"
       onClick={() => {
         onClick();
-        setToggleState((pre) => !pre);
       }}
     >
       <div className="inner-container">
@@ -26,8 +24,8 @@ const ToggleButton = ({ onClick, leftText, rightText }) => {
         id="toggle-container"
         ref={toggleContainer}
         style={{
-          clipPath: toggleState ? "inset(0 0 0 50%)" : "inset(0 50% 0 0)",
-          backgroundColor: toggleState ? "#11D200" : "dodgerblue",
+          clipPath: state ? "inset(0 0 0 50%)" : "inset(0 50% 0 0)",
+          backgroundColor: state ? "#11D200" : "dodgerblue",
         }}
       >
         <div className="toggle">

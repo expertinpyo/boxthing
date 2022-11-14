@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
-import Turtle from "../../asset/turtle.gif";
+import Spine from "../../asset/spine.gif";
 import { spinePainModalState } from "../../store/modal";
 
 const SpinePainModal = () => {
@@ -31,7 +31,7 @@ const SpinePainModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Turtle} alt="" css={{ width: 200 }} />
+      <img src={Spine} alt="" css={{ width: 200 }} />
       <div css={{ fontWeight: "bold", fontSize: 20 }}>허리를 곧게 피세요!</div>
     </div>
   );

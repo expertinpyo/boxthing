@@ -10,6 +10,7 @@ import {
   captureModalState,
   captureStartModalState,
   micModalState,
+  noOrderModalState,
   notiModalState,
   postureModalState,
   stretchModalState,
@@ -54,6 +55,7 @@ const Subscriber = () => {
   const setWaterToggle = useSetRecoilState(wtoggleState);
 
   const setMicModal = useSetRecoilState(micModalState);
+  const setNoOrderModal = useSetRecoilState(noOrderModalState);
 
   const navi = useNavigate();
 
@@ -129,7 +131,6 @@ const Subscriber = () => {
             break;
           case "github/login":
             setGitAuthenticationState(true);
-            setCaptureModalState(true);
             break;
           case "calendar":
             setPlanState(message.data);
@@ -192,16 +193,16 @@ const Subscriber = () => {
             navi("/water");
             break;
           case "toggle/posture/today":
-            setPostureToggle(true);
+            setPostureToggle(false);
             break;
           case "toggle/posture/runtime":
-            setPostureToggle(false);
-            break;
-          case "toggle/water/today":
             setPostureToggle(true);
             break;
+          case "toggle/water/today":
+            setWaterToggle(true);
+            break;
           case "toggle/water/week":
-            setPostureToggle(false);
+            setWaterToggle(false);
             break;
           case "send/cmd":
             setMicModal(true);
@@ -211,6 +212,7 @@ const Subscriber = () => {
             break;
           case "fail/cmd":
             setMicModal(false);
+            setNoOrderModal(true);
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -243,6 +245,7 @@ const Subscriber = () => {
     setPostureToggle,
     setWaterToggle,
     setMicModal,
+    setNoOrderModal,
   ]);
 };
 

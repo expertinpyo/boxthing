@@ -40,18 +40,11 @@ class VoiceRecognition():
             print("command not parsing")
             self.var = "Error"
 
-    def map_commands(self):
-        # map robot func according to the cmd
-        if self.var == "테스트":
-            print("테스트!!!!!!!")
-        else:
-            print("Unknown command!!")
-
     def run(self):
         """record cmd if hot word detected -> parse -> map
         """
         if voice_porcupine_custom.hot_word_flag:
-            print("\nFinish recording\n Start parsing")
+            print("\nStart parsing")
             self.parse_command()
-            print("\nFinish parsing\n")
+            print("Finish parsing\n")
             return self.var

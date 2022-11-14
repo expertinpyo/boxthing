@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -150,7 +149,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             .path("/success/" + registrationId)
             .build()
             .toUriString();
-
 
     getRedirectStrategy().sendRedirect(request, response, uri);
   }

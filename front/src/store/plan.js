@@ -26,11 +26,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-11-14T23:50:00+09:00",
+  //       dateTime: "2022-11-15T23:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-11-14T23:59:00+09:00",
+  //       dateTime: "2022-11-15T23:59:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "5curjtaj80idbjt1i46vtgimfq@google.com",
@@ -40,7 +40,7 @@ const planState = atom({
   //     },
   //     eventType: "default",
   //     calendar: {
-  //       backgroundColor: "white",
+  //       backgroundColor: "red",
   //     },
   //   },
   //   {
@@ -63,11 +63,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-11-14T23:50:00+09:00",
+  //       dateTime: "2022-11-15T09:10:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-11-14T23:59:00+09:00",
+  //       dateTime: "2022-11-15T10:00:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "3q67nteuc6h3jn6o7jljokfdr9@google.com",
@@ -100,11 +100,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-11-14T23:57:00+09:00",
+  //       dateTime: "2022-11-15T09:37:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-11-14T23:59:00+09:00",
+  //       dateTime: "2022-11-15T09:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "5kdtfcmv5qhuj6qas12need0ct@google.com",
@@ -114,7 +114,7 @@ const planState = atom({
   //     },
   //     eventType: "default",
   //     calendar: {
-  //       backgroundColor: "white",
+  //       backgroundColor: "blue",
   //     },
   //   },
   // ],

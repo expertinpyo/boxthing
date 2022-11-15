@@ -1,10 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
 import ReactECharts from "echarts-for-react";
-// import cloneDeep from "lodash.clonedeep";
-import { useRecoilValue } from "recoil";
-import { postureState } from "../../store/posture";
-// import { sample_data } from "./sampleData";
 import moment from "moment";
 
 const PostureLineGraph = ({ data }) => {
@@ -28,6 +24,10 @@ const PostureLineGraph = ({ data }) => {
       splitLine: {
         show: false,
       },
+      type: "value",
+      scale: true,
+      max: 100,
+      min: 0,
     },
     visualMap: [
       {

@@ -21,7 +21,7 @@ import {
 import { ptoggleState, wtoggleState } from "../store/nav";
 import { notiState } from "../store/noti";
 import { planState } from "../store/plan";
-import { postureState } from "../store/posture";
+import { cameraConnectionState, postureState } from "../store/posture";
 import { linkState } from "../store/qrcode";
 import { socketState } from "../store/socket";
 import { statisticsState } from "../store/statistics";
@@ -61,6 +61,7 @@ const Subscriber = () => {
 
   const setOrderModal = useSetRecoilState(orderModalState);
   const setOrderSecondModal = useSetRecoilState(orderSecondModalState);
+  const setCameraConnection = useSetRecoilState(cameraConnectionState);
 
   const navi = useNavigate();
 
@@ -103,10 +104,6 @@ const Subscriber = () => {
                   JSON.stringify({ type: "log/posture/today", data: null })
                 );
                 console.log("send lo g/posture/today message to server!");
-                socket.send(
-                  JSON.stringify({ type: "posture/reset", data: null })
-                );
-                console.log("send close capture modal message to server!");
               }
             } else {
               setLinkState(message.data.google.link);
@@ -125,10 +122,6 @@ const Subscriber = () => {
                 JSON.stringify({ type: "log/posture/today", data: null })
               );
               console.log("send lo g/posture/today message to server!");
-              socket.send(
-                JSON.stringify({ type: "posture/reset", data: null })
-              );
-              console.log("send close capture modal message to server!");
             }
             break;
           case "github/qr":
@@ -180,6 +173,7 @@ const Subscriber = () => {
               );
               console.log("send close capture modal message to server!");
             }
+            setCameraConnection(true);
             break;
           case "route/calendar":
             navi("/");
@@ -217,6 +211,7 @@ const Subscriber = () => {
             break;
           case "posture/re":
             if (socket && socket.readyState === 1) {
+              setCameraConnection(false);
               socket.send(
                 JSON.stringify({ type: "posture/reset", data: null })
               );
@@ -260,6 +255,7 @@ const Subscriber = () => {
     setNoOrderModal,
     setOrderModal,
     setOrderSecondModal,
+    setCameraConnection,
   ]);
 };
 

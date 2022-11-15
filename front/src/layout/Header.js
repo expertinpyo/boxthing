@@ -4,7 +4,6 @@ import Timer from "../component/Header/Timer";
 import calendar from "../asset/nav_icon/google-calendar.png";
 import github from "../asset/nav_icon/github.png";
 import pain from "../asset/nav_icon/pain.png";
-import drinkWater from "../asset/nav_icon/drink-water.png";
 
 import NavListItem from "../component/Header/NavListItem";
 import WaterNavItem from "../component/Header/WaterNavItem";

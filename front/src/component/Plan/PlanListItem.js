@@ -1,32 +1,36 @@
 /** @jsxImportSource @emotion/react */
 import moment from "moment";
-import { useRecoilValue } from "recoil";
-import { inProgressPlanState } from "../../store/plan";
 import "./PlanListItem.css";
+import "../Git/NotiListItem.css";
 
 const PlanListItem = ({ item, type = "" }) => {
-  const inprogress = useRecoilValue(inProgressPlanState);
   const start = moment(item.start.dateTime);
   const end = moment(item.end.dateTime);
 
   return (
     <div
       css={{
+        background: type === "inprogress" ? "white" : "rgba(255,255,255,0.375)",
+        position: "relative",
         width: "100%",
         height: "15%",
         display: "flex",
         justifyContent: "space-between",
-        background: "rgba(255,255,255,0.375)",
         alignItems: "center",
         paddingRight: 16,
         paddingLeft: 16,
         marginBottom: 8,
         borderRadius: 8,
-        border: `${item.calendar.backgroundColor} 3px solid`,
+        border:
+          type === "inprogress"
+            ? ""
+            : `${item.calendar.backgroundColor} 3px solid`,
       }}
       className={
-        inprogress.some((progress) => progress.id === item.id)
-          ? "inprogressItem"
+        type === "inprogress"
+          ? "gradient-border"
+          : type === "upcoming"
+          ? "alerts-border"
           : ""
       }
     >

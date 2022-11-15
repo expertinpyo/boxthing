@@ -26,3 +26,14 @@
     background-position: 661px 0px;
   }
 }
+
+.alerts-border {
+  animation: blink 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}

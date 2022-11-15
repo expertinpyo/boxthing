@@ -64,7 +64,15 @@ function PlanBox({ key }) {
         <div css={{ width: "69%", height: "100%" }}>
           {plan.length !== 0 ? (
             plan.map((item) => {
-              return <PlanListItem key={item.id} item={item} />;
+              return upcomingPlan.some(
+                (upcoming) => upcoming.id === item.id
+              ) ? (
+                <PlanListItem key={item.id} item={item} type={"upcoming"} />
+              ) : inProgressPlan.some((progress) => progress.id === item.id) ? (
+                <PlanListItem key={item.id} item={item} type={"inprogress"} />
+              ) : (
+                <PlanListItem key={item.id} item={item} />
+              );
             })
           ) : (
             <div

@@ -65,9 +65,14 @@ const Subscriber = () => {
 
   const navi = useNavigate();
 
+  console.log(socket);
+
   useEffect(() => {
-    setSocket(new WebSocket("ws://localhost:8765"));
-  }, [setSocket]);
+    if (socket == null) {
+      console.log("try to connect with server!");
+      setSocket(new WebSocket("ws://localhost:8765"));
+    }
+  }, [socket, setSocket]);
 
   useEffect(() => {
     if (socket) {

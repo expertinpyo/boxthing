@@ -8,6 +8,7 @@ import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
 from os import environ
+from threading import Thread
 import logging
 
 from modules.api import (
@@ -41,6 +42,9 @@ class State:
 state = State()
 cam = Cam()
 
+th = Thread(target=cam.take_picture)
+th.start()
+
 
 async def ws_consumer(websocket):
     async for message in websocket:
@@ -66,16 +70,16 @@ async def ws_consumer(websocket):
 
         if type_list[0] == "posture":
             if type_list[1] == "reset":
-                await cam.stop()
+                cam.stop()
                 await ws_message_queue.put(("posture/ready", None))
             elif type_list[1] == "capture":
-                result = await cam.checking(data)
+                result = cam.checking(data)
                 if result:
                     await ws_message_queue.put(("posture/complete", None))
                 else:
                     await ws_message_queue.put(("posture/nope", None))
             elif type_list[1] == "complete":
-                await cam.start()
+                cam.start()
 
 
 async def ws_producer(websocket):
@@ -357,19 +361,19 @@ async def voice_command_coroutine():
                 # print("calendar")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/calendar", None))
-            elif voice_cmd == "깃허브":
+            elif voice_cmd == "깃허브" or voice_cmd == "기타부" or voice_cmd == "러브":
                 # print("Git")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/git", None))
-            elif voice_cmd == "자세":
+            elif voice_cmd == "자세" or voice_cmd == "자세히":
                 # print("posture")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/posture", None))
-            elif voice_cmd == "마신" or voice_cmd == "음수량":
+            elif voice_cmd == "마신" or voice_cmd == "음수량" or voice_cmd == "맛있는" or voice_cmd == "마신물" or voice_cmd == "음주량" or voice_cmd == "미수령":
                 # print("water-check")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/water", None))
-            elif voice_cmd == "누적":
+            elif voice_cmd == "누적" or voice_cmd == "무적":
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/posture/today", None))
@@ -381,20 +385,22 @@ async def voice_command_coroutine():
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/today", None))
-            elif voice_cmd == "일주일" or voice_cmd == "통계":
+            elif voice_cmd == "일주일" or voice_cmd == "통계" or voice_cmd == "공개" or voice_cmd == "홍게":
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/week", None))
-            elif voice_cmd == "스트레칭":
+            elif voice_cmd == "스트레칭" or voice_cmd == "채팅":
                 # print("show_Stretching")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("stretch", None))
             elif voice_cmd == "사진":
                 print("take picture")
-                # await ws_message_queue.put(("posture/re", None))
+                await ws_message_queue.put(("success/cmd", None))
+                await ws_message_queue.put(("posture/re", None))
             elif voice_cmd == "음성":
                 print("show voice_cmd")
-                # await ws_message_queue.put(("posture/re", None))
+                await ws_message_queue.put(("success/cmd", None))
+                await ws_message_queue.put(("show/cmd", None))
             else:
                 await ws_message_queue.put(("fail/cmd", None))
                 print("unknown command")

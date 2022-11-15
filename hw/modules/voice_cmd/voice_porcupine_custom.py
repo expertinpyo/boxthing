@@ -267,5 +267,5 @@ def timer():
     global record_flag
     while True:
         if record_flag == 1:
-            time.sleep(6)
+            time.sleep(4)
             record_flag = 0

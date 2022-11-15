@@ -12,6 +12,8 @@ import {
   micModalState,
   noOrderModalState,
   notiModalState,
+  orderModalState,
+  orderSecondModalState,
   postureModalState,
   stretchModalState,
   waterModalState,
@@ -56,6 +58,9 @@ const Subscriber = () => {
 
   const setMicModal = useSetRecoilState(micModalState);
   const setNoOrderModal = useSetRecoilState(noOrderModalState);
+
+  const setOrderModal = useSetRecoilState(orderModalState);
+  const setOrderSecondModal = useSetRecoilState(orderSecondModalState);
 
   const navi = useNavigate();
 
@@ -134,7 +139,6 @@ const Subscriber = () => {
             break;
           case "calendar":
             setPlanState(message.data);
-            console.log("planState updated!");
             break;
           case "github/noti":
             setNotiState((old) => [...message.data, ...old]);
@@ -211,6 +215,20 @@ const Subscriber = () => {
             setMicModal(false);
             setNoOrderModal(true);
             break;
+          case "posture/re":
+            if (socket && socket.readyState === 1) {
+              socket.send(
+                JSON.stringify({ type: "posture/reset", data: null })
+              );
+              console.log("send close capture modal message to server!");
+            }
+            break;
+          case "show/cmd":
+            setOrderSecondModal(true);
+            setTimeout(() => {
+              setOrderModal(true);
+            }, 6000);
+            break;
           default:
             console.log("I can't distinguish the type of message...");
         }
@@ -240,6 +258,8 @@ const Subscriber = () => {
     setWaterToggle,
     setMicModal,
     setNoOrderModal,
+    setOrderModal,
+    setOrderSecondModal,
   ]);
 };
 

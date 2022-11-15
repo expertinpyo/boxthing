@@ -31,7 +31,7 @@ const NeckPainModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Turtle} alt="" css={{ width: 200 }} />
+      <img src={Turtle} alt="" css={{ width: 200, borderRadius: 8 }} />
       <div css={{ fontWeight: "bold", fontSize: 20 }}>
         거북목이 될 수 있어요!
       </div>

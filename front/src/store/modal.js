@@ -80,6 +80,16 @@ const noOrderModalState = atom({
   default: false,
 });
 
+const orderModalState = atom({
+  key: "orderModalState",
+  default: false,
+});
+
+const orderSecondModalState = atom({
+  key: "orderSecondModal",
+  default: false,
+});
+
 export {
   stretchModalState,
   planModalState,
@@ -96,5 +106,7 @@ export {
   neckPainModalState,
   spinePainModalState,
   micModalState,
+  orderModalState,
   noOrderModalState,
+  orderSecondModalState,
 };

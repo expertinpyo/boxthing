@@ -50,6 +50,9 @@ import MicModal from "./component/Modal/MicModal";
 import NoOrderModal from "./component/Modal/NoOrderModal";
 import { upcomingPlanState } from "./store/plan";
 import { unreadNotiState } from "./store/noti";
+import { useNavigate } from "react-router-dom";
+import OrderModal from "./component/Modal/OrderModal";
+import OrderSecondModal from "./component/Modal/OrderSecondModal";
 
 function App() {
   const setCurrentTime = useSetRecoilState(timerState);
@@ -70,6 +73,8 @@ function App() {
 
   const [upcomingCount, setUpcomingCount] = useState(0);
   const [unreadNotiCount, setUnreadNotiCount] = useState(0);
+
+  const navi = useNavigate();
 
   const handleResize = () => {
     const vh = window.innerHeight;
@@ -136,17 +141,23 @@ function App() {
 
   useEffect(() => {
     if (upcomingPlan.length !== upcomingCount) {
-      if (upcomingPlan.length > 0) setPlanModal(true);
+      if (upcomingPlan.length > 0) {
+        setPlanModal(true);
+        navi("/");
+      }
       setUpcomingCount(upcomingPlan.length);
     }
-  }, [upcomingPlan, setPlanModal, upcomingCount, setUpcomingCount]);
+  }, [upcomingPlan, setPlanModal, upcomingCount, setUpcomingCount, navi]);
 
   useEffect(() => {
     if (unreadNoti.length !== unreadNotiCount) {
-      if (unreadNoti.length > 0) setGitModal(true);
+      if (unreadNoti.length > 0) {
+        setGitModal(true);
+        navi("/git");
+      }
       setUnreadNotiCount(unreadNoti.length);
     }
-  }, [unreadNoti, setGitModal, unreadNotiCount, setUnreadNotiCount]);
+  }, [unreadNoti, setGitModal, unreadNotiCount, setUnreadNotiCount, navi]);
 
   return (
     <div className="App">
@@ -171,6 +182,8 @@ function App() {
       <SpinePainModal />
       <MicModal />
       <NoOrderModal />
+      <OrderModal />
+      <OrderSecondModal />
       <AnimatePresence mode="wait">
         {captureModal ? <CaptureModal /> : false}
       </AnimatePresence>

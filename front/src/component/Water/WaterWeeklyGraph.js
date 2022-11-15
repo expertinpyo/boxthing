@@ -35,8 +35,7 @@ const WaterWeeklyGraph = () => {
         })
         .map((item) => {
           return item[0].substring(5);
-        })
-        .reverse(),
+        }),
     },
     yAxis: {
       splitLine: {

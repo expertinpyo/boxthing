@@ -20,17 +20,21 @@ const PlanInProgress = ({ item }) => {
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "flex-start",
+            position: "relative",
           }}
         >
-          <div css={{ fontSize: 12, color: "var(--font-sub-color)" }}>
+          <div css={{ fontSize: 14, color: "var(--font-sub-color)" }}>
             진행 중인 일정
           </div>
           <div
             css={{
+              position: "absolute",
               width: "100%",
-              height: "50%",
+              height: "100%",
               display: "flex",
               justifyContent: "center",
+              opacity: 0.6,
+              zIndex: -1,
             }}
           >
             <img
@@ -43,7 +47,7 @@ const PlanInProgress = ({ item }) => {
           <div css={{ width: "100%" }}>
             <div
               css={{
-                fontSize: 20,
+                fontSize: "1.5rem",
                 width: "100%",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -54,7 +58,7 @@ const PlanInProgress = ({ item }) => {
             </div>
             <div
               css={{
-                fontSize: 12,
+                fontSize: "1rem",
                 width: "100%",
                 whiteSpace: "nowrap",
                 overflow: "hidden",

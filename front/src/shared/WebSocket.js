@@ -33,10 +33,10 @@ const Subscriber = () => {
   const setGitAuthenticationState = useSetRecoilState(gitAuthenticationState);
   const setLinkState = useSetRecoilState(linkState);
   const setPlanState = useSetRecoilState(planState);
-  const [noti, setNotiState] = useRecoilState(notiState);
+  const setNotiState = useSetRecoilState(notiState);
   const setStatisticsState = useSetRecoilState(statisticsState);
-  const [drinked, setDrinkedState] = useRecoilState(drinkedState);
-  const [posture, setPostureState] = useRecoilState(postureState);
+  const setDrinkedState = useSetRecoilState(drinkedState);
+  const setPostureState = useSetRecoilState(postureState);
 
   //setState about modal
   const setStretchModalState = useSetRecoilState(stretchModalState);
@@ -137,7 +137,7 @@ const Subscriber = () => {
             console.log("planState updated!");
             break;
           case "github/noti":
-            setNotiState((old) => [...old, ...message.data]);
+            setNotiState((old) => [...message.data, ...old]);
             break;
           case "log/water/stat":
             setStatisticsState({ water: message.data });

@@ -26,11 +26,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-11-08T16:50:00+09:00",
+  //       dateTime: "2022-11-15T23:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-11-08T17:50:00+09:00",
+  //       dateTime: "2022-11-15T23:59:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "5curjtaj80idbjt1i46vtgimfq@google.com",
@@ -39,6 +39,9 @@ const planState = atom({
   //       useDefault: true,
   //     },
   //     eventType: "default",
+  //     calendar: {
+  //       backgroundColor: "red",
+  //     },
   //   },
   //   {
   //     kind: "calendar#event",
@@ -60,11 +63,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-10-27T15:50:00+09:00",
+  //       dateTime: "2022-11-15T09:10:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-11-08T17:50:00+09:00",
+  //       dateTime: "2022-11-15T10:00:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "3q67nteuc6h3jn6o7jljokfdr9@google.com",
@@ -73,6 +76,9 @@ const planState = atom({
   //       useDefault: true,
   //     },
   //     eventType: "default",
+  //     calendar: {
+  //       backgroundColor: "white",
+  //     },
   //   },
   //   {
   //     kind: "calendar#event",
@@ -94,11 +100,11 @@ const planState = atom({
   //       self: true,
   //     },
   //     start: {
-  //       dateTime: "2022-11-07T17:57:00+09:00",
+  //       dateTime: "2022-11-15T09:37:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     end: {
-  //       dateTime: "2022-11-04T13:30:00+09:00",
+  //       dateTime: "2022-11-15T09:50:00+09:00",
   //       timeZone: "Asia/Seoul",
   //     },
   //     iCalUID: "5kdtfcmv5qhuj6qas12need0ct@google.com",
@@ -107,6 +113,9 @@ const planState = atom({
   //       useDefault: true,
   //     },
   //     eventType: "default",
+  //     calendar: {
+  //       backgroundColor: "blue",
+  //     },
   //   },
   // ],
 });

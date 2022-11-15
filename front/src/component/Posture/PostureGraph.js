@@ -5,8 +5,6 @@ import ReactECharts from "echarts-for-react";
 // import cloneDeep from "lodash.clonedeep";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { ptoggleState } from "../../store/nav";
 const PostureGraph = ({ data }) => {
   const [runtime, setRuntime] = useState([]);
 
@@ -64,11 +62,15 @@ const PostureGraph = ({ data }) => {
       type: "time",
     },
     yAxis: {
+      splitLine: {
+        show: false,
+      },
       type: "value",
       scale: true,
       max: 100,
       min: 0,
     },
+
     series: {
       name: "측정값",
       type: "bar",
@@ -94,6 +96,17 @@ const PostureGraph = ({ data }) => {
             item["posture_score"] === 0 ? null : item["posture_score"],
           ];
         }),
+      markLine: {
+        silent: true,
+        lineStyle: {
+          color: "#333",
+        },
+        data: [
+          {
+            yAxis: 70,
+          },
+        ],
+      },
     },
   };
 

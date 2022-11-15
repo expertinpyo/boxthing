@@ -41,10 +41,12 @@ class State:
 state = State()
 cam = Cam()
 
+
 async def ws_consumer(websocket):
     async for message in websocket:
         message_dict = json.loads(message)
-        type_list = message_dict["type"].split("/") if "type" in message_dict else [""]
+        type_list = message_dict["type"].split(
+            "/") if "type" in message_dict else [""]
         data = message_dict["data"] if "data" in message_dict else None
 
         logger.info(f"message from websocket type={type_list}")
@@ -71,7 +73,7 @@ async def ws_consumer(websocket):
                 if result:
                     await ws_message_queue.put(("posture/complete", None))
                 else:
-                    await ws_message_queue.put(("posture/nope", None)) 
+                    await ws_message_queue.put(("posture/nope", None))
             elif type_list[1] == "complete":
                 await cam.start()
 
@@ -127,7 +129,6 @@ async def ws_handler(websocket):
     state.github_notification_last_updated_at = None
 
     await mqtt_message_queue.put(("init", None))
-
 
 
 async def mqtt_consumer(client):
@@ -328,48 +329,51 @@ async def water_coroutine():
             await mqtt_message_queue.put(("water", water))
         await asyncio.sleep(0.1)
 
+
 async def motion_coro():
     async for image in cam.capture():
         print(image)
         await ws_message_queue.put(("posture", image))
         await mqtt_message_queue.put(("posture", image))
 
+
 async def recognize_boxthing_coroutine():
     while True:
         recognize_flag = recognize_boxthing()
-        if recognize_flag :
+        if recognize_flag:
             print("인식함")
             await ws_message_queue.put(("send/cmd", None))
         await asyncio.sleep(0.1)
 
+
 async def voice_command_coroutine():
 
     while True:
-        #await state.ws_connected.wait()
+        # await state.ws_connected.wait()
         voice_cmd = give_events()
         if voice_cmd:
             print(voice_cmd)
             if voice_cmd == "캘린더":
-                #print("calendar")
+                # print("calendar")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/calendar", None))
             elif voice_cmd == "깃허브":
-                #print("Git")
+                # print("Git")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/git", None))
             elif voice_cmd == "자세":
-                #print("posture")
+                # print("posture")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/posture", None))
-            elif voice_cmd == "음수량":
-                #print("water-check")
+            elif voice_cmd == "마신" or voice_cmd == "음수량":
+                # print("water-check")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/water", None))
-            elif voice_cmd == "현재":
+            elif voice_cmd == "누적":
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/posture/today", None))
-            elif voice_cmd == "진행":
+            elif voice_cmd == "실시간":
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/posture/runtime", None))
@@ -377,16 +381,19 @@ async def voice_command_coroutine():
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/today", None))
-            elif voice_cmd == "일주일":
+            elif voice_cmd == "일주일" or voice_cmd == "통계":
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/week", None))
             elif voice_cmd == "스트레칭":
-                #print("show_Stretching")
+                # print("show_Stretching")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("stretch", None))
             elif voice_cmd == "사진":
                 print("take picture")
+                # await ws_message_queue.put(("posture/re", None))
+            elif voice_cmd == "음성":
+                print("show voice_cmd")
                 # await ws_message_queue.put(("posture/re", None))
             else:
                 await ws_message_queue.put(("fail/cmd", None))

@@ -7,20 +7,21 @@ import PostureGraph from "../Posture/PostureGraph";
 import PostureLineGraph from "../Posture/PostureLineGraph";
 import ToggleButton from "../Water/ToggleButton";
 import { useEffect } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
-  cutRuntimeState,
+  cameraConnectionState,
   postureAvgState,
   postureState,
-  runtimeState,
 } from "../../store/posture";
 import { socketState } from "../../store/socket";
 import { ptoggleState } from "../../store/nav";
+import NoRecord from "../../asset/no-recording.png";
 
 function PostureBox({ key }) {
+  const setCameraConnection = useSetRecoilState(cameraConnectionState);
   const [state, setState] = useRecoilState(ptoggleState);
+  const cameraConnection = useRecoilValue(cameraConnectionState);
   const posture = useRecoilValue(postureState);
-  // const runtime = useRecoilValue(cutRuntimeState);
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
@@ -47,6 +48,28 @@ function PostureBox({ key }) {
       exit={{ transform: "translateY(100%)", opacity: 0 }}
       transition={{ duration: 0.5, ease: "circOut" }}
     >
+      {cameraConnection ? (
+        false
+      ) : (
+        <div
+          css={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "30%",
+            aspectRatio: "1/1",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            zIndex: 50,
+          }}
+        >
+          <img src={NoRecord} alt="" css={{ width: 200 }} />
+          <div css={{ fontWeight: "bold" }}>기준 사진 촬영이 필요합니다!</div>
+        </div>
+      )}
       <div css={{ position: "relative", width: "100%", height: "100%" }}>
         <div css={{ position: "absolute", top: 0, right: 0, zIndex: 10 }}>
           <ToggleButton
@@ -79,6 +102,7 @@ function PostureBox({ key }) {
           onClick={() => {
             console.log("send reset message to server!");
             if (socket && socket.readyState === 1) {
+              setCameraConnection(false);
               socket.send(
                 JSON.stringify({ type: "posture/reset", data: null })
               );

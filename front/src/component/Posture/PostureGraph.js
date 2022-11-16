@@ -9,16 +9,18 @@ const PostureGraph = ({ data }) => {
   const [runtime, setRuntime] = useState([]);
 
   useEffect(() => {
-    return () => {
-      setRuntime([]);
-    };
-  }, []);
-
-  useEffect(() => {
     if (data.length !== 0) {
       setRuntime((old) => [...old, data[data.length - 1]]);
     }
   }, [data, setRuntime]);
+
+  useEffect(() => {
+    setRuntime([]);
+
+    return () => {
+      setRuntime([]);
+    };
+  }, []);
 
   const DEFAULT_OPTION = {
     title: {

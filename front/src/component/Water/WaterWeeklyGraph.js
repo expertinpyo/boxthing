@@ -56,8 +56,7 @@ const WaterWeeklyGraph = () => {
           })
           .map((item) => {
             return Number.parseInt(item[0]);
-          })
-          .reverse(),
+          }),
         markLine: {
           silent: true,
           lineStyle: {

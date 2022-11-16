@@ -33,8 +33,8 @@ const WelcomeModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Hello} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold" }}>환영합니다!</div>
+      <img src={Hello} alt="" css={{ width: 250, marginBottom: 10 }} />
+      <div css={{ fontWeight: "bold", fontSize: 20 }}>환영합니다!</div>
     </div>
   );
 };

@@ -13,7 +13,6 @@ import { AnimatePresence } from "framer-motion";
 import { authenticationState } from "./store/auth";
 
 // import modals
-import PostureModal from "./component/Modal/PostureModal";
 import WaterModal from "./component/Modal/WaterModal";
 import StretchingModal from "./component/Modal/StretchingModal";
 
@@ -28,7 +27,6 @@ import NotiModal from "./component/Modal/NotiModal";
 
 import { Subscriber } from "./shared/WebSocket";
 import WelcomeModal from "./component/Modal/WelcomeModal";
-import PhotoModal from "./component/Modal/PhotoModal";
 
 import moment from "moment";
 import CaptureModal from "./component/Modal/CaptureModal";
@@ -37,7 +35,6 @@ import {
   neckPainModalState,
   notiModalState,
   planModalState,
-  spinePainModalState,
 } from "./store/modal";
 
 import { postureState } from "./store/posture";
@@ -45,7 +42,6 @@ import CaptureBadModal from "./component/Modal/CaptureBadModal";
 import CaptureStartModal from "./component/Modal/CaptureStartModal";
 import CaptureGoodModal from "./component/Modal/CaptureGoodModal";
 import NeckPainModal from "./component/Modal/NeckPainModal";
-import SpinePainModal from "./component/Modal/SpinePainModal";
 import MicModal from "./component/Modal/MicModal";
 import NoOrderModal from "./component/Modal/NoOrderModal";
 import { upcomingPlanState } from "./store/plan";
@@ -64,7 +60,6 @@ function App() {
 
   const captureModal = useRecoilValue(captureModalState);
   const [neckModal, setNeckModal] = useRecoilState(neckPainModalState);
-  const [spineModal, setSpineModal] = useRecoilState(spinePainModalState);
   const runtime = useRecoilValue(postureState);
   const upcomingPlan = useRecoilValue(upcomingPlanState);
   const setPlanModal = useSetRecoilState(planModalState);
@@ -129,15 +124,7 @@ function App() {
 
       if (neck) setNeckModal(true);
     }
-    if (!spineModal && runtime.length >= 5) {
-      const spine = cut.every((item) => {
-        const result = item["posture_flag"];
-        return result && Number.parseInt(result) === 3;
-      });
-
-      if (spine) setSpineModal(true);
-    }
-  }, [runtime, neckModal, setNeckModal, spineModal, setSpineModal]);
+  }, [runtime, neckModal, setNeckModal]);
 
   useEffect(() => {
     if (upcomingPlan.length !== upcomingCount) {
@@ -172,14 +159,11 @@ function App() {
       <NotiModal />
       <WaterModal />
       <PlanModal />
-      <PostureModal />
       <WelcomeModal />
-      <PhotoModal />
       <CaptureBadModal />
       <CaptureStartModal />
-      <CaptureGoodModal />
+      <CaptureGoodModal />-
       <NeckPainModal />
-      <SpinePainModal />
       <MicModal />
       <NoOrderModal />
       <OrderModal />

@@ -162,7 +162,7 @@ function App() {
       <WelcomeModal />
       <CaptureBadModal />
       <CaptureStartModal />
-      <CaptureGoodModal />-
+      <CaptureGoodModal />
       <NeckPainModal />
       <MicModal />
       <NoOrderModal />

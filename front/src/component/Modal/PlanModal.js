@@ -33,8 +33,8 @@ const PlanModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Hurry} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold" }}>일정이 임박했습니다!</div>
+      <img src={Hurry} alt="" css={{ width: 300, marginBottom: 10 }} />
+      <div css={{ fontWeight: "bold", fontSize: 20 }}>일정이 임박했습니다!</div>
     </div>
   );
 };

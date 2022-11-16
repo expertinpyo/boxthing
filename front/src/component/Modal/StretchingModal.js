@@ -100,6 +100,7 @@ const StretchingModal = () => {
               alignItems: "flex-start",
               paddingLeft: 32,
               flexDirection: "column",
+              paddingRight: 16,
             }}
           >
             {stretchingList[choice].explanation.map((item, index) => {

@@ -31,7 +31,7 @@ const CaptureBadModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Bad} alt="" css={{ width: 200 }} />
+      <img src={Bad} alt="" css={{ width: 200, marginBottom: 20 }} />
       <div css={{ fontWeight: "bold", fontSize: 20 }}>
         인식에 실패했습니다... 다시 해볼게요!
       </div>

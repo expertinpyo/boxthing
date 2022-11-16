@@ -9,11 +9,13 @@ const postureAvgState = selector({
   key: "postureAvgState",
   get: ({ get }) => {
     const list = get(postureState);
-    const length = list.length;
+    let length = list.length;
     if (length === 0) return 0;
     let sum = 0;
     list.forEach((item) => {
-      sum += Number.parseInt(item["posture_score"]);
+      const temp = Number.parseInt(item["posture_score"]);
+      if (temp !== 0) sum += Number.parseInt(item["posture_score"]);
+      else length--;
     });
     return (sum / length).toFixed(1);
   },

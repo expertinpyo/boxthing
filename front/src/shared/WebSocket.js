@@ -65,8 +65,6 @@ const Subscriber = () => {
 
   const navi = useNavigate();
 
-  console.log(socket);
-
   useEffect(() => {
     if (socket == null) {
       console.log("try to connect with server!");

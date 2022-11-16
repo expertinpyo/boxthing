@@ -14,9 +14,9 @@ import {
   notiModalState,
   orderModalState,
   orderSecondModalState,
-  postureModalState,
   stretchModalState,
   waterModalState,
+  welcomeModalState,
 } from "../store/modal";
 import { ptoggleState, wtoggleState } from "../store/nav";
 import { notiState } from "../store/noti";
@@ -44,7 +44,6 @@ const Subscriber = () => {
   const setStretchModalState = useSetRecoilState(stretchModalState);
   const setNotiModalState = useSetRecoilState(notiModalState);
   const setWaterModalState = useSetRecoilState(waterModalState);
-  const setPostureModalState = useSetRecoilState(postureModalState);
   const setCaptureModalState = useSetRecoilState(captureModalState);
 
   const setCaptureFunc = useSetRecoilState(captureFuncState);
@@ -62,6 +61,8 @@ const Subscriber = () => {
   const setOrderModal = useSetRecoilState(orderModalState);
   const setOrderSecondModal = useSetRecoilState(orderSecondModalState);
   const setCameraConnection = useSetRecoilState(cameraConnectionState);
+
+  const setWelcomeModal = useSetRecoilState(welcomeModalState);
 
   const navi = useNavigate();
 
@@ -116,6 +117,7 @@ const Subscriber = () => {
             break;
           case "login":
             setAuthenticationState(true);
+            setWelcomeModal(true);
             if (socket && socket.readyState === 1) {
               socket.send(
                 JSON.stringify({ type: "log/water/today", data: null })
@@ -241,7 +243,6 @@ const Subscriber = () => {
     setLinkState,
     setStatisticsState,
     setWaterModalState,
-    setPostureModalState,
     setStretchModalState,
     setNotiModalState,
     setDrinkedState,
@@ -259,6 +260,7 @@ const Subscriber = () => {
     setOrderModal,
     setOrderSecondModal,
     setCameraConnection,
+    setWelcomeModal,
   ]);
 };
 

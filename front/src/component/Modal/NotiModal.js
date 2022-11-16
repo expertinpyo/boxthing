@@ -33,8 +33,10 @@ const NotiModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={NewPost} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold" }}>새로운 Github 알림이 도착했어요!</div>
+      <img src={NewPost} alt="" css={{ width: 250, marginBottom: 10 }} />
+      <div css={{ fontWeight: "bold", fontSize: 20 }}>
+        새로운 Github 알림이 도착했어요!
+      </div>
     </div>
   );
 };

@@ -31,7 +31,7 @@ const CaptureGoodModal = () => {
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Good} alt="" css={{ width: 200 }} />
+      <img src={Good} alt="" css={{ width: 250, marginBottom: 10 }} />
       <div css={{ fontWeight: "bold", fontSize: 20 }}>
         성공적으로 촬영했습니다!
       </div>

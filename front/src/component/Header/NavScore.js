@@ -13,7 +13,7 @@ const NavScore = () => {
         aspectRatio: "1/1",
         bottom: -15,
         right: -15,
-        color: score === 0 ? "black" : score > 80 ? "green" : "red",
+        color: score === 0 ? "black" : score > 70 ? "green" : "red",
         fontSize: 20,
         fontWeight: "bold",
         lineHeight: 0,

@@ -1,6 +1,6 @@
 # Boxthing
 
-![LGO2.png](README%20b10055c6f998418885c89ce72ca17d2e/LGO2.png)
+![LGO2.png](https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F74877254-3d32-4c85-bbce-cb78aafb315b%2FLGO2.png?table=block&id=f6b2810a-6aa8-4acb-adb3-156df6d8b176&spaceId=1cb587b7-9197-4d3d-ae40-7c93fcf2070a&width=2000&userId=1aa8f4c2-cc76-4782-a183-7be85c182abc&cache=v2)
 
 ## ****🎥**** 서비스 소개 영상
 
@@ -33,7 +33,7 @@
 
 ## 🏗️ Total Architecture
 
-![Untitled](README%20b10055c6f998418885c89ce72ca17d2e/Untitled.png)
+![Untitled](https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F32b44f8d-d88a-4133-ab35-1ecc7d3370e7%2FUntitled.png?table=block&id=2c07facc-752d-4680-9be3-a3d1c842fbf2&spaceId=1cb587b7-9197-4d3d-ae40-7c93fcf2070a&width=2000&userId=1aa8f4c2-cc76-4782-a183-7be85c182abc&cache=v2)
 
 ## ⌨️ Tech Stacks
 

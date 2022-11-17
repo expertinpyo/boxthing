@@ -39,7 +39,7 @@ async def github_notification(token, last_updated_at=None):
                 if not updated_at:
                     updated_at = datetime.fromisoformat(
                         notifications[0]["updated_at"].replace("Z", "+00:00")
-                    )
+                    ) + timedelta(seconds=1)
 
                 if len(data) < PER_PAGE:
                     break
@@ -62,9 +62,8 @@ async def github_set_read(token, last_updated_at=None):
     data = {"read": True}
 
     if last_updated_at:
-        last_updated_at_plus_1sec = last_updated_at + timedelta(seconds=1)
-        data["last_read_at"] = last_updated_at_plus_1sec.strftime("%Y-%m-%dT%H:%M:%SZ")
+        data["last_read_at"] = last_updated_at.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     async with aiohttp.ClientSession() as session:
         async with session.put(url=url, headers=headers, json=data) as response:
-            logger.info(f"set github notifications as read since {last_updated_at} with status={response.status}")
+            logger.info(f"set github notifications as read until {last_updated_at} with status={response.status}")

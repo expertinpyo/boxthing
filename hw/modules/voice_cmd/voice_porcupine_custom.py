@@ -27,6 +27,7 @@ from pvrecorder import PvRecorder
 hot_word_flag = 0
 stop_wake_flag = 0
 record_flag = 0
+wakeword_flag = 0
 recognize = 0
 load_dotenv()
 
@@ -64,7 +65,7 @@ class PorcupineCustom(Thread):
         self.kill_received = False  # for terminating thread
 
     def run(self):
-        global record_flag
+        global record_flag, wakeword_flag
         """
          Creates an input audio stream, instantiates an instance of Porcupine object, and monitors the audio stream for
          occurrences of the wake word(s). It prints the time of detection for each occurrence and the wake word.
@@ -111,6 +112,9 @@ class PorcupineCustom(Thread):
                     pcm = recorder.read()
                     result = porcupine.process(pcm)
                     # set hot word flag
+                    if wakeword_flag == 1:
+                        hot_word_flag = 0
+                        continue
                     if result >= 0:
                         recognize = 1
                         print('[%s] Detected %s' %
@@ -120,6 +124,7 @@ class PorcupineCustom(Thread):
                         wav_file = wave.open(output_path, "w")
                         wav_file.setparams((1, 2, 16000, 512, "NONE", "NONE"))
                         record_flag = 1
+                        wakeword_flag = 1
                         while record_flag == 1:
                             pcm = recorder.read()
                             wav_file.writeframes(
@@ -263,9 +268,17 @@ def porcupine_parsing():
         return args
 
 
-def timer():
+def timer1():
     global record_flag
     while True:
         if record_flag == 1:
             time.sleep(4)
             record_flag = 0
+
+
+def timer2():
+    global wakeword_flag
+    while True:
+        if wakeword_flag == 1:
+            time.sleep(12)
+            wakeword_flag = 0

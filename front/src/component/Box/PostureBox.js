@@ -7,7 +7,7 @@ import PostureGraph from "../Posture/PostureGraph";
 import PostureLineGraph from "../Posture/PostureLineGraph";
 import ToggleButton from "../Water/ToggleButton";
 import { useEffect } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
   cameraConnectionState,
   postureAvgState,
@@ -18,9 +18,10 @@ import { ptoggleState } from "../../store/nav";
 import NoRecord from "../../asset/no-recording.png";
 
 function PostureBox({ key }) {
-  const setCameraConnection = useSetRecoilState(cameraConnectionState);
+  const [cameraConnection, setCameraConnection] = useRecoilState(
+    cameraConnectionState
+  );
   const [state, setState] = useRecoilState(ptoggleState);
-  const cameraConnection = useRecoilValue(cameraConnectionState);
   const posture = useRecoilValue(postureState);
   const avg = useRecoilValue(postureAvgState);
 
@@ -102,7 +103,7 @@ function PostureBox({ key }) {
           onClick={() => {
             console.log("send reset message to server!");
             if (socket && socket.readyState === 1) {
-              setCameraConnection(false);
+              setCameraConnection(true);
               socket.send(
                 JSON.stringify({ type: "posture/reset", data: null })
               );

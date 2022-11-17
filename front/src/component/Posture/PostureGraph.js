@@ -48,11 +48,6 @@ const PostureGraph = ({ data }) => {
             lte: 100,
             color: "green",
           },
-          {
-            gt: 1,
-            lt: 4,
-            color: "rgba(0, 0, 180, 0.4)",
-          },
         ],
         show: false,
         outOfRange: {

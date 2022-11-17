@@ -212,7 +212,7 @@ def porcupine_parsing():
     parser.add_argument(
         '--keyword_paths',
         nargs='+',
-        help="Absolute paths to keyword model files. If not set it will be populated from `--keywords` argument", default=[environ["KEYWORDS_PATH1"],environ["KEYWORDS_PATH2"],environ["KEYWORDS_PATH3"],environ["KEYWORDS_PATH4"]])
+        help="Absolute paths to keyword model files. If not set it will be populated from `--keywords` argument", default=[environ["KEYWORDS_PATH1"], environ["KEYWORDS_PATH2"], environ["KEYWORDS_PATH3"], environ["KEYWORDS_PATH4"]])
 
     parser.add_argument(
         '--library_path', help='Absolute path to dynamic library.', default=pvporcupine.LIBRARY_PATH)

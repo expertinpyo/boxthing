@@ -26,12 +26,6 @@ function PostureBox({ key }) {
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
-  useEffect(() => {
-    if (socket && socket.readyState === 1) {
-      socket.send(JSON.stringify({ type: "log/posture/today", data: null }));
-      console.log("send lo g/posture/today message to server!");
-    }
-  }, [socket]);
 
   return (
     <motion.div

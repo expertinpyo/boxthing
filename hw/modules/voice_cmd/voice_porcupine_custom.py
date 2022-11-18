@@ -133,8 +133,9 @@ class PorcupineCustom(Thread):
                         wav_file.close()
                         hot_word_flag = 1
                         recorder.stop()
-                        time.sleep(5)
+                        time.sleep(2)
                         recorder.start()
+                        time.sleep(3)
                         print('Using device: %s', recorder.selected_device)
                         print('Listening {')
                         for keyword, sensitivity in zip(keywords, self._sensitivities):

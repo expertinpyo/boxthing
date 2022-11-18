@@ -60,7 +60,7 @@ function App() {
 
   const captureModal = useRecoilValue(captureModalState);
   const [neckModal, setNeckModal] = useRecoilState(neckPainModalState);
-  const runtime = useRecoilValue(postureState);
+  const [runtime, setRuntime] = useRecoilState(postureState);
   const upcomingPlan = useRecoilValue(upcomingPlanState);
   const setPlanModal = useSetRecoilState(planModalState);
   const unreadNoti = useRecoilValue(unreadNotiState);
@@ -114,17 +114,21 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const copy = [...runtime];
-    const cut = copy.splice(runtime.length - 5);
-    if (!neckModal && runtime.length >= 5) {
-      const neck = cut.every((item) => {
-        const result = item["posture_flag"];
-        return result && Number.parseInt(result) === 2;
-      });
+    if (runtime) {
+      const copy = [...runtime];
+      const cut = copy.splice(runtime.length - 5);
+      if (!neckModal && runtime.length >= 5) {
+        const neck = cut.every((item) => {
+          const result = item["posture_flag"];
+          return result && Number.parseInt(result) === 2;
+        });
 
-      if (neck) setNeckModal(true);
+        if (neck) setNeckModal(true);
+      }
+    } else {
+      setRuntime([]);
     }
-  }, [runtime, neckModal, setNeckModal]);
+  }, [runtime, neckModal, setNeckModal, setRuntime]);
 
   useEffect(() => {
     if (upcomingPlan.length !== upcomingCount) {

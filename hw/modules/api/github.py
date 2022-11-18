@@ -1,6 +1,7 @@
 import aiohttp
 from datetime import datetime, timedelta
 import logging
+import json
 
 GITHUB_API_BASE_URL = "https://api.github.com"
 PER_PAGE = 50
@@ -49,6 +50,8 @@ async def github_notification(token, last_updated_at=None):
     logger.info(
         f"get {len(notifications)} github notifications since {last_updated_at}"
     )
+
+    logger.debug(f"Obtained notifications: {json.dumps(notifications, ensure_ascii=False, indent=2)}")
 
     return notifications, updated_at
 

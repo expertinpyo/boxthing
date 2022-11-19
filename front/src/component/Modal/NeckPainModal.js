@@ -26,13 +26,20 @@ const NeckPainModal = () => {
         alignItems: "center",
         flexDirection: "column",
         zIndex: 50,
+        background: "rgba(255, 255, 255, 0.375)",
         transition: "visibility 0.3s linear,opacity 0.3s linear",
         visibility: state ? "visible" : "hidden",
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Turtle} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold", fontSize: 20 }}>목이 무거워해요 ㅠㅠ</div>
+      <img
+        src={Turtle}
+        alt=""
+        css={{ width: 300, borderRadius: 8, marginBottom: 10 }}
+      />
+      <div css={{ fontWeight: "bold", fontSize: 20 }}>
+        거북목이 될 수 있어요!
+      </div>
     </div>
   );
 };

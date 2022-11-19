@@ -2,17 +2,17 @@
 
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
-import Turtle from "../../asset/turtle.gif";
-import { spinePainModalState } from "../../store/modal";
+import DontKnow from "../../asset/dontknow.gif";
+import { noOrderModalState } from "../../store/modal";
 
-const SpinePainModal = () => {
-  const [state, setter] = useRecoilState(spinePainModalState);
+const NoOrderModal = () => {
+  const [state, setter] = useRecoilState(noOrderModalState);
 
   useEffect(() => {
     if (state) {
       setTimeout(() => {
         setter((pre) => !pre);
-      }, 3000);
+      }, 2000);
     }
   }, [state, setter]);
   return (
@@ -26,15 +26,22 @@ const SpinePainModal = () => {
         alignItems: "center",
         flexDirection: "column",
         zIndex: 50,
+        background: "rgba(255, 255, 255, 0.375)",
         transition: "visibility 0.3s linear,opacity 0.3s linear",
         visibility: state ? "visible" : "hidden",
         opacity: state ? 1 : 0,
       }}
     >
-      <img src={Turtle} alt="" css={{ width: 200 }} />
-      <div css={{ fontWeight: "bold", fontSize: 20 }}>허리를 곧게 피세요!</div>
+      <img
+        src={DontKnow}
+        alt=""
+        css={{ width: 300, borderRadius: 8, marginBottom: 10 }}
+      />
+      <div css={{ fontWeight: "bold", fontSize: 20 }}>
+        등록되지 않은 명령입니다!
+      </div>
     </div>
   );
 };
 
-export default SpinePainModal;
+export default NoOrderModal;

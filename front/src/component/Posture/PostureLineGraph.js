@@ -1,14 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import ReactECharts from "echarts-for-react";
-// import cloneDeep from "lodash.clonedeep";
-import { useRecoilValue } from "recoil";
-import { postureState } from "../../store/posture";
-// import { sample_data } from "./sampleData";
 import moment from "moment";
 
-const PostureLineGraph = () => {
-  const posture = useRecoilValue(postureState);
+const PostureLineGraph = ({ data }) => {
   const DEFAULT_OPTION = {
     title: {
       text: "자세 데이터 통계 분석",
@@ -29,6 +24,10 @@ const PostureLineGraph = () => {
       splitLine: {
         show: false,
       },
+      type: "value",
+      scale: true,
+      max: 100,
+      min: 0,
     },
     visualMap: [
       {
@@ -42,11 +41,6 @@ const PostureLineGraph = () => {
             gt: 70,
             lte: 100,
             color: "green",
-          },
-          {
-            gt: 1,
-            lt: 4,
-            color: "rgba(0, 0, 180, 0.4)",
           },
         ],
         show: false,
@@ -67,12 +61,14 @@ const PostureLineGraph = () => {
       // animationDelayUpdate: function (idx) {
       //   return idx * 10;
       // },
-      data: posture.map((item) => {
-        return [
-          moment(item.timestamp) - 0,
-          item["posture_score"] === 0 ? null : item["posture_score"],
-        ];
-      }),
+      data:
+        data.length !== 0 &&
+        data.map((item) => {
+          return [
+            moment(item.timestamp) - 0,
+            item["posture_score"] === 0 ? null : item["posture_score"],
+          ];
+        }),
       markLine: {
         silent: true,
         lineStyle: {

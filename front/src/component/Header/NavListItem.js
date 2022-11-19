@@ -1,17 +1,24 @@
 /** @jsxImportSource @emotion/react */
 
-import { Link } from "react-router-dom"
-import { defaultBoxStyle } from "../../style/shared"
-import NavBadge from "./NavBadge"
-import NavBang from "./NavBang"
-import NavScore from "./NavScore"
+import { Link } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { cameraConnectionState } from "../../store/posture";
+import { defaultBoxStyle } from "../../style/shared";
+import NavBadge from "./NavBadge";
+import NavBang from "./NavBang";
+import NavEx from "./NavEx";
+import NavScore from "./NavScore";
 
 const NavListItem = ({ img, path }) => {
+  const cameraConnection = useRecoilValue(cameraConnectionState);
   const setBadge = () => {
-    if (path === "/git") return <NavBadge />
-    else if (path === "/") return <NavBang />
-    else if (path === "/posture") return <NavScore />
-  }
+    if (path === "/git") return <NavBadge />;
+    else if (path === "/") return <NavBang />;
+    else if (path === "/posture") {
+      if (cameraConnection) return <NavScore />;
+      else return <NavEx />;
+    }
+  };
   return (
     <div
       css={{
@@ -30,7 +37,7 @@ const NavListItem = ({ img, path }) => {
       </Link>
       {setBadge()}
     </div>
-  )
-}
+  );
+};
 
-export default NavListItem
+export default NavListItem;

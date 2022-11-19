@@ -62,9 +62,55 @@ function PlanBox({ key }) {
           </div>
         </div>
         <div css={{ width: "69%", height: "100%" }}>
-          {plan.map((item) => {
-            return <PlanListItem key={item.id} item={item} />;
-          })}
+          {plan.length !== 0 ? (
+            plan.map((item) => {
+              return upcomingPlan.some(
+                (upcoming) => upcoming.id === item.id
+              ) ? (
+                <PlanListItem key={item.id} item={item} type={"upcoming"} />
+              ) : inProgressPlan.some((progress) => progress.id === item.id) ? (
+                <PlanListItem key={item.id} item={item} type={"inprogress"} />
+              ) : (
+                <PlanListItem key={item.id} item={item} />
+              );
+            })
+          ) : (
+            <div
+              css={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                fontSize: 24,
+              }}
+            >
+              <div css={{ marginBottom: 8, marginRight: "40%" }}>
+                오늘의 일정을
+              </div>
+              <div css={{ fontSize: 48, fontWeight: "bold", marginBottom: 8 }}>
+                <span css={{ color: "#4285F4" }}>G</span>
+                <span css={{ color: "#DB4437" }}>o</span>
+                <span css={{ color: "#F4B400" }}>o</span>
+                <span css={{ color: "#4285F4" }}>g</span>
+                <span css={{ color: "#0F9D58" }}>l</span>
+                <span css={{ color: "#DB4437" }}>e</span>
+                <span css={{ color: "#DB4437" }}> </span>
+                <span css={{ color: "#4285F4" }}>C</span>
+                <span css={{ color: "#F4B400" }}>a</span>
+                <span css={{ color: "#DB4437" }}>l</span>
+                <span css={{ color: "#0F9D58" }}>e</span>
+                <span css={{ color: "#F4B400" }}>n</span>
+                <span css={{ color: "#DB4437" }}>d</span>
+                <span css={{ color: "#0F9D58" }}>a</span>
+                <span css={{ color: "#4285F4" }}>r</span>
+
+                <span css={{ fontSize: 24, fontWeight: "normal" }}>에</span>
+              </div>
+              <div css={{ marginLeft: "40%" }}>추가해보세요!</div>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

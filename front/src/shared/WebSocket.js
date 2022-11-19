@@ -9,15 +9,19 @@ import {
   captureGoodModalState,
   captureModalState,
   captureStartModalState,
+  micModalState,
+  noOrderModalState,
   notiModalState,
-  postureModalState,
+  orderModalState,
+  orderSecondModalState,
   stretchModalState,
   waterModalState,
+  welcomeModalState,
 } from "../store/modal";
 import { ptoggleState, wtoggleState } from "../store/nav";
 import { notiState } from "../store/noti";
 import { planState } from "../store/plan";
-import { postureState } from "../store/posture";
+import { cameraConnectionState, postureState } from "../store/posture";
 import { linkState } from "../store/qrcode";
 import { socketState } from "../store/socket";
 import { statisticsState } from "../store/statistics";
@@ -31,16 +35,15 @@ const Subscriber = () => {
   const setGitAuthenticationState = useSetRecoilState(gitAuthenticationState);
   const setLinkState = useSetRecoilState(linkState);
   const setPlanState = useSetRecoilState(planState);
-  const [noti, setNotiState] = useRecoilState(notiState);
+  const setNotiState = useSetRecoilState(notiState);
   const setStatisticsState = useSetRecoilState(statisticsState);
-  const [drinked, setDrinkedState] = useRecoilState(drinkedState);
-  const [posture, setPostureState] = useRecoilState(postureState);
+  const setDrinkedState = useSetRecoilState(drinkedState);
+  const setPostureState = useSetRecoilState(postureState);
 
   //setState about modal
   const setStretchModalState = useSetRecoilState(stretchModalState);
   const setNotiModalState = useSetRecoilState(notiModalState);
   const setWaterModalState = useSetRecoilState(waterModalState);
-  const setPostureModalState = useSetRecoilState(postureModalState);
   const setCaptureModalState = useSetRecoilState(captureModalState);
 
   const setCaptureFunc = useSetRecoilState(captureFuncState);
@@ -52,11 +55,23 @@ const Subscriber = () => {
   const setPostureToggle = useSetRecoilState(ptoggleState);
   const setWaterToggle = useSetRecoilState(wtoggleState);
 
+  const setMicModal = useSetRecoilState(micModalState);
+  const setNoOrderModal = useSetRecoilState(noOrderModalState);
+
+  const setOrderModal = useSetRecoilState(orderModalState);
+  const setOrderSecondModal = useSetRecoilState(orderSecondModalState);
+  const setCameraConnection = useSetRecoilState(cameraConnectionState);
+
+  const setWelcomeModal = useSetRecoilState(welcomeModalState);
+
   const navi = useNavigate();
 
   useEffect(() => {
-    setSocket(new WebSocket("ws://localhost:8765"));
-  }, [setSocket]);
+    if (socket == null) {
+      console.log("try to connect with server!");
+      setSocket(new WebSocket("ws://localhost:8765"));
+    }
+  }, [socket, setSocket]);
 
   useEffect(() => {
     if (socket) {
@@ -93,10 +108,6 @@ const Subscriber = () => {
                   JSON.stringify({ type: "log/posture/today", data: null })
                 );
                 console.log("send lo g/posture/today message to server!");
-                socket.send(
-                  JSON.stringify({ type: "posture/reset", data: null })
-                );
-                console.log("send close capture modal message to server!");
               }
             } else {
               setLinkState(message.data.google.link);
@@ -106,6 +117,7 @@ const Subscriber = () => {
             break;
           case "login":
             setAuthenticationState(true);
+            setWelcomeModal(true);
             if (socket && socket.readyState === 1) {
               socket.send(
                 JSON.stringify({ type: "log/water/today", data: null })
@@ -115,10 +127,6 @@ const Subscriber = () => {
                 JSON.stringify({ type: "log/posture/today", data: null })
               );
               console.log("send lo g/posture/today message to server!");
-              socket.send(
-                JSON.stringify({ type: "posture/reset", data: null })
-              );
-              console.log("send close capture modal message to server!");
             }
             break;
           case "github/qr":
@@ -126,17 +134,12 @@ const Subscriber = () => {
             break;
           case "github/login":
             setGitAuthenticationState(true);
-            setCaptureModalState(true);
             break;
           case "calendar":
             setPlanState(message.data);
-            console.log("planState updated!");
             break;
           case "github/noti":
-            setNotiState([...noti, ...message.data]);
-            const someUnread = message.data.some((item) => item.unread);
-            if (someUnread) setNotiModalState(true);
-            console.log("notiState updated!");
+            setNotiState((old) => [...message.data, ...old]);
             break;
           case "log/water/stat":
             setStatisticsState({ water: message.data });
@@ -152,10 +155,10 @@ const Subscriber = () => {
             break;
           case "water":
             setWaterModalState(true);
-            setDrinkedState([...drinked, message.data]);
+            setDrinkedState((old) => [...old, message.data]);
             break;
           case "posture":
-            setPostureState([...posture, message.data]);
+            setPostureState((old) => [...old, message.data]);
             break;
           case "posture/ready":
             setCaptureStartModal(true);
@@ -175,6 +178,7 @@ const Subscriber = () => {
               );
               console.log("send close capture modal message to server!");
             }
+            setCameraConnection(true);
             break;
           case "route/calendar":
             navi("/");
@@ -189,16 +193,41 @@ const Subscriber = () => {
             navi("/water");
             break;
           case "toggle/posture/today":
-            setPostureToggle(true);
+            setPostureToggle(false);
             break;
           case "toggle/posture/runtime":
-            setPostureToggle(false);
-            break;
-          case "toggle/water/today":
             setPostureToggle(true);
             break;
+          case "toggle/water/today":
+            setWaterToggle(true);
+            break;
           case "toggle/water/week":
-            setPostureToggle(false);
+            setWaterToggle(false);
+            break;
+          case "send/cmd":
+            setMicModal(true);
+            break;
+          case "success/cmd":
+            setMicModal(false);
+            break;
+          case "fail/cmd":
+            setMicModal(false);
+            setNoOrderModal(true);
+            break;
+          case "posture/re":
+            if (socket && socket.readyState === 1) {
+              setCameraConnection(false);
+              socket.send(
+                JSON.stringify({ type: "posture/reset", data: null })
+              );
+              console.log("send close capture modal message to server!");
+            }
+            break;
+          case "show/cmd":
+            setOrderSecondModal(true);
+            setTimeout(() => {
+              setOrderModal(true);
+            }, 6000);
             break;
           default:
             console.log("I can't distinguish the type of message...");
@@ -209,18 +238,14 @@ const Subscriber = () => {
     socket,
     setPlanState,
     setNotiState,
-    noti,
     setAuthenticationState,
     setGitAuthenticationState,
     setLinkState,
     setStatisticsState,
     setWaterModalState,
-    setPostureModalState,
     setStretchModalState,
     setNotiModalState,
-    drinked,
     setDrinkedState,
-    posture,
     setPostureState,
     setCaptureFunc,
     setCaptureModalState,
@@ -230,6 +255,12 @@ const Subscriber = () => {
     setCaptureStartModal,
     setPostureToggle,
     setWaterToggle,
+    setMicModal,
+    setNoOrderModal,
+    setOrderModal,
+    setOrderSecondModal,
+    setCameraConnection,
+    setWelcomeModal,
   ]);
 };
 

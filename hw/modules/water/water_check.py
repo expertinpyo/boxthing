@@ -29,7 +29,7 @@ def amount_water():
     check_data_next = 0
     check_data_before = 0
     check_cnt = 0
-    hx = HX711(13, 8)
+    hx = HX711(15, 14)
     hx.setting()
     hx.set_reading_format("MSB", "MSB")
     hx.set_reference_unit(referenceUnit)
@@ -41,17 +41,17 @@ def amount_water():
             val = hx.get_weight(11)
             
             int_val = val + 220
-            print(int_val)
+            #print(int_val)
             if -3 <= int_val - check_data_next <= 3:
-                if check_cnt < 5:
+                if check_cnt < 3:
                     check_cnt += 1
-                if check_cnt == 5 and int_val > 10:
+                if check_cnt == 3 and int_val > 20:
                     check_cnt += 1
                     cha = check_data_before - check_data_next
                     if cha > 10:
                         return_flag = 1
             else:
-                if check_cnt == 6 and check_data_next > 10:
+                if check_cnt == 4 and check_data_next > 20:
                     check_data_before = check_data_next
                 check_cnt = 0
                 check_data_next = int_val

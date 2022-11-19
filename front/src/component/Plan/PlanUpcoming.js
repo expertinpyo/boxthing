@@ -1,24 +1,13 @@
 /** @jsxImportSource @emotion/react */
 
-import { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import Break from "../../asset/plan/Break.gif";
-import { planModalState } from "../../store/modal";
 import { upcomingPlanTimerState } from "../../store/plan";
+import Ready from "../../asset/ready.gif";
 
 const PlanUpcoming = ({ item }) => {
   const upcomingPlanTimer = useRecoilValue(upcomingPlanTimerState);
-  const [current, setCurrent] = useState(0);
-  const setPlanModal = useSetRecoilState(planModalState);
 
-  useEffect(() => {
-    if (item.length > current) {
-      setPlanModal(true);
-      setCurrent(item.length);
-    } else {
-      setCurrent(item.length);
-    }
-  }, [item, setPlanModal, current]);
   return (
     <div
       css={{
@@ -36,10 +25,28 @@ const PlanUpcoming = ({ item }) => {
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "flex-start",
+            position: "relative",
           }}
         >
           <div css={{ fontSize: 14, color: "var(--font-sub-color)" }}>
             임박한 일정
+          </div>
+          <div
+            css={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              opacity: 0.6,
+              zIndex: -1,
+            }}
+          >
+            <img
+              src={Ready}
+              alt="Ready"
+              css={{ height: "100%", aspectRatio: "1/1", borderRadius: 16 }}
+            />
           </div>
           <div
             css={{

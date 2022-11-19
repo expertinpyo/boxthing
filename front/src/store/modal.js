@@ -15,11 +15,6 @@ const notiModalState = atom({
   default: false,
 });
 
-const postureModalState = atom({
-  key: "postureModalState",
-  default: false,
-});
-
 const waterModalState = atom({
   key: "waterModalState",
   default: false,
@@ -27,11 +22,6 @@ const waterModalState = atom({
 
 const welcomeModalState = atom({
   key: "welcomeModalState",
-  default: false,
-});
-
-const photoModalState = atom({
-  key: "photoModalState",
   default: false,
 });
 
@@ -65,8 +55,23 @@ const neckPainModalState = atom({
   default: false,
 });
 
-const spinePainModalState = atom({
-  key: "spinePainModalState",
+const micModalState = atom({
+  key: "micModalState",
+  default: false,
+});
+
+const noOrderModalState = atom({
+  key: "noOrderModalState",
+  default: false,
+});
+
+const orderModalState = atom({
+  key: "orderModalState",
+  default: false,
+});
+
+const orderSecondModalState = atom({
+  key: "orderSecondModal",
   default: false,
 });
 
@@ -74,15 +79,16 @@ export {
   stretchModalState,
   planModalState,
   notiModalState,
-  postureModalState,
   waterModalState,
   welcomeModalState,
-  photoModalState,
   captureModalState,
   captureFuncState,
   captureGoodModalState,
   captureBadModalState,
   captureStartModalState,
   neckPainModalState,
-  spinePainModalState,
+  micModalState,
+  orderModalState,
+  noOrderModalState,
+  orderSecondModalState,
 };

@@ -35,13 +35,16 @@ const WaterWeeklyGraph = () => {
         })
         .map((item) => {
           return item[0].substring(5);
-        })
-        .reverse(),
+        }),
     },
     yAxis: {
       splitLine: {
         show: false,
       },
+      type: "value",
+      scale: true,
+      max: 1500,
+      min: 0,
     },
     series: [
       {
@@ -53,8 +56,7 @@ const WaterWeeklyGraph = () => {
           })
           .map((item) => {
             return Number.parseInt(item[0]);
-          })
-          .reverse(),
+          }),
         markLine: {
           silent: true,
           lineStyle: {

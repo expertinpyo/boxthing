@@ -27,6 +27,8 @@ from pvrecorder import PvRecorder
 hot_word_flag = 0
 stop_wake_flag = 0
 record_flag = 0
+wakeword_flag = 0
+recognize = 0
 load_dotenv()
 
 
@@ -63,7 +65,7 @@ class PorcupineCustom(Thread):
         self.kill_received = False  # for terminating thread
 
     def run(self):
-        global record_flag
+        global record_flag, wakeword_flag
         """
          Creates an input audio stream, instantiates an instance of Porcupine object, and monitors the audio stream for
          occurrences of the wake word(s). It prints the time of detection for each occurrence and the wake word.
@@ -104,13 +106,17 @@ class PorcupineCustom(Thread):
                 print('}')
 
                 while True:
-                    global stop_wake_flag
+                    global stop_wake_flag, recognize
                     if stop_wake_flag:
                         continue
                     pcm = recorder.read()
                     result = porcupine.process(pcm)
                     # set hot word flag
+                    if wakeword_flag == 1:
+                        hot_word_flag = 0
+                        continue
                     if result >= 0:
+                        recognize = 1
                         print('[%s] Detected %s' %
                               (str(datetime.now()), keywords[result]))
                         print("Start Recording")
@@ -118,6 +124,7 @@ class PorcupineCustom(Thread):
                         wav_file = wave.open(output_path, "w")
                         wav_file.setparams((1, 2, 16000, 512, "NONE", "NONE"))
                         record_flag = 1
+                        wakeword_flag = 1
                         while record_flag == 1:
                             pcm = recorder.read()
                             wav_file.writeframes(
@@ -126,8 +133,9 @@ class PorcupineCustom(Thread):
                         wav_file.close()
                         hot_word_flag = 1
                         recorder.stop()
-                        time.sleep(5)
+                        time.sleep(2)
                         recorder.start()
+                        time.sleep(3)
                         print('Using device: %s', recorder.selected_device)
                         print('Listening {')
                         for keyword, sensitivity in zip(keywords, self._sensitivities):
@@ -210,7 +218,7 @@ def porcupine_parsing():
     parser.add_argument(
         '--keyword_paths',
         nargs='+',
-        help="Absolute paths to keyword model files. If not set it will be populated from `--keywords` argument", default=[environ["KEYWORDS_PATH"]])
+        help="Absolute paths to keyword model files. If not set it will be populated from `--keywords` argument", default=[environ["KEYWORDS_PATH1"], environ["KEYWORDS_PATH2"], environ["KEYWORDS_PATH3"], environ["KEYWORDS_PATH4"]])
 
     parser.add_argument(
         '--library_path', help='Absolute path to dynamic library.', default=pvporcupine.LIBRARY_PATH)
@@ -261,9 +269,17 @@ def porcupine_parsing():
         return args
 
 
-def timer():
+def timer1():
     global record_flag
     while True:
         if record_flag == 1:
-            time.sleep(3)
+            time.sleep(4)
             record_flag = 0
+
+
+def timer2():
+    global wakeword_flag
+    while True:
+        if wakeword_flag == 1:
+            time.sleep(12)
+            wakeword_flag = 0

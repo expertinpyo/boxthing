@@ -24,7 +24,10 @@ const QrcodeBox = () => {
       {link ? (
         <>
           <Qrcode link={link} />
-          <div css={{ marginTop: 16 }}>스캔하면 우째되는지에 대한 멘트</div>
+          <div css={{ marginTop: 16 }}>연동을 위한</div>
+          <div>
+            <span css={{ color: "blue" }}>QR 스캔</span> 부탁드립니다!
+          </div>
         </>
       ) : (
         <div>Loading...</div>

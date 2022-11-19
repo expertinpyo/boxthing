@@ -8,24 +8,24 @@ import PostureLineGraph from "../Posture/PostureLineGraph";
 import ToggleButton from "../Water/ToggleButton";
 import { useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { postureAvgState, runtimePostureState } from "../../store/posture";
+import {
+  cameraConnectionState,
+  postureAvgState,
+  postureState,
+} from "../../store/posture";
 import { socketState } from "../../store/socket";
-
-import Refresh from "../../asset/refresh.png";
 import { ptoggleState } from "../../store/nav";
+import NoRecord from "../../asset/no-recording.png";
 
 function PostureBox({ key }) {
+  const [cameraConnection, setCameraConnection] = useRecoilState(
+    cameraConnectionState
+  );
   const [state, setState] = useRecoilState(ptoggleState);
-  const runtime = useRecoilValue(runtimePostureState);
+  const posture = useRecoilValue(postureState);
   const avg = useRecoilValue(postureAvgState);
 
   const socket = useRecoilValue(socketState);
-  useEffect(() => {
-    if (socket && socket.readyState === 1) {
-      socket.send(JSON.stringify({ type: "log/posture/today", data: null }));
-      console.log("send lo g/posture/today message to server!");
-    }
-  }, [socket]);
 
   return (
     <motion.div
@@ -43,14 +43,37 @@ function PostureBox({ key }) {
       exit={{ transform: "translateY(100%)", opacity: 0 }}
       transition={{ duration: 0.5, ease: "circOut" }}
     >
+      {cameraConnection ? (
+        false
+      ) : (
+        <div
+          css={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "30%",
+            aspectRatio: "1/1",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            zIndex: 50,
+          }}
+        >
+          <img src={NoRecord} alt="" css={{ width: 200 }} />
+          <div css={{ fontWeight: "bold" }}>기준 사진 촬영이 필요합니다!</div>
+        </div>
+      )}
       <div css={{ position: "relative", width: "100%", height: "100%" }}>
         <div css={{ position: "absolute", top: 0, right: 0, zIndex: 10 }}>
           <ToggleButton
-            leftText={"RUNTIME"}
-            rightText={"TODAY"}
+            leftText={"TODAY"}
+            rightText={"RUNTIME"}
             onClick={() => {
               setState((pre) => !pre);
             }}
+            state={state}
           />
         </div>
         <div
@@ -74,6 +97,7 @@ function PostureBox({ key }) {
           onClick={() => {
             console.log("send reset message to server!");
             if (socket && socket.readyState === 1) {
+              setCameraConnection(true);
               socket.send(
                 JSON.stringify({ type: "posture/reset", data: null })
               );
@@ -90,10 +114,10 @@ function PostureBox({ key }) {
           }}
         >
           {state ? (
-            <PostureGraph data={runtime} />
+            <PostureGraph data={posture} />
           ) : (
             <div css={{ width: "100%", height: "100%" }}>
-              <PostureLineGraph />
+              <PostureLineGraph data={posture} />
               <div
                 css={{
                   position: "absolute",

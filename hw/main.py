@@ -3,11 +3,12 @@ import json
 import websockets.server as websockets
 from modules.water import return_water
 from modules.posture import Cam
-from modules.voice_cmd import give_events
+from modules.voice_cmd import give_events, recognize_boxthing
 import asyncio_mqtt as aiomqtt
 from dotenv import load_dotenv
 import os
 from os import environ
+from threading import Thread
 import logging
 
 from modules.api import (
@@ -41,10 +42,15 @@ class State:
 state = State()
 cam = Cam()
 
+th = Thread(target=cam.take_picture)
+th.start()
+
+
 async def ws_consumer(websocket):
     async for message in websocket:
         message_dict = json.loads(message)
-        type_list = message_dict["type"].split("/") if "type" in message_dict else [""]
+        type_list = message_dict["type"].split(
+            "/") if "type" in message_dict else [""]
         data = message_dict["data"] if "data" in message_dict else None
 
         logger.info(f"message from websocket type={type_list}")
@@ -64,16 +70,16 @@ async def ws_consumer(websocket):
 
         if type_list[0] == "posture":
             if type_list[1] == "reset":
-                await cam.stop()
+                cam.stop()
                 await ws_message_queue.put(("posture/ready", None))
             elif type_list[1] == "capture":
-                result = await cam.checking(data)
+                result = cam.checking(data)
                 if result:
                     await ws_message_queue.put(("posture/complete", None))
                 else:
-                    await ws_message_queue.put(("posture/nope", None)) 
+                    await ws_message_queue.put(("posture/nope", None))
             elif type_list[1] == "complete":
-                await cam.start()
+                cam.start()
 
 
 async def ws_producer(websocket):
@@ -127,7 +133,6 @@ async def ws_handler(websocket):
     state.github_notification_last_updated_at = None
 
     await mqtt_message_queue.put(("init", None))
-
 
 
 async def mqtt_consumer(client):
@@ -328,6 +333,7 @@ async def water_coroutine():
             await mqtt_message_queue.put(("water", water))
         await asyncio.sleep(0.1)
 
+
 async def motion_coro():
     async for image in cam.capture():
         print(image)
@@ -335,44 +341,68 @@ async def motion_coro():
         await mqtt_message_queue.put(("posture", image))
 
 
+async def recognize_boxthing_coroutine():
+    while True:
+        recognize_flag = recognize_boxthing()
+        if recognize_flag:
+            print("인식함")
+            await ws_message_queue.put(("send/cmd", None))
+        await asyncio.sleep(0.1)
+
+
 async def voice_command_coroutine():
 
     while True:
-        #await state.ws_connected.wait()
+        # await state.ws_connected.wait()
         voice_cmd = give_events()
         if voice_cmd:
             print(voice_cmd)
             if voice_cmd == "캘린더":
-                #print("calendar")
+                # print("calendar")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/calendar", None))
-            elif voice_cmd == "깃허브":
-                #print("Git")
+            elif voice_cmd == "깃허브" or voice_cmd == "기타부" or voice_cmd == "러브":
+                # print("Git")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/git", None))
-            elif voice_cmd == "자세":
-                #print("posture")
+            elif voice_cmd == "자세" or voice_cmd == "자세히":
+                # print("posture")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/posture", None))
-            elif voice_cmd == "음수량":
-                #print("water-check")
+            elif voice_cmd == "마신" or voice_cmd == "음수량" or voice_cmd == "맛있는" or voice_cmd == "마신물" or voice_cmd == "음주량" or voice_cmd == "미수령":
+                # print("water-check")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("route/water", None))
-            elif voice_cmd == "현재":
+            elif voice_cmd == "누적" or voice_cmd == "무적":
                 print("show_graph")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/posture/today", None))
-            elif voice_cmd == "진행":
+            elif voice_cmd == "실시간":
                 print("show_graph")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/posture/runtime", None))
             elif voice_cmd == "오늘":
                 print("show_graph")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/today", None))
-            elif voice_cmd == "일주일":
+            elif voice_cmd == "일주일" or voice_cmd == "통계" or voice_cmd == "공개" or voice_cmd == "홍게":
                 print("show_graph")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/week", None))
-            elif voice_cmd == "스트레칭":
-                #print("show_Stretching")
+            elif voice_cmd == "스트레칭" or voice_cmd == "채팅" or voice_cmd == "세팅" or voice_cmd == "쇼파":
+                # print("show_Stretching")
+                await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("stretch", None))
             elif voice_cmd == "사진":
                 print("take picture")
-                # await ws_message_queue.put(("posture/re", None))
+                await ws_message_queue.put(("success/cmd", None))
+                await ws_message_queue.put(("posture/re", None))
+            elif voice_cmd == "음성":
+                print("show voice_cmd")
+                await ws_message_queue.put(("success/cmd", None))
+                await ws_message_queue.put(("show/cmd", None))
             else:
+                await ws_message_queue.put(("fail/cmd", None))
                 print("unknown command")
 
         await asyncio.sleep(1)
@@ -395,7 +425,8 @@ async def main():
         github_notifications_coroutine(),
         water_coroutine(),
         voice_command_coroutine(),
-        motion_coro()
+        motion_coro(),
+        recognize_boxthing_coroutine()
     )
 
 

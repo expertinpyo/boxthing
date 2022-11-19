@@ -45,6 +45,7 @@ function WaterBox({ key }) {
             onClick={() => {
               setState((pre) => !pre);
             }}
+            state={state}
           />
         </div>
 

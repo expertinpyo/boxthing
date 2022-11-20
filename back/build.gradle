@@ -1,0 +1,115 @@
+buildscript {
+    // 1. query dsl version 정보 추가
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+plugins {
+	id 'org.springframework.boot' version '2.7.4'
+	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    // query dsl plugin 추가
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+	id 'java'
+  id 'com.diffplug.spotless' version '6.11.0'
+}
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+
+    // jwt
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // mqtt
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation 'org.springframework.integration:spring-integration-mqtt'
+    implementation 'com.google.code.gson:gson:2.10'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    compileOnly 'org.projectlombok:lombok'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // queryDsl
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    // ConfigurationProperties
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+}
+
+spotless  {
+  lineEndings "UNIX"
+
+  java {
+    targetExclude "build/**"
+
+    importOrder()
+    googleJavaFormat()
+    formatAnnotations()
+  }
+}
+
+bootRun {
+  dependsOn("spotlessApply")
+
+  if (file('.env').exists()) {
+    file('.env').readLines().each() {
+      if (!it.isEmpty() && !it.startsWith("#")) {
+        def pos = it.indexOf("=")
+        def key = it.substring(0, pos)
+        def value = it.substring(pos + 1)
+
+        if (System.getenv(key) == null) {
+          environment key, value
+        }
+      }
+    }
+  }
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+def querydslDir = "$buildDir/generated/querydsl"
+// JPA 사용 여부와 사용할 경로를 설정
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+// build 시 사용할 sourceSet 추가
+sourceSets {
+    main.java.srcDir querydslDir
+}
+// querydsl 컴파일시 사용할 옵션 설정
+compileQuerydsl{
+    options.annotationProcessorPath = configurations.querydsl
+}
+// querydsl 이 compileClassPath 를 상속하도록 설정
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}

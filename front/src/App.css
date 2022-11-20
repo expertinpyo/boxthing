@@ -1,0 +1,44 @@
+.App {
+  /* min-height: calc(var(--vh) * 100); 설정 시 자식 element가 height: 100% 해도 not working! */
+  /* min-height 와 height는 결이 다른 property 인 듯 */
+  height: 100vh;
+  /* height: 100vh; */
+  display: flex;
+  flex-direction: column;
+  /* background-color: #8ec5fc;
+  background-image: linear-gradient(
+    62deg,
+    #8ec5fc 0%,
+    #e0c3fc 50%,
+    #95f2ff 100%
+  ); */
+  position: relative;
+
+  /* background-image: url(./asset/Honeydew.jpg);
+  background-size: cover; */
+}
+
+.video-container {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -100;
+  overflow: hidden;
+}
+.video-container video {
+  /* Make video to at least 100% wide and tall */
+  min-width: 100%;
+  min-height: 100%;
+
+  /* Setting width & height to auto prevents the browser from stretching or squishing the video */
+  width: auto;
+  height: auto;
+
+  /* Center the video */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

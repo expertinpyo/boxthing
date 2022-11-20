@@ -1,0 +1,42 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+    show-sql: true
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: "jdbc:mariadb://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}"
+    username: "${MYSQL_USER}"
+    password: "${MYSQL_PASSWORD}"
+    driver-class-name: org.mariadb.jdbc.Driver
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "${OAUTH2_GOOGLE_CLIENT_ID}"
+            client-secret: "${OAUTH2_GOOGLE_CLIENT_SECRET}"
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - profile
+              - email
+              - https://www.googleapis.com/auth/calendar.readonly
+          github:
+            client-id: "${OAUTH2_GITHUB_CLIENT_ID}"
+            client-secret: "${OAUTH2_GITHUB_CLIENT_SECRET}"
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - notifications
+mqtt:
+  BASE_TOPIC: "${BASE_TOPIC}"
+  BROKER_URL: "${BROKER_URL}"
+
+urlmaker:
+  scheme: "${LOGIN_SCHEME}"
+  host: "${LOGIN_HOST}"

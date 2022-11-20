@@ -389,7 +389,7 @@ async def voice_command_coroutine():
                 print("show_graph")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("toggle/water/week", None))
-            elif voice_cmd == "스트레칭" or voice_cmd == "채팅" or voice_cmd == "세팅" or voice_cmd == "쇼파":
+            elif voice_cmd == "스트레칭" or voice_cmd == "채팅" or voice_cmd == "세팅" or voice_cmd == "쇼파" or voice_cmd == "트레이딩" or voice_cmd == "스트레스" or voice_cmd == "스케쥴":
                 # print("show_Stretching")
                 await ws_message_queue.put(("success/cmd", None))
                 await ws_message_queue.put(("stretch", None))

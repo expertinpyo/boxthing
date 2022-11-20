@@ -63,9 +63,14 @@
 
 ### HW
 
--
--
--
+- Debian 10 (buster)
+- Python: 3.7.3
+- OpenCV: 4.6.0
+- cvlib: 0.2.7
+- dlib: 19.24.0
+- google-cloud-speech: 2.16.2
+- pvporcupine: 2.1.4
+- pvrecorder: 1.1.1
 
 ## 📺 ScreenShot
 
@@ -132,8 +137,8 @@
 
 | Name   | Email              | Position |
 | ------ | ------------------ | -------- |
-| 김지인 |                    |          |
-| 윤경식 | didnlie@naver.com  | FE       |
-| 정재훈 |                    |          |
-| 한동현 |                    |          |
-| 홍인표 | ypd02363@naver.com | BE       |
+| 김지인 | skygazer227@gmail.com | BE, HW |
+| 윤경식 | didnlie@naver.com   | FE       |
+| 정재훈 | jaeung644@gmail.com | HW      |
+| 한동현 | handh0519@naver.com | 팀장, HW |
+| 홍인표 | ypd02363@naver.com  | BE       |

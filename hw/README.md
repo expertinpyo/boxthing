@@ -21,7 +21,8 @@
 - Raspberry Pi 4
 - USB Mic
 - USB Webcam
-- 로드셀(?)
+- Load Cell
+- HX711
 - LCD Display (1024x600)
 
 ## 세팅
@@ -162,6 +163,45 @@ python3 -c "import cvlib; print(cvlib.__version__)"
 
 에러 없을 시 정상
 
+
+### 4. LoadCell, HX711 설정
+#### 선 연결
+* Ground: 9번 핀
+* VCC: 2번 핀
+* SCK: 8번 핀(GPIO 14)
+* DT: 10번 핀(GPIO 15)
+
+연결 후 프로그램 동작 했을 때 Tare Done! 문구 출력되면 정상
+
+
+### 5. SmartThings 세팅
+#### 1. 필수 패키지 설치
+    ```
+    sudo apt-get install gcc make git wget pythono3-serial python3-cryptography
+    sudo apt-get install cmake gperf ninja-build ccache libncurses-dev flex bison libffi-dev libssl-dev python3-future python3-pyparsing python3-pyelftools
+    sudo apt-get install libpthread-stubs0-dev
+    pip3 install --user pynacl
+    sudo apt-get install python3-pil
+    pip3 install --user qrcode
+    pip3 install --user pillow
+    sudo apt-get install libopenjp2-7
+    ```
+
+#### 2. Device Library Build
+    ```
+    cd ~/rpi-st-device
+    ./sdkbuildsetup
+    cd ~/st-device-sdk-c
+    make
+    ```
+
+#### 3. Developer WorkSpace에서 스마트싱스 등록
+
+#### 4. 라즈베리파이 AP모드 변환
+
+#### 5. 스마트싱스 어플리케이션에 등록
+
+
 ## 실행
 
 ### .env 설정
@@ -188,9 +228,14 @@ python3 -c "import cvlib; print(cvlib.__version__)"
 - RECORD_PATH : 녹음 후 저장되는 경로, 어느 경로든 상관없음
 
 ### 실행
-
+#### main.py
 ```
 python3 main.py
+```
+#### 스마트싱스
+```
+cd ~/st-device-sdk-c/example
+./example
 ```
 
 ## 차후 보완점
